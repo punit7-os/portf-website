@@ -1,0 +1,22 @@
+{% extends "shop/base.html" %}
+{% block title %}Your Shopping Cart{% endblock %}
+
+{% block content %}
+<h1>🛍️ Your Shopping Cart</h1>
+
+<p><a href="{% url 'shop:product_list' %}">⬅️ Continue Shopping</a></p>
+
+<ul>
+    {% for item in cart %}
+    <li>
+        {{ item.product.name }} — {{ item.quantity }} × 💰 {{ item.product.price }} =
+        <strong>💰 {{ item.total_price }}</strong>
+        <a href="{% url 'shop:cart_remove' item.product.id %}">❌ Remove</a>
+    </li>
+    {% empty %}
+    <p>Your cart is empty.</p>
+    {% endfor %}
+</ul>
+
+<h3>Total: 💰 {{ cart.get_total_price }}</h3>
+{% endblock %}

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Punit Patel | Portfolio</title>
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+    body { background: #f4f6f9; color: #333; }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #007BFF, #0056b3);
+      color: white;
+      padding: 50px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 3rem; margin-bottom: 10px; }
+    header p { font-size: 1.2rem; opacity: 0.9; }
+
+    /* Navigation */
+    nav {
+      display: flex; justify-content: center; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    nav a {
+      padding: 15px 20px; text-decoration: none; color: #007BFF; font-weight: 600;
+      transition: 0.3s;
+    }
+    nav a:hover { background: #007BFF; color: white; border-radius: 5px; }
+
+    /* Sections */
+    section { padding: 60px 20px; text-align: center; }
+    section h2 { font-size: 2.2rem; margin-bottom: 20px; color: #0056b3; }
+
+    /* About */
+    #about { background: #ffffff; }
+    #about p { max-width: 700px; margin: auto; font-size: 1.1rem; line-height: 1.7; }
+
+    /* Skills */
+    #skills { background: #e9f5ff; }
+    .skill { display: inline-block; background: white; margin: 10px; padding: 15px 25px;
+      border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-weight: bold; }
+
+    /* Projects */
+    #projects { background: #ffffff; }
+    .project {
+      display: inline-block; width: 280px; margin: 15px; background: #f9f9f9; border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; transition: 0.3s;
+    }
+    .project:hover { transform: scale(1.05); }
+    .project img { width: 100%; height: 180px; object-fit: cover; }
+    .project h3 { margin: 15px; font-size: 1.2rem; color: #007BFF; }
+    .project p { margin: 0 15px 20px; font-size: 0.95rem; }
+
+    /* Contact */
+    #contact { background: #f1f8f6; }
+    #contact a {
+      display: inline-block; margin: 10px; padding: 12px 24px;
+      border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;
+    }
+    .btn-hire { background: #007BFF; color: white; }
+    .btn-hire:hover { background: #0056b3; }
+    .btn-work { background: #28a745; color: white; }
+    .btn-work:hover { background: #1e7e34; }
+
+    /* Footer */
+    footer {
+      background: #007BFF; color: white; padding: 20px; text-align: center;
+      margin-top: 30px;
+    }
+    .projects-section {
+  padding: 60px 20px;
+  background: #f8f9fb;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.project-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.project-content {
+  padding: 20px;
+}
+
+.project-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.project-content p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.project-link {
+  display: inline-block;
+  padding: 10px 15px;
+  background: #007bff;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.project-link:hover {
+  background: #0056b3;
+}
+.project-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.project-card:hover .project-img {
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 14px 30px rgba(2,6,23,0.12);
+}
+
+/* small responsive tweak */
+@media (max-width:600px){
+  .project-img { height: 160px; }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>👋 Hi, I'm Punit Patel</h1>
+    <p>Web Developer | Python | Django | AWS | Freelancer</p>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <!-- About -->
+  <section id="about">
+    <h2>About Me</h2>
+    <p>
+      I am a passionate Web Developer and Freelancer with expertise in building
+      modern, scalable, and user-friendly applications using Django, Python, and AWS.
+      I help businesses and entrepreneurs bring their ideas to life with clean code and
+      attractive design.
+    </p>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills">
+    <h2>My Skills</h2>
+    <div class="skill">Python</div>
+    <div class="skill">Django</div>
+    <div class="skill">HTML & CSS</div>
+    <div class="skill">JavaScript</div>
+    <div class="skill">AWS</div>
+    <div class="skill">SQL</div>
+  </section>
+
+  <!-- Projects -->
+  <!-- Projects Section -->
+<section id="projects" class="projects-section">
+  <h2 class="section-title">🚀 My Projects</h2>
+  <p class="section-subtitle">Showcasing work that blends creativity with functionality</p>
+
+  <div class="projects-grid">
+    <!-- Project 1: Portfolio Website -->
+{% load static %}
+    <div class="project-card">
+  <img src="{% static 'images/projects/portfolio.png' %}" alt="Portfolio Website Screenshot" class="project-img">
+  <div class="project-content">
+    <h3>Portfolio Website</h3>
+    <p>A professional portfolio built with Django, HTML/CSS/JS and deployed on AWS — optimised for conversions and clarity.</p>
+    <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+  </div>
+</div>
+
+
+    <!-- Project 2 Placeholder -->
+    <div class="project-card">
+      <img src="images/ecommerce.jpg" alt="E-commerce Store">
+      <div class="project-content">
+        <h3>E-commerce Store</h3>
+        <p>A fully functional e-commerce website with product management, cart, and payment gateway integration.</p>
+        <a href="{% url 'shop:product_list' %}" target="_blank" class="project-link">🔗 View Project</a>
+      </div>
+    </div>
+
+    <!-- Project 3 Placeholder -->
+    <div class="project-card">
+      <img src="images/blog.jpg" alt="Blog System">
+      <div class="project-content">
+        <h3>Blog System</h3>
+        <p>A blog/CMS platform with categories, comments, and SEO-friendly design.</p>
+        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+      </div>
+    </div>
+
+    <!-- Project 4 Placeholder -->
+    <div class="project-card">
+      <img src="images/api.jpg" alt="API Integration">
+      <div class="project-content">
+        <h3>API Integration</h3>
+        <p>Project using REST APIs to fetch and display live weather, stock market, or crypto data.</p>
+        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+      </div>
+    </div>
+
+    <!-- Project 5 Placeholder -->
+    <div class="project-card">
+      <img src="images/dashboard.jpg" alt="Data Dashboard">
+      <div class="project-content">
+        <h3>Data Dashboard</h3>
+        <p>An interactive analytics dashboard with charts, filters, and insights.</p>
+        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+      </div>
+    </div>
+
+    <!-- Project 6 Placeholder -->
+    <div class="project-card">
+      <img src="images/automation.jpg" alt="Automation Project">
+      <div class="project-content">
+        <h3>Automation/Bot</h3>
+        <p>Automation scripts (like scrapers, trading bots, or email senders) to showcase technical problem-solving skills.</p>
+        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Punit Patel | Designed with ❤️ and Django</p>
+  </footer>
+
+</body>
+</html>

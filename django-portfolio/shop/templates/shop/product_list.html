@@ -1,0 +1,25 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Shop - My Shoppings{% endblock %}
+{% block content %}
+
+<h2>🛍️ Available Products</h2>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+  {% for product in products %}
+  <div style="border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;background:#fff;">
+    <a href="{% url 'shop:product_detail' product.slug %}">
+      <img src="{{ product.image_url|default:'https://via.placeholder.com/180x150' }}" alt="{{ product.name }}" style="width:180px;height:150px;object-fit:cover;border-radius:8px;">
+    </a>
+    <h3>{{ product.name }}</h3>
+    <p>₹ {{ product.price }}</p>
+    <a href="{% url 'shop:cart_add' product.id %}">
+      <button style="background:#007BFF;color:white;border:none;padding:8px 14px;border-radius:6px;">Add to Cart</button>
+    </a>
+  </div>
+  {% empty %}
+  <p>No products available.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

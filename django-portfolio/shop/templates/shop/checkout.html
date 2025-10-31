@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Checkout</title>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, Arial;
+      background: #f6f8fb;
+      margin: 0;
+      color: #333;
+    }
+    .wrap {
+      max-width: 700px;
+      margin: 24px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      padding: 24px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    .cart-item {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+    .suggestions {
+      margin-top: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.05);
+      overflow: hidden;
+      text-align: center;
+      padding-bottom: 8px;
+    }
+    .card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Checkout</h1>
+
+    {% if cart %}
+      <h2>Your Cart</h2>
+      {% for item in cart %}
+        <div class="cart-item">
+          <div style="display:flex;align-items:center;">
+            <img src="{{ item.product.image_url|default:'https://via.placeholder.com/60' }}" alt="">
+            <div>
+              <strong>{{ item.product.name }}</strong><br>
+              ₹ {{ item.product.price }} × {{ item.quantity }}
+            </div>
+          </div>
+          <div><strong>₹ {{ item.total_price }}</strong></div>
+        </div>
+      {% endfor %}
+      <h3 style="text-align:right;">Total: ₹ {{ cart.get_total_price }}</h3>
+      <hr>
+      <form method="post">
+        {% csrf_token %}
+        <label>Email for receipt</label>
+        <input type="email" name="email" required placeholder="you@example.com">
+        <button type="submit">Place Order (Demo)</button>
+      </form>
+    {% else %}
+      <p>Your cart is empty.</p>
+    {% endif %}
+
+    <p style="margin-top:12px;"><em>Note: Demo checkout (no payment).</em></p>
+
+    {% if suggestions %}
+    <div class="suggestions">
+      <h2>You may also like</h2>
+      <div class="grid">
+        {% for p in suggestions %}
+        <div class="card">
+          <a href="{% url 'shop:product_detail' p.slug %}">
+            <img src="{{ p.image_url|default:'https://via.placeholder.com/150x120' }}" alt="{{ p.name }}">
+          </a>
+          <div><strong>{{ p.name }}</strong></div>
+          <div>₹ {{ p.price }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
