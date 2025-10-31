@@ -3,23 +3,26 @@
 {% block title %}Shop - My Shoppings{% endblock %}
 {% block content %}
 
-<h2>🛍️ Available Products</h2>
-
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-  {% for product in products %}
-  <div style="border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;background:#fff;">
-    <a href="{% url 'shop:product_detail' product.slug %}">
-      <img src="{{ product.image_url|default:'https://via.placeholder.com/180x150' }}" alt="{{ product.name }}" style="width:180px;height:150px;object-fit:cover;border-radius:8px;">
-    </a>
-    <h3>{{ product.name }}</h3>
-    <p>₹ {{ product.price }}</p>
-    <a href="{% url 'shop:cart_add' product.id %}">
-      <button style="background:#007BFF;color:white;border:none;padding:8px 14px;border-radius:6px;">Add to Cart</button>
-    </a>
-  </div>
+<div class="grid">
+  {% for p in products %}
+    <div class="card">
+      <a href="{% url 'shop:product_detail' p.slug %}">
+        <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
+      </a>
+      <div class="p">
+        <div><a href="{% url 'shop:product_detail' p.slug %}"><strong>{{ p.name }}</strong></a></div>
+        <div class="price">₹ {{ p.price }}</div>
+        <form action="{% url 'shop:cart_add' p.id %}" method="post" class="cart-btn">
+          {% csrf_token %}
+          <input type="number" name="qty" value="1" min="1">
+          <button type="submit" class="add">Add to Cart</button>
+        </form>
+      </div>
+    </div>
   {% empty %}
-  <p>No products available.</p>
+    <p>No products found.</p>
   {% endfor %}
 </div>
+
 
 {% endblock %}

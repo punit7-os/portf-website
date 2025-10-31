@@ -6,6 +6,7 @@ app_name = 'shop'
 urlpatterns = [
     # Product pages
     path('', views.product_list, name='product_list'),
+    path('search/', views.search_products, name='search_products'),
     path('c/<slug:slug>/', views.product_list, name='product_list_by_category'),
     path('<slug:slug>/', views.product_detail, name='product_detail'),
 
@@ -19,8 +20,7 @@ urlpatterns = [
     path('checkout/success/', views.checkout_success, name='checkout_success'),
 
     # # Pasteables
-    # path('<slug:slug>/', views.product_detail, name='product_detail'),
-    # path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'),
+    
 
 
 ]

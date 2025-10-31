@@ -116,3 +116,13 @@ def checkout(request):
 def checkout_success(request):
     suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
     return render(request, "shop/checkout_success.html", {"suggestions": suggestions})
+
+
+from django.shortcuts import render
+from .models import Product
+
+def search_products(request):
+    query = request.GET.get('q', '')
+    products = Product.objects.filter(name__icontains=query) if query else Product.objects.all()
+    return render(request, 'shop/product_list_partial.html', {'products': products})
+

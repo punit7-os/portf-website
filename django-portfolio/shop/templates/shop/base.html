@@ -1,54 +1,218 @@
+{% load static %}
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}My Shop{% endblock %}</title>
+  <title>{% block title %}My Shoppings{% endblock %}</title>
+
   <style>
     body {
-      font-family: Segoe UI, Tahoma, Arial;
-      background: #f6f8fb;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
       margin: 0;
+      background: #f6f8fb;
+      color: #333;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
+
+    /* ===== HEADER ===== */
     header {
       background: #007BFF;
       color: #fff;
-      padding: 14px 24px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+    header .left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
     }
     header a {
-      color: #fff;
+      color: #ffd43b;
       text-decoration: none;
-      margin: 0 10px;
       font-weight: 500;
     }
-    header a:hover {
-      text-decoration: underline;
+
+    /* ===== FLOATING SEARCH BAR ===== */
+    .floating-search {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 30px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 90%;
+      max-width: 400px;
+      transition: all 0.3s ease;
     }
+    .floating-search input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 15px;
+      color: #333;
+    }
+    .floating-search button {
+      background: #007BFF;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.2s ease;
+    }
+    .floating-search button:hover {
+      background: #0056b3;
+    }
+
+    /* ===== MAIN WRAPPER ===== */
     main {
-      max-width: 1000px;
-      margin: 24px auto;
+      flex: 1;
+      max-width: 1200px;
+      margin: 100px auto 24px auto;
+      padding: 0 16px;
+      width: 100%;
+    }
+
+    /* ===== GRID READY STYLES ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      justify-items: center;
+    }
+
+    .card {
       background: #fff;
-      padding: 24px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 280px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease-out;
+    }
+    .card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      background: #f9f9f9;
+    }
+    .p {
+      padding: 12px;
+    }
+    .price {
+      font-weight: 700;
+      color: #007BFF;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: #f0f0f0;
+      color: #333;
+      text-align: center;
+      padding: 12px;
+      font-size: 14px;
+      border-top: 1px solid #ddd;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .floating-search {
+        top: 10px;
+        width: 92%;
+        max-width: 350px;
+      }
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .floating-search {
+        padding: 6px 12px;
+      }
+      .floating-search button {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
-<body>
-  <header>
-    <div>
-      <a href="{% url 'shop:product_list' %}"><strong>🛒 My Shop</strong></a>
-    </div>
-    <div>
-      <a href="{% url 'shop:cart_detail' %}">Cart</a>
-      <a href="{% url 'shop:checkout' %}">Checkout</a>
-    </div>
-  </header>
 
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+<body>
+
+<!-- ✅ Floating Search Bar -->
+<form class="floating-search" method="get" action="{% url 'shop:product_list' %}">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search for products...">
+  <button type="submit">🔍</button>
+</form>
+
+<header>
+  <div class="left">
+    <h1>🛍️ My Shoppings</h1>
+  </div>
+  <div>
+    <a href="{% url 'shop:cart_detail' %}">🛒 Cart</a>
+    <a href="{% url 'shop:checkout' %}">Checkout</a>
+  </div>
+</header>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  © {{ now|date:"Y" }} My Shoppings. All rights reserved.
+</footer>
+
+<script>
+  const cards = document.querySelectorAll('.card');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  cards.forEach(card => observer.observe(card));
+</script>
+
 </body>
 </html>
