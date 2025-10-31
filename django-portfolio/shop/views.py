@@ -126,3 +126,17 @@ def search_products(request):
     products = Product.objects.filter(name__icontains=query) if query else Product.objects.all()
     return render(request, 'shop/product_list_partial.html', {'products': products})
 
+from django.http import JsonResponse
+from .models import Product
+
+def ajax_search(request):
+    q = request.GET.get('q', '')
+    results = []
+    if q:
+        products = Product.objects.filter(name__icontains=q)[:10]
+        results = [
+            {"name": p.name, "slug": p.slug, "price": float(p.price)} for p in products
+        ]
+    return JsonResponse({"results": results})
+
+

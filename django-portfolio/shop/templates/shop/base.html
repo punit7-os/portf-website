@@ -212,6 +212,84 @@
   }, { threshold: 0.1 });
 
   cards.forEach(card => observer.observe(card));
+
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.querySelector('.floating-search input[name="q"]');
+  const searchForm = document.querySelector('.floating-search');
+  let resultBox = document.createElement('div');
+  resultBox.className = 'live-results';
+  searchForm.appendChild(resultBox);
+
+  // Style for dropdown results
+  const style = document.createElement('style');
+  style.textContent = `
+    .live-results {
+      position: absolute;
+      top: 105%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      overflow: hidden;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 9999;
+    }
+    .live-results a {
+      display: block;
+      padding: 10px 14px;
+      text-decoration: none;
+      color: #333;
+      border-bottom: 1px solid #eee;
+      transition: background 0.2s;
+    }
+    .live-results a:hover {
+      background: #f7f9fc;
+    }
+    .live-results .no-result {
+      padding: 10px 14px;
+      color: #666;
+      text-align: center;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Live search
+  searchInput.addEventListener('input', async function () {
+    const query = this.value.trim();
+    if (query.length < 2) {
+      resultBox.style.display = 'none';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/shop/ajax/search/?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      resultBox.innerHTML = '';
+      if (data.results.length === 0) {
+        resultBox.innerHTML = '<div class="no-result">No products found</div>';
+      } else {
+        data.results.forEach(p => {
+          const item = document.createElement('a');
+          item.href = `/shop/${p.slug}/`;
+          item.innerHTML = `${p.name}`;
+          resultBox.appendChild(item);
+        });
+      }
+      resultBox.style.display = 'block';
+    } catch (err) {
+      console.error('Search error:', err);
+    }
+  });
+
+  // Hide dropdown when clicked outside
+  document.addEventListener('click', (e) => {
+    if (!searchForm.contains(e.target)) resultBox.style.display = 'none';
+  });
+});
 </script>
 
 </body>
