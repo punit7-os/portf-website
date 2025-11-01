@@ -6,6 +6,13 @@ from .cart import Cart
 
 CART_KEY = "cart"
 
+from django.shortcuts import redirect, get_object_or_404
+from .models import Product
+from .cart import Cart  # assuming your cart logic is in cart.py
+
+
+
+
 def _get_cart(session):
     return session.get(CART_KEY, {})
 
@@ -139,4 +146,11 @@ def ajax_search(request):
         ]
     return JsonResponse({"results": results})
 
+
+def buy_now(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart = Cart(request)
+    cart.clear()  # clear previous cart to make single-product checkout
+    cart.add(product=product, quantity=1)
+    return redirect('shop:checkout')
 

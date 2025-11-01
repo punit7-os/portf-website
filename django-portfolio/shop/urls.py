@@ -15,10 +15,12 @@ urlpatterns = [
     # Cart pages
     path('cart/', views.cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'),
+    path('buy/<int:product_id>/', views.buy_now, name='buy_now'),
     path('cart/remove/<int:product_id>/', views.cart_remove, name='cart_remove'),
 
     # Checkout
     path('checkout/', views.checkout, name='checkout'),
+
     path('checkout/success/', views.checkout_success, name='checkout_success'),
 
     # # Pasteables

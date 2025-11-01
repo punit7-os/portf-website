@@ -29,20 +29,21 @@
       position: relative;
       z-index: 2;
     }
-    header .left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+
     header h1 {
       margin: 0;
       font-size: 22px;
     }
+
     header a {
       color: #ffd43b;
       text-decoration: none;
       font-weight: 500;
+      margin-left: 10px;
+    }
+
+    header a:hover {
+      text-decoration: underline;
     }
 
     /* ===== FLOATING SEARCH BAR ===== */
@@ -52,8 +53,8 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: 30px;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
       padding: 8px 16px;
@@ -61,9 +62,9 @@
       align-items: center;
       gap: 10px;
       width: 90%;
-      max-width: 400px;
-      transition: all 0.3s ease;
+      max-width: 420px;
     }
+
     .floating-search input[type="text"] {
       flex: 1;
       padding: 10px 14px;
@@ -73,6 +74,7 @@
       font-size: 15px;
       color: #333;
     }
+
     .floating-search button {
       background: #007BFF;
       border: none;
@@ -83,11 +85,12 @@
       font-size: 18px;
       transition: background 0.2s ease;
     }
+
     .floating-search button:hover {
       background: #0056b3;
     }
 
-    /* ===== MAIN WRAPPER ===== */
+    /* ===== MAIN CONTENT ===== */
     main {
       flex: 1;
       max-width: 1200px;
@@ -96,7 +99,7 @@
       width: 100%;
     }
 
-    /* ===== GRID READY STYLES ===== */
+    /* ===== PRODUCT GRID ===== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -114,29 +117,90 @@
       justify-content: space-between;
       width: 100%;
       max-width: 280px;
+      transition: all 0.3s ease;
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.6s ease-out;
     }
+
     .card.show {
       opacity: 1;
       transform: translateY(0);
     }
+
     .card:hover {
       transform: translateY(-5px);
     }
+
     .card img {
       width: 100%;
       height: 200px;
       object-fit: contain;
       background: #f9f9f9;
     }
+
     .p {
       padding: 12px;
+      text-align: center;
     }
+
     .price {
       font-weight: 700;
       color: #007BFF;
+    }
+
+    /* ===== UNIFORM BUTTONS SIDE BY SIDE ===== */
+    .cart-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px 15px 12px;
+    }
+
+    .cart-btn form {
+      flex: 1;
+      margin: 0;
+      max-width: 140px;
+    }
+
+    .cart-btn button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      height: 45px;
+    }
+
+    /* Add to Cart Button */
+    .add {
+      background: linear-gradient(135deg, #007BFF, #00C6FF);
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+
+    .add:hover {
+      transform: translateY(-2px) scale(1.03);
+      background: linear-gradient(135deg, #0062cc, #00a3cc);
+    }
+
+    .add.added {
+      background: linear-gradient(135deg, #28a745, #6ddf72);
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Buy Now Button */
+    .buy {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+    }
+
+    .buy:hover {
+      transform: translateY(-2px) scale(1.03);
+      background: linear-gradient(135deg, #ff5f50, #fdaf6b);
     }
 
     /* ===== FOOTER ===== */
@@ -150,147 +214,95 @@
     }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .floating-search {
-        top: 10px;
-        width: 92%;
-        max-width: 350px;
-      }
-      .grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      }
-    }
-
     @media (max-width: 480px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
       }
-      .floating-search {
-        padding: 6px 12px;
+      .cart-btn {
+        flex-direction: column;
       }
-      .floating-search button {
-        font-size: 16px;
+      .cart-btn form {
+        max-width: none;
+        width: 100%;
+      }
+      .cart-btn button {
+        width: 100%;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- ✅ Floating Search Bar -->
+  <form class="floating-search" method="get" action="{% url 'shop:product_list' %}">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search for products...">
+    <button type="submit">🔍</button>
+  </form>
 
-<!-- ✅ Floating Search Bar -->
-<form class="floating-search" method="get" action="{% url 'shop:product_list' %}">
-  <input type="text" name="q" value="{{ query }}" placeholder="Search for products...">
-  <button type="submit">🔍</button>
-</form>
-
-<header>
-  <div class="left">
+  <header>
     <h1>🛍️ My Shoppings</h1>
-  </div>
-  <div>
-    <a href="{% url 'shop:cart_detail' %}">🛒 Cart</a>
-    <a href="{% url 'shop:checkout' %}">Checkout</a>
-  </div>
-</header>
+    <div>
+      <a href="{% url 'shop:cart_detail' %}">🛒 Cart</a>
+      <a href="{% url 'shop:checkout' %}">💳 Checkout</a>
+    </div>
+  </header>
 
-<main>
-  {% block content %}{% endblock %}
-</main>
+  <main>
+    {% block content %}
+    <!-- Example Product Card -->
+    <div class="grid">
+      <div class="card">
+        <img src="{% static 'images/sample.jpg' %}" alt="Sample Product">
+        <div class="p">
+          <h3>Sample Product</h3>
+          <p class="price">₹499</p>
+        </div>
 
-<footer>
-  © {{ now|date:"Y" }} My Shoppings. All rights reserved.
-</footer>
+        <!-- ✅ Buttons Side by Side, Equal Size -->
+        <div class="cart-btn">
+          <form action="{% url 'shop:cart_add' 1 %}" method="post" class="cart-form">
+            {% csrf_token %}
+            <button type="button" class="add">🛒 Add to Cart</button>
+          </form>
+          <form action="{% url 'shop:buy_now' 1 %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy">⚡ Buy Now</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+  </main>
 
-<script>
-  const cards = document.querySelectorAll('.card');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('show');
+  <footer>
+    © {{ now|date:"Y" }} My Shoppings. All rights reserved.
+  </footer>
+
+  <script>
+    // Animate cards on scroll
+    const cards = document.querySelectorAll('.card');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.1 });
+    cards.forEach(card => observer.observe(card));
+
+    // Add to cart toggle animation
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add')) {
+        e.preventDefault();
+        const btn = e.target;
+        btn.textContent = '✅ Added';
+        btn.classList.add('added');
+        const form = btn.closest('form');
+        if (form) form.submit();
+        setTimeout(() => {
+          btn.textContent = '🛒 Add to Cart';
+          btn.classList.remove('added');
+        }, 2000);
       }
     });
-  }, { threshold: 0.1 });
-
-  cards.forEach(card => observer.observe(card));
-
-document.addEventListener("DOMContentLoaded", function () {
-  const searchInput = document.querySelector('.floating-search input[name="q"]');
-  const searchForm = document.querySelector('.floating-search');
-  let resultBox = document.createElement('div');
-  resultBox.className = 'live-results';
-  searchForm.appendChild(resultBox);
-
-  // Style for dropdown results
-  const style = document.createElement('style');
-  style.textContent = `
-    .live-results {
-      position: absolute;
-      top: 105%;
-      left: 0;
-      right: 0;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      overflow: hidden;
-      display: none;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 9999;
-    }
-    .live-results a {
-      display: block;
-      padding: 10px 14px;
-      text-decoration: none;
-      color: #333;
-      border-bottom: 1px solid #eee;
-      transition: background 0.2s;
-    }
-    .live-results a:hover {
-      background: #f7f9fc;
-    }
-    .live-results .no-result {
-      padding: 10px 14px;
-      color: #666;
-      text-align: center;
-    }
-  `;
-  document.head.appendChild(style);
-
-  // Live search
-  searchInput.addEventListener('input', async function () {
-    const query = this.value.trim();
-    if (query.length < 2) {
-      resultBox.style.display = 'none';
-      return;
-    }
-
-    try {
-      const response = await fetch(`/shop/ajax/search/?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
-
-      resultBox.innerHTML = '';
-      if (data.results.length === 0) {
-        resultBox.innerHTML = '<div class="no-result">No products found</div>';
-      } else {
-        data.results.forEach(p => {
-          const item = document.createElement('a');
-          item.href = `/shop/${p.slug}/`;
-          item.innerHTML = `${p.name}`;
-          resultBox.appendChild(item);
-        });
-      }
-      resultBox.style.display = 'block';
-    } catch (err) {
-      console.error('Search error:', err);
-    }
-  });
-
-  // Hide dropdown when clicked outside
-  document.addEventListener('click', (e) => {
-    if (!searchForm.contains(e.target)) resultBox.style.display = 'none';
-  });
-});
-</script>
-
+  </script>
 </body>
 </html>
