@@ -78,10 +78,7 @@
 
   .add.added {
     background: #28a745 !important;
-  }
-
-  .add.added::after {
-    content: ' ✅';
+    color: white;
   }
 
   .buy {
@@ -139,7 +136,11 @@
       });
       if (response.ok) {
         button.classList.add('added');
-        button.textContent = '✅ Added';
+        button.textContent = 'Added ✅'; // ✅ Only one checkmark now
+        setTimeout(() => {
+          button.classList.remove('added');
+          button.textContent = '🛒 Add to Cart';
+        }, 1500);
       }
     });
   });

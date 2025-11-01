@@ -1,18 +1,13 @@
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.http import JsonResponse
 from .models import Category, Product, Order
 from .cart import Cart
 
 CART_KEY = "cart"
 
-from django.shortcuts import redirect, get_object_or_404
-from .models import Product
-from .cart import Cart  # assuming your cart logic is in cart.py
-
-
-
-
+# --- Utility Cart Functions ---
 def _get_cart(session):
     return session.get(CART_KEY, {})
 
@@ -65,7 +60,6 @@ def cart_add(request, product_id):
         qty = 1
     cart.add(product=product, quantity=qty, update_quantity=False)
     return redirect("shop:cart_detail")
-    # return redirect('shop:product_list')
 
 
 # ❌ REMOVE FROM CART
@@ -100,7 +94,22 @@ def cart_detail(request):
 
 # 💳 CHECKOUT
 def checkout(request):
+    """
+    If ?buy=<product_id> is present, clear cart, add only that product, then render checkout.
+    Otherwise use current cart.
+    """
+    buy_id = request.GET.get('buy')
     cart = Cart(request)
+
+    if buy_id:
+        try:
+            product = Product.objects.get(id=int(buy_id), is_active=True)
+        except (Product.DoesNotExist, ValueError):
+            return redirect('shop:product_list')
+        # Single product checkout mode
+        cart.clear()
+        cart.add(product=product, quantity=1)
+
     if len(cart) == 0:
         return redirect("shop:product_list")
 
@@ -117,7 +126,8 @@ def checkout(request):
         items.append(item)
         total += item["total_price"]
 
-    return render(request, "shop/checkout.html", {"cart_items": items, "total": total})
+    suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
+    return render(request, "shop/checkout.html", {"cart": cart, "cart_items": items, "total": total, "suggestions": suggestions})
 
 
 # ✅ CHECKOUT SUCCESS
@@ -126,35 +136,25 @@ def checkout_success(request):
     return render(request, "shop/checkout_success.html", {"suggestions": suggestions})
 
 
-from django.shortcuts import render
-from .models import Product
-
+# 🔍 SEARCH (FULL & AJAX)
 def search_products(request):
     query = request.GET.get('q', '')
     products = Product.objects.filter(name__icontains=query) if query else Product.objects.all()
     return render(request, 'shop/product_list_partial.html', {'products': products})
-
-from django.http import JsonResponse
-from .models import Product
 
 def ajax_search(request):
     q = request.GET.get('q', '')
     results = []
     if q:
         products = Product.objects.filter(name__icontains=q)[:10]
-        results = [
-            {"name": p.name, "slug": p.slug, "price": float(p.price)} for p in products
-        ]
+        results = [{"name": p.name, "slug": p.slug, "price": float(p.price)} for p in products]
     return JsonResponse({"results": results})
 
 
-# ⚡ BUY NOW VIEW
+# ⚡ BUY NOW (Redirect to checkout)
 def buy_now(request, product_id):
+    """
+    When user clicks Buy Now, redirect directly to checkout with the product preloaded.
+    """
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    cart = Cart(request)
-    cart.clear()  # clear previous cart
-    cart.add(product=product, quantity=1)
-    # ✅ Redirect directly to checkout page
-    return redirect('shop:checkout')
-
-
+    return redirect(f"{reverse('shop:checkout')}?buy={product.id}")
