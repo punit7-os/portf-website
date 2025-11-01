@@ -2,7 +2,6 @@
 
 {% block title %}Shop - My Shoppings{% endblock %}
 {% block content %}
-
 <style>
   .grid {
     display: grid;
@@ -106,18 +105,20 @@
     <div class="p">
       <div><a href="{% url 'shop:product_detail' p.slug %}"><strong>{{ p.name }}</strong></a></div>
       <div class="price">₹ {{ p.price }}</div>
+
       <div class="cart-btn">
-        <form action="{% url 'shop:cart_add' p.id %}" method="post">
+        <!-- ✅ Add to Cart -->
+        <form action="{% url 'shop:cart_add' p.id %}" method="post" class="cart-form">
           {% csrf_token %}
-          <button type="button" class="add">🛒 Add to Cart</button>
+          <button type="submit" class="add">🛒 Add to Cart</button>
         </form>
+
+        <!-- ✅ Buy Now -->
         <form action="{% url 'shop:buy_now' p.id %}" method="post">
           {% csrf_token %}
           <button type="submit" class="buy">⚡ Buy Now</button>
         </form>
       </div>
-
-
     </div>
   </div>
   {% empty %}
@@ -126,32 +127,21 @@
 </div>
 
 <script>
+  // Add to Cart – AJAX feedback
   document.querySelectorAll('.cart-form').forEach(form => {
     const button = form.querySelector('.add');
-
-    button.addEventListener('click', async function () {
-      const isAdded = button.classList.contains('added');
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
       const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
-
-      try {
-        const url = isAdded
-          ? form.action.replace('cart_add', 'cart_remove')
-          : form.action;
-
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'X-CSRFToken': csrf }
-        });
-
-        if (!response.ok) throw new Error('Network error');
-
-        button.classList.toggle('added');
-        button.textContent = isAdded ? '🛒 Add to Cart' : '✅ Added';
-      } catch (err) {
-        console.error('Cart toggle error:', err);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrf }
+      });
+      if (response.ok) {
+        button.classList.add('added');
+        button.textContent = '✅ Added';
       }
     });
   });
 </script>
-
 {% endblock %}

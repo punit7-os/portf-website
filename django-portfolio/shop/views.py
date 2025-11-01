@@ -65,6 +65,7 @@ def cart_add(request, product_id):
         qty = 1
     cart.add(product=product, quantity=qty, update_quantity=False)
     return redirect("shop:cart_detail")
+    # return redirect('shop:product_list')
 
 
 # ❌ REMOVE FROM CART
@@ -147,10 +148,13 @@ def ajax_search(request):
     return JsonResponse({"results": results})
 
 
+# ⚡ BUY NOW VIEW
 def buy_now(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product, id=product_id, is_active=True)
     cart = Cart(request)
-    cart.clear()  # clear previous cart to make single-product checkout
+    cart.clear()  # clear previous cart
     cart.add(product=product, quantity=1)
+    # ✅ Redirect directly to checkout page
     return redirect('shop:checkout')
+
 

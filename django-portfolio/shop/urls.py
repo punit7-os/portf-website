@@ -8,9 +8,7 @@ urlpatterns = [
     path('', views.product_list, name='product_list'),
     path('search/', views.search_products, name='search_products'),
     path('c/<slug:slug>/', views.product_list, name='product_list_by_category'),
-    path('<slug:slug>/', views.product_detail, name='product_detail'),
     path('ajax/search/', views.ajax_search, name='ajax_search'),
-
 
     # Cart pages
     path('cart/', views.cart_detail, name='cart_detail'),
@@ -20,11 +18,9 @@ urlpatterns = [
 
     # Checkout
     path('checkout/', views.checkout, name='checkout'),
-
     path('checkout/success/', views.checkout_success, name='checkout_success'),
 
-    # # Pasteables
-    
-
-
+    # Product detail (keep this last to avoid URL conflicts)
+    path('<slug:slug>/', views.product_detail, name='product_detail'),
 ]
+
