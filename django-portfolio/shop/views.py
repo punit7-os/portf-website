@@ -41,11 +41,23 @@ def product_list(request, slug=None):
 # 📦 PRODUCT DETAIL
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
+
+    # get related products
+    related_products = Product.objects.filter(
+        category=product.category, is_active=True
+    ).exclude(id=product.id)[:4]
+
+    # if no related products, get random products instead
+    all_products = None
+    if not related_products.exists():
+        all_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:4]
+
     return render(request, 'shop/product_detail.html', {
         'product': product,
         'related_products': related_products,
+        'all_products': all_products,
     })
+
 
 
 # ➕ ADD TO CART
