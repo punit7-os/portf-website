@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>{% block title %}My Shoppings{% endblock %}</title>
@@ -205,26 +206,79 @@
 
     /* ===== FOOTER ===== */
     footer {
-      background: #f0f0f0;
-      color: #333;
-      text-align: center;
-      padding: 12px;
+      background: linear-gradient(135deg, #007BFF, #4dabff);
+      color: #fff;
+      padding: 30px 10px;
       font-size: 14px;
-      border-top: 1px solid #ddd;
+      margin-top: auto;
     }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      max-width: 1100px;
+      margin: auto;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .footer-column {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .footer-column h4 {
+      margin-bottom: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .footer-column a {
+      color: #fffa;
+      text-decoration: none;
+      display: block;
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .footer-column a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    /* Responsive Footer */
+    @media (max-width: 480px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 480px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
       }
+
       .cart-btn {
         flex-direction: column;
       }
+
       .cart-btn form {
         max-width: none;
         width: 100%;
       }
+
       .cart-btn button {
         width: 100%;
       }
@@ -275,8 +329,40 @@
   </main>
 
   <footer>
-    © {{ now|date:"Y" }} My Shoppings. All rights reserved.
+    <div class="footer-container">
+
+      <!-- Column 1: Contact -->
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <a
+          href="mailto:punitp0170@gmail.com?subject=Inquiry%20from%20E-commerce%20Website&body=Hey,%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F">
+          📧 Email
+        </a>
+        <a href="https://wa.me/917048856947?text=Hey,%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
+          target="_blank">
+          💬 WhatsApp
+        </a>
+      </div>
+
+      <!-- Column 2: Branding -->
+      <div class="footer-column">
+        <h4>My Shoppings</h4>
+        <p>© {{ now|date:"Y" }} All Rights Reserved</p>
+      </div>
+
+      <!-- Column 3: Developed By -->
+      <div class="footer-column">
+        <h4>Developer</h4>
+        <p>Designed & Developed by <strong>Punit Patel</strong></p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      Made with ❤️ for learning & portfolio purpose
+    </div>
   </footer>
+
 
   <script>
     // Animate cards on scroll
@@ -305,4 +391,5 @@
     });
   </script>
 </body>
+
 </html>
