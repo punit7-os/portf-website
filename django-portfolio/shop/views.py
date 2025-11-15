@@ -5,6 +5,11 @@ from django.http import JsonResponse
 from .models import Category, Product, Order
 from .cart import Cart
 
+# Auth imports
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm
+
 CART_KEY = "cart"
 
 # --- Utility Cart Functions ---
@@ -57,7 +62,6 @@ def product_detail(request, slug):
         'related_products': related_products,
         'all_products': all_products,
     })
-
 
 
 # ➕ ADD TO CART
@@ -170,3 +174,34 @@ def buy_now(request, product_id):
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
     return redirect(f"{reverse('shop:checkout')}?buy={product.id}")
+
+
+# --- AUTH: Signup with email validation ---
+def signup(request):
+    """
+    Signup using CustomUserCreationForm which includes an email field and validates uniqueness.
+    On successful signup the user is authenticated and logged in.
+    """
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            # Save user but ensure we attach the email to the user instance
+            user = form.save(commit=False)
+            user.email = form.cleaned_data.get('email')
+            user.save()
+            # authenticate & login
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            if user:
+                login(request, user)
+                return redirect('shop:product_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+def logout_view(request):
+    # logs out and redirects
+    logout(request)
+    return redirect('shop:product_list')

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 app_name = 'shop'
 
@@ -20,6 +21,16 @@ urlpatterns = [
 
     # Buy Now
     path('buy-now/<int:product_id>/', views.buy_now, name='buy_now'),
+
+    # Authentication
+    path('signup/', views.signup, name='signup'),
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),    
+    path('logout/', views.logout_view, name='logout'),
+
+    
+
+    # Profile placeholder (you can implement later)
+    path('profile/', views.product_list, name='profile'),
 
     # Product Detail (keep last)
     path('<slug:slug>/', views.product_detail, name='product_detail'),

@@ -28,6 +28,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    # if using https in dev:
+    # "https://127.0.0.1:8000",
+    # "https://your.dev.domain"
+]
+
+
 
 # Application definition
 
@@ -70,6 +79,10 @@ TEMPLATES = [
         },
     },
 ]
+
+# Redirects after login/logout
+LOGIN_REDIRECT_URL = 'shop:product_list'
+LOGOUT_REDIRECT_URL = 'shop:product_list'
 
 
 WSGI_APPLICATION = 'portfolio_site.wsgi.application'

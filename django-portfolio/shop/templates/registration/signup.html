@@ -1,0 +1,55 @@
+{% extends "shop/base.html" %}
+{% block title %}Signup - My Shoppings{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
+  <h2 style="margin-top:0;text-align:center;">Create an account</h2>
+
+  {# show non-field errors (like password mismatch or other form-level errors) #}
+  {% if form.non_field_errors %}
+    <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:6px;margin-bottom:12px;">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Username</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.username.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Email</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.email.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Password</label>
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.password1.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Confirm Password</label>
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.password2.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <button type="submit" style="width:100%;padding:12px;border-radius:8px;border:none;background:#007BFF;color:white;font-weight:600;">Signup</button>
+  </form>
+
+  <p style="text-align:center;margin-top:12px;">Already have an account? <a href="{% url 'shop:login' %}">Login</a></p>
+</div>
+{% endblock %}

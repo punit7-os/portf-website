@@ -7,6 +7,7 @@
   <title>{% block title %}My Shoppings{% endblock %}</title>
 
   <style>
+    /* (keep the same CSS you already had) */
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
       margin: 0;
@@ -18,7 +19,6 @@
       min-height: 100vh;
     }
 
-    /* ===== HEADER ===== */
     header {
       background: #007BFF;
       color: #fff;
@@ -47,7 +47,44 @@
       text-decoration: underline;
     }
 
-    /* ===== FLOATING SEARCH BAR ===== */
+    /* small account dropdown */
+    .account {
+      position: relative;
+      display: inline-block;
+    }
+    .account .account-btn {
+      background: transparent;
+      border: none;
+      color: #ffd43b;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .account .account-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 36px;
+      background: #fff;
+      color: #222;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      min-width: 160px;
+      overflow: hidden;
+      z-index: 2000;
+    }
+    .account .account-menu a {
+      display: block;
+      padding: 10px 12px;
+      color: #222;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .account .account-menu a:hover {
+      background: #f1f5fb;
+    }
+
+    /* rest of your css kept as-is... */
     .floating-search {
       position: fixed;
       top: 15px;
@@ -91,7 +128,6 @@
       background: #0056b3;
     }
 
-    /* ===== MAIN CONTENT ===== */
     main {
       flex: 1;
       max-width: 1200px;
@@ -100,7 +136,6 @@
       width: 100%;
     }
 
-    /* ===== PRODUCT GRID ===== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -149,7 +184,6 @@
       color: #007BFF;
     }
 
-    /* ===== UNIFORM BUTTONS SIDE BY SIDE ===== */
     .cart-btn {
       display: flex;
       justify-content: center;
@@ -177,7 +211,6 @@
       height: 45px;
     }
 
-    /* Add to Cart Button */
     .add {
       background: linear-gradient(135deg, #007BFF, #00C6FF);
       box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
@@ -193,7 +226,6 @@
       box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
     }
 
-    /* Buy Now Button */
     .buy {
       background: linear-gradient(135deg, #ff7e5f, #feb47b);
       box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
@@ -204,7 +236,6 @@
       background: linear-gradient(135deg, #ff5f50, #fdaf6b);
     }
 
-    /* ===== FOOTER ===== */
     footer {
       background: linear-gradient(135deg, #007BFF, #4dabff);
       color: #fff;
@@ -255,7 +286,6 @@
       opacity: 0.85;
     }
 
-    /* Responsive Footer */
     @media (max-width: 480px) {
       .footer-container {
         flex-direction: column;
@@ -263,8 +293,6 @@
       }
     }
 
-
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 480px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
@@ -295,9 +323,25 @@
 
   <header>
     <h1>🛍️ My Shoppings</h1>
-    <div>
+    <div style="display:flex; align-items:center; gap:12px;">
       <a href="{% url 'shop:cart_detail' %}">🛒 Cart</a>
       <a href="{% url 'shop:checkout' %}">💳 Checkout</a>
+
+      <!-- Account links -->
+      <div class="account">
+        {% if request.user.is_authenticated %}
+          <button class="account-btn" id="accountBtn">{{ request.user.get_username }} ▾</button>
+          <div class="account-menu" id="accountMenu" aria-hidden="true">
+            <a href="{% url 'shop:product_list' %}">My Orders</a>
+            <!-- you can change My Orders to a real url later -->
+            <a href="{% url 'shop:profile' %}">Profile</a>
+            <a href="{% url 'shop:logout' %}">Logout</a>
+          </div>
+        {% else %}
+          <a href="{% url 'shop:login' %}">🔐 Login</a>
+          <a href="{% url 'shop:signup' %}">📝 Signup</a>
+        {% endif %}
+      </div>
     </div>
   </header>
 
@@ -334,10 +378,13 @@
       <!-- Column 1: Contact -->
       <div class="footer-column">
         <h4>Contact</h4>
-        <a
-          href="mailto:punitp0170@gmail.com?subject=Inquiry%20from%20E-commerce%20Website&body=Hey,%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F">
+        <a 
+          href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Inquiry%20from%20E-commerce%20Website&body=Hey%2C%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
+          target="_blank"
+        >
           📧 Email
         </a>
+
         <a href="https://wa.me/917048856947?text=Hey,%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
           target="_blank">
           💬 WhatsApp
@@ -362,7 +409,6 @@
       Made with ❤️ for learning & portfolio purpose
     </div>
   </footer>
-
 
   <script>
     // Animate cards on scroll
@@ -389,6 +435,21 @@
         }, 2000);
       }
     });
+
+    // small account dropdown toggle
+    const accountBtn = document.getElementById('accountBtn');
+    const accountMenu = document.getElementById('accountMenu');
+    if (accountBtn) {
+      accountBtn.addEventListener('click', (e) => {
+        const open = accountMenu.style.display === 'block';
+        accountMenu.style.display = open ? 'none' : 'block';
+      });
+      document.addEventListener('click', (e) => {
+        if (!accountBtn.contains(e.target) && !accountMenu.contains(e.target)) {
+          accountMenu.style.display = 'none';
+        }
+      });
+    }
   </script>
 </body>
 
