@@ -10,6 +10,12 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponse
+
+
 CART_KEY = "cart"
 
 # --- Utility Cart Functions ---
@@ -129,13 +135,37 @@ def checkout(request):
     if len(cart) == 0:
         return redirect("shop:product_list")
 
+    # If POST -> place order
     if request.method == "POST":
-        email = request.POST.get("email", "")
+        # Prefer posted email, but if user is logged in and has an email, use that
+        posted_email = request.POST.get("email", "").strip()
+        if posted_email:
+            email = posted_email
+        elif request.user.is_authenticated and request.user.email:
+            email = request.user.email
+        else:
+            # no email provided and user not logged in -> re-render with error
+            suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
+            error = "Please provide an email address to receive the receipt."
+            items = []
+            total = Decimal("0.00")
+            for item in cart:
+                items.append(item)
+                total += item["total_price"]
+            return render(request, "shop/checkout.html", {
+                "cart": cart,
+                "cart_items": items,
+                "total": total,
+                "suggestions": suggestions,
+                "error": error
+            })
+
         total = sum(item["price"] * item["quantity"] for item in cart)
         Order.objects.create(email=email, total_amount=total)
         cart.clear()
         return redirect("shop:checkout_success")
 
+    # GET -> render checkout
     items = []
     total = Decimal("0.00")
     for item in cart:
@@ -143,7 +173,123 @@ def checkout(request):
         total += item["total_price"]
 
     suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
-    return render(request, "shop/checkout.html", {"cart": cart, "cart_items": items, "total": total, "suggestions": suggestions})
+    return render(request, "shop/checkout.html", {
+        "cart": cart,
+        "cart_items": items,
+        "total": total,
+        "suggestions": suggestions
+    })
+
+def initiate_payment(request):
+    """
+    Called when user clicks "Pay" on checkout (POST).
+    Creates a local Order object AND Razorpay Order, returns needed info to JS.
+    """
+    if request.method != "POST":
+        return HttpResponseBadRequest("Invalid method")
+
+    cart = Cart(request)
+    if len(cart) == 0:
+        return JsonResponse({"error": "Cart is empty"}, status=400)
+
+    # decide email
+    posted_email = request.POST.get("email", "").strip()
+    if posted_email:
+        email = posted_email
+    elif request.user.is_authenticated and request.user.email:
+        email = request.user.email
+    else:
+        return JsonResponse({"error": "Email required"}, status=400)
+
+    # compute amount in paise (Razorpay expects amount in smallest currency unit)
+    total = sum(item["price"] * item["quantity"] for item in cart)
+    amount_paise = int(total * 100)  # Decimal -> paise (int)
+
+    # create local Order
+    order = Order.objects.create(email=email, total_amount=total)
+
+    # create razorpay order
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    DATA = {
+        "amount": amount_paise,
+        "currency": "INR",
+        "receipt": f"order_{order.id}",
+        "notes": {"order_id": str(order.id)}
+    }
+    razorpay_order = client.order.create(data=DATA)
+
+    # save razorpay order id
+    order.razorpay_order_id = razorpay_order.get('id')
+    order.save()
+
+    # return data to frontend
+    return JsonResponse({
+        "razorpay_order_id": order.razorpay_order_id,
+        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+        "amount": amount_paise,
+        "order_id": order.id,
+        "currency": "INR",
+    })
+
+
+@csrf_exempt
+def payment_handler(request):
+    """
+    This endpoint handles the verification after payment is completed (POST from frontend)
+    and also can be used as webhook endpoint (recommended to verify signature).
+    """
+    if request.method != "POST":
+        return HttpResponseBadRequest("Invalid method")
+
+    data = request.POST
+
+    # Expected fields from Razorpay checkout success
+    razorpay_payment_id = data.get('razorpay_payment_id')
+    razorpay_order_id = data.get('razorpay_order_id')
+    razorpay_signature = data.get('razorpay_signature')
+    order_id = data.get('order_id')  # our DB order id (passed via checkout)
+
+    # Validate presence
+    if not (razorpay_payment_id and razorpay_order_id and razorpay_signature and order_id):
+        return HttpResponseBadRequest("Missing parameters")
+
+    # verify signature using razorpay util
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    params_dict = {
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_payment_id': razorpay_payment_id,
+        'razorpay_signature': razorpay_signature
+    }
+    try:
+        client.utility.verify_payment_signature(params_dict)
+    except razorpay.errors.SignatureVerificationError:
+        # mark order failed
+        try:
+            order = Order.objects.get(id=int(order_id))
+            order.status = 'failed'
+            order.razorpay_payment_id = razorpay_payment_id
+            order.razorpay_signature = razorpay_signature
+            order.save()
+        except Order.DoesNotExist:
+            pass
+        return HttpResponseBadRequest("Signature verification failed")
+
+    # signature ok -> mark paid, clear cart
+    try:
+        order = Order.objects.get(id=int(order_id))
+        order.razorpay_payment_id = razorpay_payment_id
+        order.razorpay_signature = razorpay_signature
+        order.status = 'paid'
+        order.save()
+    except Order.DoesNotExist:
+        pass
+
+    # clear cart
+    cart = Cart(request)
+    cart.clear()
+
+    # respond OK
+    return JsonResponse({"status": "paid", "order_id": order_id})
 
 
 # ✅ CHECKOUT SUCCESS

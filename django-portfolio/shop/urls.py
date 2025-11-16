@@ -17,6 +17,8 @@ urlpatterns = [
 
     # Checkout
     path('checkout/', views.checkout, name='checkout'),
+    path('payment/initiate/', views.initiate_payment, name='payment_initiate'),
+    path('payment/handler/', views.payment_handler, name='payment_handler'),
     path('checkout/success/', views.checkout_success, name='checkout_success'),
 
     # Buy Now

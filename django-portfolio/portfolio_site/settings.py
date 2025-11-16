@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from decouple import config
+
+# below your imports, read keys like this:
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default=None)
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default=None)
+RAZORPAY_WEBHOOK_SECRET = config('RAZORPAY_WEBHOOK_SECRET', default=None)
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_DIRS = [ BASE_DIR / 'static' ]

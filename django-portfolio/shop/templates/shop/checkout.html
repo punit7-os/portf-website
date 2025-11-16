@@ -1,128 +1,179 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Checkout</title>
-  <style>
-    body {
-      font-family: Segoe UI, Tahoma, Arial;
-      background: #f6f8fb;
-      margin: 0;
-      color: #333;
-    }
-    .wrap {
-      max-width: 700px;
-      margin: 24px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-      padding: 24px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-    button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    h1, h2 {
-      margin-top: 0;
-    }
-    .cart-item {
-      border-bottom: 1px solid #eee;
-      padding: 10px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .cart-item img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-right: 10px;
-    }
-    .suggestions {
-      margin-top: 30px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin-top: 12px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,.05);
-      overflow: hidden;
-      text-align: center;
-      padding-bottom: 8px;
-    }
-    .card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>Checkout</h1>
+{% extends "shop/base.html" %}
+{% block title %}Checkout - My Shoppings{% endblock %}
 
-    {% if cart %}
-      <h2>Your Cart</h2>
-      {% for item in cart %}
-        <div class="cart-item">
-          <div style="display:flex;align-items:center;">
-            <img src="{{ item.product.image_url|default:'https://via.placeholder.com/60' }}" alt="">
-            <div>
-              <strong>{{ item.product.name }}</strong><br>
-              ₹ {{ item.product.price }} × {{ item.quantity }}
-            </div>
-          </div>
-          <div><strong>₹ {{ item.total_price }}</strong></div>
-        </div>
-      {% endfor %}
-      <h3 style="text-align:right;">Total: ₹ {{ cart.get_total_price }}</h3>
-      <hr>
-      <form method="post">
-        {% csrf_token %}
-        <label>Email for receipt</label>
-        <input type="email" name="email" required placeholder="you@example.com">
-        <button type="submit">Place Order (Demo)</button>
-      </form>
-    {% else %}
-      <p>Your cart is empty.</p>
+{% block content %}
+<div style="max-width:920px; margin:24px auto; padding:20px;">
+  <div style="background:#fff; border-radius:12px; padding:22px; box-shadow:0 6px 18px rgba(0,0,0,0.06);">
+    <h1 style="margin-top:0;">Checkout</h1>
+
+    {% if error %}
+      <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:8px;margin-bottom:12px;">
+        {{ error }}
+      </div>
     {% endif %}
 
-    <p style="margin-top:12px;"><em>Note: Demo checkout (no payment).</em></p>
+    {% if cart|length %}
+      <h2 style="margin-bottom:8px;">Your Cart</h2>
 
-    {% if suggestions %}
-    <div class="suggestions">
-      <h2>You may also like</h2>
-      <div class="grid">
-        {% for p in suggestions %}
-        <div class="card">
-          <a href="{% url 'shop:product_detail' p.slug %}">
-            <img src="{{ p.image_url|default:'https://via.placeholder.com/150x120' }}" alt="{{ p.name }}">
-          </a>
-          <div><strong>{{ p.name }}</strong></div>
-          <div>₹ {{ p.price }}</div>
+      {% for item in cart %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f1f4f8;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <img src="{{ item.product.image_url|default:'https://via.placeholder.com/60' }}" alt="{{ item.product.name }}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
+            <div>
+              <div style="font-weight:700;">{{ item.product.name }}</div>
+              <div style="color:#666;font-size:14px;">₹ {{ item.price }} × {{ item.quantity }}</div>
+            </div>
+          </div>
+          <div style="font-weight:700;">₹ {{ item.total_price }}</div>
         </div>
+      {% endfor %}
+
+      <div style="text-align:right;margin-top:16px;">
+        <h3 style="margin:4px 0;">Total: <strong>₹ {{ total }}</strong></h3>
+      </div>
+
+      <hr style="margin:18px 0;border:none;border-top:1px solid #eef3fb;">
+
+      <form id="checkout-form" method="post" style="max-width:560px;">
+        {% csrf_token %}
+
+        {% if request.user.is_authenticated and request.user.email %}
+          <!-- logged-in user with email: show readonly and include hidden field -->
+          <label style="font-weight:600;display:block;margin-bottom:6px;">Email for receipt</label>
+          <div style="margin-bottom:12px;padding:10px;border:1px solid #eee;border-radius:8px;background:#fbfcff;color:#222;">
+            {{ request.user.email }}
+          </div>
+          <input type="hidden" id="email-field" name="email" value="{{ request.user.email }}">
+        {% else %}
+          <!-- guest or user without email: show email input -->
+          <label style="font-weight:600;display:block;margin-bottom:6px;">Email for receipt</label>
+          <input id="email-field" type="email" name="email" required placeholder="you@example.com" style="border:1px solid #e6edf8;padding:10px;border-radius:8px;margin-bottom:12px;">
+        {% endif %}
+
+        <!-- NOTE: button type="button" because we will handle the payment flow via JS -->
+        <button id="pay-button" type="button" style="background:#007bff;color:#fff;border:none;padding:12px 16px;border-radius:8px;font-weight:700;cursor:pointer;">
+          Pay Now
+        </button>
+      </form>
+
+    {% else %}
+      <p>Your cart is empty. <a href="{% url 'shop:product_list' %}">Start shopping</a></p>
+    {% endif %}
+
+    <p style="margin-top:12px;color:#666;font-size:13px;"><em>Note: This checkout uses Razorpay for payments. You will be redirected to a secure popup for payment.</em></p>
+  </div>
+
+  {% if suggestions %}
+    <div style="margin-top:20px;">
+      <h2 style="margin-bottom:8px;">You may also like</h2>
+      <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;">
+        {% for p in suggestions %}
+          <div style="background:#fff;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.04);overflow:hidden;text-align:center;">
+            <a href="{% url 'shop:product_detail' p.slug %}" style="display:block;">
+              <img src="{{ p.image_url|default:'https://via.placeholder.com/150x120' }}" alt="{{ p.name }}" style="width:100%;height:120px;object-fit:cover;">
+            </a>
+            <div style="padding:10px;">
+              <div style="font-weight:700;">{{ p.name }}</div>
+              <div style="color:#007BFF;margin-top:6px;">₹ {{ p.price }}</div>
+            </div>
+          </div>
         {% endfor %}
       </div>
     </div>
-    {% endif %}
-  </div>
-</body>
-</html>
+  {% endif %}
+</div>
+
+<!-- Razorpay checkout script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+/*
+ Flow:
+ 1) User clicks Pay Now -> JS collects email and posts to server endpoint payment_initiate (creates local Order + razorpay order).
+ 2) Server returns razorpay_order_id, key_id (public), amount.
+ 3) JS opens Razorpay checkout using returned data.
+ 4) On successful payment, handler posts payment response to server payment_handler to verify signature and mark order paid.
+ 5) On verification success, redirect to checkout_success page.
+*/
+
+document.getElementById('pay-button').addEventListener('click', async function () {
+  // get CSRF token
+  const csrftokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+  const csrftoken = csrftokenInput ? csrftokenInput.value : '';
+
+  // get email
+  const emailEl = document.getElementById('email-field');
+  const email = emailEl ? emailEl.value.trim() : '';
+
+  if (!email) {
+    alert('Please provide an email for the receipt.');
+    return;
+  }
+
+  // Call server to create razorpay order (payment_initiate view)
+  const resp = await fetch("{% url 'shop:payment_initiate' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": csrftoken,
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    },
+    body: new URLSearchParams({email: email}).toString()
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(()=>({error:"Failed to initiate"}));
+    alert(err.error || "Could not initiate payment. Try again.");
+    return;
+  }
+
+  const data = await resp.json();
+
+  // Razorpay options
+  const options = {
+    "key": data.razorpay_key_id,
+    "amount": data.amount,
+    "currency": data.currency || "INR",
+    "name": "My Shoppings",
+    "description": "Order #" + data.order_id,
+    "order_id": data.razorpay_order_id,
+    "handler": async function (response) {
+      // verify payment on server
+      const verifyResp = await fetch("{% url 'shop:payment_handler' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: new URLSearchParams({
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+          order_id: data.order_id
+        }).toString()
+      });
+
+      if (!verifyResp.ok) {
+        alert("Payment verification failed. Please contact support.");
+        return;
+      }
+
+      const verifyData = await verifyResp.json();
+      if (verifyData.status === 'paid') {
+        // redirect to success page
+        window.location.href = "{% url 'shop:checkout_success' %}";
+      } else {
+        alert("Payment verification failed. Please contact support.");
+      }
+    },
+    "prefill": {
+      "email": email
+    },
+    "theme": {
+      "color": "#007bff"
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+});
+</script>
+{% endblock %}
