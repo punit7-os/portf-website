@@ -52,6 +52,7 @@
       position: relative;
       display: inline-block;
     }
+
     .account .account-btn {
       background: transparent;
       border: none;
@@ -60,6 +61,7 @@
       cursor: pointer;
       font-size: 15px;
     }
+
     .account .account-menu {
       display: none;
       position: absolute;
@@ -68,11 +70,12 @@
       background: #fff;
       color: #222;
       border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
       min-width: 160px;
       overflow: hidden;
       z-index: 2000;
     }
+
     .account .account-menu a {
       display: block;
       padding: 10px 12px;
@@ -80,8 +83,33 @@
       text-decoration: none;
       font-size: 14px;
     }
+
     .account .account-menu a:hover {
       background: #f1f5fb;
+    }
+
+    /* Cart badge */
+    .cart-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #ffd43b;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .cart-count {
+      background: #ffd43b;
+      color: #07263a;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      min-width: 22px;
+      text-align: center;
+      display: inline-block;
     }
 
     /* rest of your css kept as-is... */
@@ -322,24 +350,39 @@
   </form>
 
   <header>
-    <h1>🛍️ My Shoppings</h1>
+    <!-- 1) Make "My Shoppings" link to homepage -->
+    <h1>
+      <a href="{% url 'shop:product_list' %}" style="color: #ffd43b; text-decoration: none;">🛍️ My Shoppings</a>
+    </h1>
+
     <div style="display:flex; align-items:center; gap:12px;">
-      <a href="{% url 'shop:cart_detail' %}">🛒 Cart</a>
-      <a href="{% url 'shop:checkout' %}">💳 Checkout</a>
+      <!-- Cart link with badge -->
+      <a href="{% url 'shop:cart_detail' %}" class="cart-badge" id="cartLink">
+        🛒 Cart
+        <span id="cartCountBadge" class="cart-count">
+          {% if request.session.cart %}
+            {{ request.session.cart|length }}
+          {% else %}
+            0
+          {% endif %}
+        </span>
+      </a>
+
+      <!-- 2) Removed Checkout and added My Orders in header -->
+      <a href="{% url 'shop:my_orders' %}">📦 My Orders</a>
 
       <!-- Account links -->
       <div class="account">
         {% if request.user.is_authenticated %}
-          <button class="account-btn" id="accountBtn">{{ request.user.get_username }} ▾</button>
-          <div class="account-menu" id="accountMenu" aria-hidden="true">
-            <a href="{% url 'shop:product_list' %}">My Orders</a>
-            <!-- you can change My Orders to a real url later -->
-            <a href="{% url 'shop:profile' %}">Profile</a>
-            <a href="{% url 'shop:logout' %}">Logout</a>
-          </div>
+        <button class="account-btn" id="accountBtn">{{ request.user.get_username }} ▾</button>
+        <div class="account-menu" id="accountMenu" aria-hidden="true">
+          <!-- 3) My Orders removed from profile dropdown -->
+          <a href="{% url 'shop:profile' %}">Profile</a>
+          <a href="{% url 'shop:logout' %}">Logout</a>
+        </div>
         {% else %}
-          <a href="{% url 'shop:login' %}">🔐 Login</a>
-          <a href="{% url 'shop:signup' %}">📝 Signup</a>
+        <a href="{% url 'shop:login' %}">🔐 Login</a>
+        <a href="{% url 'shop:signup' %}">📝 Signup</a>
         {% endif %}
       </div>
     </div>
@@ -378,10 +421,8 @@
       <!-- Column 1: Contact -->
       <div class="footer-column">
         <h4>Contact</h4>
-        <a 
-          href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Inquiry%20from%20E-commerce%20Website&body=Hey%2C%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
-          target="_blank"
-        >
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Inquiry%20from%20E-commerce%20Website&body=Hey%2C%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
+          target="_blank">
           📧 Email
         </a>
 
@@ -411,6 +452,13 @@
   </footer>
 
   <script>
+    // CSRF helper
+    function getCookie(name) {
+      const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return v ? v.pop() : '';
+    }
+    const csrftoken = getCookie('csrftoken');
+
     // Animate cards on scroll
     const cards = document.querySelectorAll('.card');
     const observer = new IntersectionObserver(entries => {
@@ -420,19 +468,70 @@
     }, { threshold: 0.1 });
     cards.forEach(card => observer.observe(card));
 
-    // Add to cart toggle animation
-    document.addEventListener('click', (e) => {
+    // Add to cart via AJAX (prevents redirect) — works for any .add button inside a form targeting cart_add
+    document.addEventListener('click', async (e) => {
       if (e.target.classList.contains('add')) {
         e.preventDefault();
         const btn = e.target;
-        btn.textContent = '✅ Added';
-        btn.classList.add('added');
         const form = btn.closest('form');
-        if (form) form.submit();
-        setTimeout(() => {
-          btn.textContent = '🛒 Add to Cart';
-          btn.classList.remove('added');
-        }, 2000);
+        if (!form) return;
+
+        // get URL + qty if present (default 1)
+        const url = form.getAttribute('action');
+        let qty = 1;
+        const qtyField = form.querySelector('input[name="qty"], input[type="number"]');
+        if (qtyField) qty = qtyField.value || 1;
+
+        // visual feedback
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Adding...';
+
+        try {
+          const resp = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-CSRFToken': csrftoken,
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({ qty: qty })
+          });
+
+          if (!resp.ok) throw new Error('Network error');
+
+          const data = await resp.json();
+          // show added state
+          btn.textContent = '✅ Added';
+          btn.classList.add('added');
+
+          // update header badge if JSON returns cart_count
+          if (data && (data.cart_count !== undefined)) {
+            const badge = document.getElementById('cartCountBadge');
+            if (badge) badge.textContent = data.cart_count;
+          } else {
+            // fallback: increment (best-effort) existing numeric badge
+            const badge = document.getElementById('cartCountBadge');
+            if (badge) {
+              const n = parseInt(badge.textContent||'0') + 1;
+              badge.textContent = n;
+            }
+          }
+
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('added');
+            btn.disabled = false;
+          }, 1400);
+        } catch (err) {
+          console.error(err);
+          btn.textContent = 'Try again';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 1200);
+        }
       }
     });
 

@@ -1,0 +1,186 @@
+{% extends "shop/base.html" %}
+{% block title %}My Orders - My Shoppings{% endblock %}
+
+{% block content %}
+<style>
+  .orders-wrap {
+    max-width: 1100px;
+    margin: 28px auto;
+    background: transparent;
+    padding: 6px;
+  }
+
+  h1.orders-title {
+    font-size: 28px;
+    margin-bottom: 18px;
+    color: #10203a;
+    font-weight: 700;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(18, 38, 63, 0.04);
+  }
+
+  .orders-table thead tr {
+    background: #f6f9fc;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: middle; /* ensures vertical alignment */
+    border-bottom: 1px solid #eef4fb;
+    font-size: 14px;
+    color: #1f2d3d;
+  }
+
+  .orders-table th {
+    font-weight: 700;
+    color: #334155;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+  }
+
+  .orders-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .order-id {
+    font-weight: 700;
+    color: #0b3b66;
+  }
+
+  .price-cell {
+    font-weight: 700;
+    color: #0b4da0;
+    white-space: nowrap;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .status-active { background: #e6f8f1; color: #05683b; }
+  .status-paid   { background: #eef6ff; color: #0a57b7; }
+  .status-cancelled { background: #fff0f0; color: #b71c1c; }
+
+  .action-form { display:inline-block; margin:0; }
+  .btn-cancel {
+    background: transparent;
+    color: #c53030;
+    border: 1px solid #f1dede;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .btn-cancel[disabled] { opacity: 0.5; cursor: default; }
+
+  .product-link {
+    color: #0b63d6;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .product-link:hover { text-decoration: underline; }
+
+  .product-list a { margin-right: 8px; display:inline-block; margin-bottom:6px; }
+
+  /* small responsive tweaks */
+  @media (max-width: 880px) {
+    .orders-table th, .orders-table td { padding: 10px 12px; font-size: 13px; }
+    .orders-wrap { padding: 0 12px; }
+  }
+</style>
+
+<div class="orders-wrap">
+  <h1 class="orders-title">My Orders</h1>
+
+  <table class="orders-table" role="table" aria-label="My Orders">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Products</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Placed On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% if orders %}
+        {% for o in orders %}
+          {# create a padded id once and reuse it to avoid quotes/escape issues #}
+          {% with o.id|stringformat:"08d" as padded_id %}
+          <tr>
+            <!-- 8-digit order id -->
+            <td class="order-id">#{{ padded_id }}</td>
+
+            <!-- Products column: try to list order items if available (default related name orderitem_set) -->
+            <td class="product-list">
+              {% if o.orderitem_set.all %}
+                {% for item in o.orderitem_set.all %}
+                  {% if item.product %}
+                    <a class="product-link" href="{% url 'shop:product_detail' item.product.slug %}">{{ item.product.name }}</a>{% if not forloop.last %},{% endif %}
+                  {% else %}
+                    <span style="color:#6b7280;">Item</span>{% if not forloop.last %},{% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <!-- fallback: link to order detail page (make sure order_detail url/view exists) -->
+                <a class="product-link" href="{% url 'shop:order_detail' o.id %}">View Items</a>
+              {% endif %}
+            </td>
+
+            <!-- Amount -->
+            <td class="price-cell">₹ {{ o.total_amount }}</td>
+
+            <!-- Status mapping: show 'Active' for 'created' -->
+            <td>
+              {% if o.status == 'created' %}
+                <span class="status-badge status-active">Active</span>
+              {% elif o.status == 'paid' %}
+                <span class="status-badge status-paid">Paid</span>
+              {% elif o.status == 'cancelled' %}
+                <span class="status-badge status-cancelled">Cancelled</span>
+              {% else %}
+                <span class="status-badge">{{ o.get_status_display }}</span>
+              {% endif %}
+            </td>
+
+            <!-- Placed On -->
+            <td>{{ o.created_at|date:"d M Y H:i" }}</td>
+
+            <!-- Action: Cancel (only if not paid/cancelled) -->
+            <td>
+              {% if o.status != 'paid' and o.status != 'cancelled' %}
+                <form method="post" action="{% url 'shop:cancel_order' o.id %}" class="action-form" onsubmit="return confirm('Cancel order #{{ padded_id }} ?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-cancel">Cancel</button>
+                </form>
+              {% else %}
+                <span style="color:#6b7280;font-weight:600;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" style="padding:22px; text-align:center; color:#6b7280;">No orders found.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -20,11 +20,22 @@
         </tr>
 
         {% for item in items %}
-        <tr style="border-bottom:1px solid #eee;">
+        <tr style="border-bottom:1px solid #eee;" data-id="{{ item.id }}">
             <td style="padding:12px;">{{ item.name }}</td>
+
             <td style="padding:12px;">₹ {{ item.price }}</td>
-            <td style="padding:12px;">{{ item.quantity }}</td>
-            <td style="padding:12px; font-weight:600;">₹ {{ item.line_total }}</td>
+
+            <td style="padding:12px;">
+                <button class="qty-btn minus" style="width:28px;height:28px;">–</button>
+
+                <input type="number" class="qty-input" value="{{ item.quantity }}" min="1"
+                    style="width:50px;text-align:center;border:1px solid #ccc;border-radius:6px;">
+
+                <button class="qty-btn plus" style="width:28px;height:28px;">+</button>
+            </td>
+
+            <td style="padding:12px; font-weight:600;" class="row-total">₹ {{ item.line_total }}</td>
+
             <td style="padding:12px;">
                 <a href="{% url 'shop:cart_remove' item.id %}" style="color:#ff4b4b; font-weight:600;">❌ Remove</a>
             </td>
@@ -32,7 +43,7 @@
         {% endfor %}
     </table>
 
-    <h3 style="margin-top:20px;">Total: <strong>₹ {{ total }}</strong></h3>
+    <h3 style="margin-top:20px;">Total: <strong id="cartTotal">₹ {{ total }}</strong></h3>
 
     <div style="margin-top:25px;">
         <a href="{% url 'shop:checkout' %}">
@@ -47,5 +58,69 @@
     {% endif %}
 
 </div>
+
+
+<script>
+function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+}
+const csrftoken = getCookie('csrftoken');
+
+// Update header cart badge
+function updateCartBadge(count) {
+    const badge = document.getElementById("cartCountBadge");
+    if (badge) badge.textContent = count;
+}
+
+// Update cart via AJAX
+async function updateQty(pid, qty, row) {
+    const resp = await fetch(`/shop/cart/update/${pid}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrftoken,
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `qty=${qty}`
+    });
+
+    const data = await resp.json();
+
+    if (data.success) {
+        row.querySelector(".row-total").textContent = "₹ " + data.row_total;
+        document.getElementById("cartTotal").textContent = "₹ " + data.cart_total;
+        updateCartBadge(data.cart_count);
+    }
+}
+
+// Quantity buttons
+document.querySelectorAll("tr[data-id]").forEach(row => {
+    const pid = row.dataset.id;
+    const minus = row.querySelector(".minus");
+    const plus = row.querySelector(".plus");
+    const input = row.querySelector(".qty-input");
+
+    minus.addEventListener("click", () => {
+        let q = parseInt(input.value) - 1;
+        if (q < 1) q = 1;
+        input.value = q;
+        updateQty(pid, q, row);
+    });
+
+    plus.addEventListener("click", () => {
+        let q = parseInt(input.value) + 1;
+        input.value = q;
+        updateQty(pid, q, row);
+    });
+
+    input.addEventListener("change", () => {
+        let q = parseInt(input.value);
+        if (q < 1) q = 1;
+        input.value = q;
+        updateQty(pid, q, row);
+    });
+});
+</script>
 
 {% endblock %}

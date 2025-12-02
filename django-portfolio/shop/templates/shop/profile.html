@@ -1,0 +1,16 @@
+{% extends "shop/base.html" %}
+{% block title %}Profile - My Shoppings{% endblock %}
+
+{% block content %}
+<div style="max-width:560px;margin:36px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06);">
+  <h2 style="margin-top:0;">Your Profile</h2>
+  <p><strong>Username:</strong> {{ request.user.username }}</p>
+  <p><strong>Email:</strong> {{ request.user.email }}</p>
+
+  <form method="post" style="margin-top:12px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" style="padding:10px 14px;background:#007bff;color:#fff;border:none;border-radius:8px;">Save</button>
+  </form>
+</div>
+{% endblock %}
