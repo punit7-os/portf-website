@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+from django.db.models import Avg, Count
 
 class Category(models.Model):
     name = models.CharField(max_length=120, unique=True)
@@ -26,6 +28,15 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def average_rating(self):
+        """
+        Returns average rating (float) for approved reviews or 0.0
+        """
+        agg = self.feedbacks.filter(approved=True).aggregate(avg=Avg('rating'))
+        return float(agg['avg'] or 0.0)
+
+    def review_count(self):
+        return self.feedbacks.filter(approved=True).count()
 
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -53,3 +64,29 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} profile"
+
+# ---------- Feedback model ----------
+class Feedback(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='feedbacks')
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    message = models.TextField(blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    reviewer_name = models.CharField(max_length=120, blank=True)   # for anonymous name
+    reviewer_email = models.EmailField(blank=True)                 # for anonymous email
+    approved = models.BooleanField(default=False, db_index=True)   # moderation flag
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Product Feedback"
+        verbose_name_plural = "Product Feedbacks"
+        indexes = [
+            models.Index(fields=['product', 'approved', 'created_at'])
+        ]
+
+    def __str__(self):
+        who = self.reviewer_name or (self.user.get_full_name() if self.user else "Anonymous")
+        return f"{self.product.name} — {self.rating} ★ by {who}"
+
+    def short_message(self, length=150):
+        return (self.message[:length] + '...') if self.message and len(self.message) > length else (self.message or '')

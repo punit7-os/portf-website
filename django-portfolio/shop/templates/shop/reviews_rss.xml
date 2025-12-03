@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{{ product.name|escape }}</title>
+    <link>{{ request.build_absolute_uri|default:"" }}</link>
+    <description>Recent reviews for {{ product.name|escape }}</description>
+    <lastBuildDate>{{ build_time }}</lastBuildDate>
+    {% for item in items %}
+      <item>
+        <title>{{ item.title|escape }}</title>
+        <link>{{ item.link|escape }}</link>
+        <description><![CDATA[{{ item.description|safe }}]]></description>
+        <pubDate>{{ item.pubdate }}</pubDate>
+        <guid isPermaLink="false">{{ item.guid }}</guid>
+      </item>
+    {% endfor %}
+  </channel>
+</rss>

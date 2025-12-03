@@ -1,4 +1,5 @@
 # shop/views.py
+from datetime import timezone
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -14,6 +15,38 @@ from .forms import CustomUserCreationForm, ProfileForm
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.template.loader import render_to_string
+from django.utils.html import escape
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse
+from .models import Feedback
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
+from django.utils import timezone
+from decimal import Decimal
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
+from .models import Category, Product, Order, Profile
+from .cart import Cart
+
+# Auth imports
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm, ProfileForm
+
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.template.loader import render_to_string
+from django.utils.html import escape
+from django.views.decorators.http import require_POST
+from .models import Feedback
 
 # -------------------------
 # PRODUCT LIST
@@ -40,7 +73,7 @@ def product_list(request, slug=None):
 
 
 # -------------------------
-# PRODUCT DETAIL
+# PRODUCT DETAIL (updated)
 # -------------------------
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
@@ -53,11 +86,44 @@ def product_detail(request, slug):
     if not related_products.exists():
         all_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:4]
 
+    # Reviews: only approved ones for public display
+    reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
+    page = request.GET.get('rpage', 1)
+    paginator = Paginator(reviews_qs, 5)  # 5 reviews per page
+    try:
+        reviews_page = paginator.page(page)
+    except PageNotAnInteger:
+        reviews_page = paginator.page(1)
+    except EmptyPage:
+        reviews_page = paginator.page(paginator.num_pages)
+
+    avg_rating = float(product.average_rating() or 0.0)
+    review_count = product.review_count()
+
+    # compute display name once in the view to avoid template expression issues
+    if request.user.is_authenticated:
+        display_name = request.user.get_full_name() or request.user.get_username()
+    else:
+        display_name = ''
+
+    # Provide user_feedback if exists (may be pending or approved)
+    user_feedback = None
+    if request.user.is_authenticated:
+        user_feedback = product.feedbacks.filter(user=request.user).first()
+
     return render(request, 'shop/product_detail.html', {
         'product': product,
         'related_products': related_products,
         'all_products': all_products,
+        'reviews_page': reviews_page,
+        'avg_rating': avg_rating,
+        'review_count': review_count,
+        'reviews_paginator': paginator,
+        'display_name': display_name,
+        'user_feedback': user_feedback,
     })
+
+
 
 
 # -------------------------
@@ -438,3 +504,148 @@ def cancel_order(request, order_id):
 def logout_view(request):
     logout(request)
     return redirect("shop:product_list")
+
+# -------------------------
+# PRODUCT FEEDBACK POST (AJAX)
+# -------------------------
+@require_POST
+def product_feedback(request, product_id):
+    """
+    Accepts JSON (application/json) or form POST.
+    Payload expected:
+      { rating: int(1-5), message: str, reviewer_name: str (optional), reviewer_email: str (optional) }
+
+    Response (JSON):
+      { success: True, approved: bool, html: "<rendered reviews snippet>" , avg_rating: float, review_count: int }
+    """
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+
+    # Support both JSON body and form-encoded
+    try:
+        if request.content_type and 'application/json' in request.content_type:
+            import json
+            payload = json.loads(request.body.decode('utf-8') or '{}')
+            rating = int(payload.get('rating', 0))
+            message = (payload.get('message') or '').strip()
+            reviewer_name = (payload.get('reviewer_name') or '').strip()
+            reviewer_email = (payload.get('reviewer_email') or '').strip()
+        else:
+            rating = int(request.POST.get('rating', 0))
+            message = (request.POST.get('message') or '').strip()
+            reviewer_name = (request.POST.get('reviewer_name') or '').strip()
+            reviewer_email = (request.POST.get('reviewer_email') or '').strip()
+    except Exception:
+        return HttpResponseBadRequest("Invalid payload")
+
+    if rating < 1 or rating > 5:
+        return JsonResponse({"success": False, "error": "Invalid rating"}, status=400)
+
+    # If user is authenticated, attach and auto-approve; else require moderation (approved=False)
+    if request.user.is_authenticated:
+        fb = Feedback.objects.create(
+            product=product,
+            rating=rating,
+            message=message,
+            user=request.user,
+            reviewer_name=request.user.get_full_name() or request.user.get_username(),
+            reviewer_email=(request.user.email or ''),
+            approved=True  # auto-approve for authenticated users (change if you want moderation)
+        )
+        approved = True
+    else:
+        fb = Feedback.objects.create(
+            product=product,
+            rating=rating,
+            message=message,
+            reviewer_name=reviewer_name,
+            reviewer_email=reviewer_email,
+            approved=False  # require admin approval
+        )
+        approved = False
+
+    # If we want to immediately render updated public reviews, only include approved ones.
+    reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
+    paginator = Paginator(reviews_qs, 5)
+    reviews_page = paginator.page(1) if paginator.count else []
+
+    # Render the reviews partial to HTML so frontend can replace the reviews block (AJAX)
+    rendered = render_to_string('shop/reviews_list.html', {
+        'reviews_page': reviews_page,
+        'product': product,
+        'avg_rating': product.average_rating(),
+        'review_count': product.review_count(),
+        'reviews_paginator': paginator,
+    }, request=request)
+
+    message = "Review submitted."
+    if not approved:
+        message = "Thanks — your review is submitted and will appear once approved."
+
+    return JsonResponse({
+        "success": True,
+        "approved": approved,
+        "message": message,
+        "html": rendered,
+        "avg_rating": product.average_rating(),
+        "review_count": product.review_count(),
+    })
+
+
+# -------------------------
+# RSS feed for product reviews
+# -------------------------
+def product_reviews_rss(request, product_id):
+    """
+    Simple RSS feed of approved reviews for a product.
+    URL: /shop/feedback/rss/<product_id>/
+    """
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    reviews = product.feedbacks.filter(approved=True).order_by('-created_at')[:50]
+
+    feed_items = []
+    for r in reviews:
+        title = f"{r.rating} stars — {escape(r.reviewer_name or (r.user.get_username() if r.user else 'Anonymous'))}"
+        link = request.build_absolute_uri(product.get_absolute_url() if hasattr(product, 'get_absolute_url') else reverse('shop:product_detail', args=[product.slug]))
+        description = escape(r.short_message(500) or '')
+        pubdate = r.created_at.strftime('%a, %d %b %Y %H:%M:%S +0000')
+        feed_items.append({
+            'title': title,
+            'link': link,
+            'description': description,
+            'pubdate': pubdate,
+            'guid': f"feedback-{r.id}"
+        })
+
+    rss = render_to_string('shop/reviews_rss.xml', {
+        'product': product,
+        'items': feed_items,
+        'build_time': timezone.now().strftime('%a, %d %b %Y %H:%M:%S +0000')
+    })
+    return HttpResponse(rss, content_type='application/rss+xml')
+    """
+    Simple RSS feed of approved reviews for a product.
+    URL: /shop/feedback/rss/<product_id>/
+    """
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    reviews = product.feedbacks.filter(approved=True).order_by('-created_at')[:50]
+
+    feed_items = []
+    for r in reviews:
+        title = f"{r.rating} stars — {escape(r.reviewer_name or (r.user.get_username() if r.user else 'Anonymous'))}"
+        link = request.build_absolute_uri(product.get_absolute_url() if hasattr(product, 'get_absolute_url') else reverse('shop:product_detail', args=[product.slug]))
+        description = escape(r.short_message(500) or '')
+        pubdate = r.created_at.strftime('%a, %d %b %Y %H:%M:%S +0000')
+        feed_items.append({
+            'title': title,
+            'link': link,
+            'description': description,
+            'pubdate': pubdate,
+            'guid': f"feedback-{r.id}"
+        })
+
+    rss = render_to_string('shop/reviews_rss.xml', {
+        'product': product,
+        'items': feed_items,
+        'build_time': timezone.now().strftime('%a, %d %b %Y %H:%M:%S +0000')
+    })
+    return HttpResponse(rss, content_type='application/rss+xml')

@@ -37,4 +37,11 @@ urlpatterns = [
 
     # Product Detail (keep last)
     path('<slug:slug>/', views.product_detail, name='product_detail'),
+    # near other urlpatterns
+    path('feedback/<int:product_id>/', views.product_feedback, name='product_feedback'),
+    path('feedback/<int:product_id>/', views.product_feedback, name='product_feedback'),
+    path('feedback/rss/<int:product_id>/', views.product_reviews_rss, name='product_reviews_rss'),
+    # product detail last
+    path('<slug:slug>/', views.product_detail, name='product_detail'),
+
 ]
