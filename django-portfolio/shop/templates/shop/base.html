@@ -7,7 +7,7 @@
   <title>{% block title %}My Shoppings{% endblock %}</title>
 
   <style>
-    /* (keep the same CSS you already had) */
+    /* keep Segoe UI as requested, improved spacing and small visual polish */
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
       margin: 0;
@@ -17,10 +17,13 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
 
+    /* Header (refreshed visuals but close to your original spacing) */
     header {
-      background: #007BFF;
+      background: linear-gradient(90deg,#007BFF 0%, #0b8fff 100%);
       color: #fff;
       padding: 12px 20px;
       display: flex;
@@ -29,17 +32,38 @@
       flex-wrap: wrap;
       position: relative;
       z-index: 2;
+      box-shadow: 0 3px 10px rgba(6,40,84,0.06);
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
+    header .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color: #ffd43b;
+    }
+    .brand .logo {
+      width:34px;
+      height:34px;
+      border-radius:8px;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      padding:3px;
+    }
+    .brand .logo svg { width:20px;height:20px; fill:#0077d9; }
+
+    .brand .title {
+      font-size:20px;
+      font-weight:700;
+      color:#fff;
+      margin:0;
     }
 
     header a {
       color: #ffd43b;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       margin-left: 10px;
     }
 
@@ -56,17 +80,19 @@
     .account .account-btn {
       background: transparent;
       border: none;
-      color: #ffd43b;
+      color: #fff;
       font-weight: 600;
       cursor: pointer;
       font-size: 15px;
+      padding:6px 10px;
+      border-radius:8px;
     }
 
     .account .account-menu {
       display: none;
       position: absolute;
       right: 0;
-      top: 36px;
+      top: 44px;
       background: #fff;
       color: #222;
       border-radius: 8px;
@@ -88,7 +114,7 @@
       background: #f1f5fb;
     }
 
-    /* Cart badge */
+    /* Cart badge (keeps original color idea but improved styling) */
     .cart-badge {
       display: inline-flex;
       align-items: center;
@@ -96,9 +122,10 @@
       background: rgba(255,255,255,0.06);
       padding: 6px 10px;
       border-radius: 999px;
-      color: #ffd43b;
+      color: #fff;
       font-weight: 600;
       text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.06);
     }
     .cart-count {
       background: #ffd43b;
@@ -110,25 +137,26 @@
       min-width: 22px;
       text-align: center;
       display: inline-block;
+      box-shadow: 0 2px 6px rgba(8,30,60,0.06);
     }
 
-    /* rest of your css kept as-is... */
+    /* Floating search (kept centered + width similar to your previous) */
     .floating-search {
       position: fixed;
       top: 15px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.98);
       border-radius: 30px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 30px rgba(6,40,84,0.06);
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 10px;
-      width: 90%;
-      max-width: 420px;
+      width: 86%;
+      max-width: 640px;
+      border: 1px solid rgba(10,40,100,0.05);
     }
 
     .floating-search input[type="text"] {
@@ -142,33 +170,31 @@
     }
 
     .floating-search button {
-      background: #007BFF;
+      background: linear-gradient(90deg,#007BFF,#00C6FF);
       border: none;
       color: white;
       padding: 8px 12px;
-      border-radius: 50%;
+      border-radius: 999px;
       cursor: pointer;
-      font-size: 18px;
-      transition: background 0.2s ease;
+      font-size: 16px;
     }
 
-    .floating-search button:hover {
-      background: #0056b3;
-    }
-
+    /* main container spacing tuned to avoid overlap with floating search */
     main {
       flex: 1;
       max-width: 1200px;
-      margin: 100px auto 24px auto;
+      margin: 110px auto 24px auto;
       padding: 0 16px;
       width: 100%;
     }
 
+    /* Grid and card keep your original sizes but improved spacing and clickable behavior */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
       justify-items: center;
+      align-items: start;
     }
 
     .card {
@@ -181,18 +207,19 @@
       justify-content: space-between;
       width: 100%;
       max-width: 280px;
-      transition: all 0.3s ease;
-      opacity: 0;
-      transform: translateY(30px);
+      transition: all 0.25s ease;
+      transform: translateY(10px);
+      cursor: pointer; /* whole card clickable */
     }
 
     .card.show {
-      opacity: 1;
       transform: translateY(0);
+      opacity: 1;
     }
 
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(6,40,84,0.06);
     }
 
     .card img {
@@ -200,6 +227,7 @@
       height: 200px;
       object-fit: contain;
       background: #f9f9f9;
+      display:block;
     }
 
     .p {
@@ -207,10 +235,14 @@
       text-align: center;
     }
 
+    .p h3 { margin: 6px 0 8px 0; font-size: 15px; color:#0b2540; }
     .price {
       font-weight: 700;
-      color: #007BFF;
+      color: #0b76d6;
+      margin-bottom: 8px;
     }
+
+    .card .card-body { padding: 10px 12px 6px 12px; }
 
     .cart-btn {
       display: flex;
@@ -236,32 +268,30 @@
       color: #fff;
       font-size: 15px;
       transition: all 0.3s ease;
-      height: 45px;
+      height: 44px;
     }
 
     .add {
       background: linear-gradient(135deg, #007BFF, #00C6FF);
-      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
     }
 
     .add:hover {
-      transform: translateY(-2px) scale(1.03);
-      background: linear-gradient(135deg, #0062cc, #00a3cc);
+      transform: translateY(-2px) scale(1.02);
     }
 
     .add.added {
       background: linear-gradient(135deg, #28a745, #6ddf72);
-      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
     }
 
     .buy {
       background: linear-gradient(135deg, #ff7e5f, #feb47b);
-      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.2);
     }
 
     .buy:hover {
-      transform: translateY(-2px) scale(1.03);
-      background: linear-gradient(135deg, #ff5f50, #fdaf6b);
+      transform: translateY(-2px) scale(1.02);
     }
 
     footer {
@@ -319,9 +349,7 @@
         flex-direction: column;
         text-align: center;
       }
-    }
 
-    @media (max-width: 480px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -342,47 +370,52 @@
   </style>
 </head>
 
-<body>
-  <!-- ✅ Floating Search Bar -->
+<body data-initial-cart-count="{{ cart_unique_items|default:0 }}">
+  <!-- Floating Search Bar -->
   <form class="floating-search" method="get" action="{% url 'shop:product_list' %}">
     <input type="text" name="q" value="{{ query }}" placeholder="Search for products...">
-    <button type="submit">🔍</button>
+    <button type="submit" aria-label="Search">
+      🔍
+    </button>
   </form>
 
   <header>
-    <!-- 1) Make "My Shoppings" link to homepage -->
-    <h1>
-      <a href="{% url 'shop:product_list' %}" style="color: #ffd43b; text-decoration: none;">🛍️ My Shoppings</a>
-    </h1>
+    <!-- Brand (clickable) -->
+    <a class="brand" href="{% url 'shop:product_list' %}">
+      <span class="logo" aria-hidden="true">
+        <!-- small bag icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7V6a4 4 0 0 1 8 0v1h3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7h3zM9 7h6" fill="#ffd43b"/></svg>
+      </span>
+      <div>
+        <div class="title">My Shoppings</div>
+      </div>
+    </a>
 
     <div style="display:flex; align-items:center; gap:12px;">
       <!-- Cart link with badge -->
-      <a href="{% url 'shop:cart_detail' %}" class="cart-badge" id="cartLink">
-        🛒 Cart
-        <span id="cartCountBadge" class="cart-count">
-          {% if request.session.cart %}
-            {{ request.session.cart|length }}
-          {% else %}
-            0
-          {% endif %}
+      <a href="{% url 'shop:cart_detail' %}" class="cart-badge" id="cartLink" aria-label="Cart">
+        <!-- cart icon -->
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 6h15l-1.5 9h-12z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1" fill="#fff"/><circle cx="18" cy="20" r="1" fill="#fff"/></svg>
+        <span style="font-weight:700;color:#fff;margin-left:6px;">Cart</span>
+        <span id="cartCountBadge" class="cart-count" aria-live="polite" aria-atomic="true">
+          {{ cart_unique_items|default:0 }}
         </span>
       </a>
 
-      <!-- 2) Removed Checkout and added My Orders in header -->
-      <a href="{% url 'shop:my_orders' %}">📦 My Orders</a>
+      <!-- My Orders -->
+      <a href="{% url 'shop:my_orders' %}" style="color:#ffd43b; font-weight:600;">My Orders</a>
 
-      <!-- Account links -->
+      <!-- Account -->
       <div class="account">
         {% if request.user.is_authenticated %}
         <button class="account-btn" id="accountBtn">{{ request.user.get_username }} ▾</button>
         <div class="account-menu" id="accountMenu" aria-hidden="true">
-          <!-- 3) My Orders removed from profile dropdown -->
           <a href="{% url 'shop:profile' %}">Profile</a>
           <a href="{% url 'shop:logout' %}">Logout</a>
         </div>
         {% else %}
-        <a href="{% url 'shop:login' %}">🔐 Login</a>
-        <a href="{% url 'shop:signup' %}">📝 Signup</a>
+        <a href="{% url 'shop:login' %}" style="color:#ffd43b; font-weight:600;">Login</a>
+        <a href="{% url 'shop:signup' %}" style="color:#ffd43b; font-weight:600; margin-left:6px;">Signup</a>
         {% endif %}
       </div>
     </div>
@@ -390,24 +423,22 @@
 
   <main>
     {% block content %}
-    <!-- Example Product Card -->
-    <div class="grid">
-      <div class="card">
+    <!-- sample card for layout/testing: in product_list.html use your loop and set data-href -->
+    <div class="grid" style="max-width:1100px; margin:40px auto 0;">
+      <div class="card" data-href="#">
         <img src="{% static 'images/sample.jpg' %}" alt="Sample Product">
-        <div class="p">
-          <h3>Sample Product</h3>
-          <p class="price">₹499</p>
+        <div class="card-body">
+          <div class="p">
+            <h3>Sample Product</h3>
+            <div class="price">₹499</div>
+          </div>
         </div>
-
-        <!-- ✅ Buttons Side by Side, Equal Size -->
         <div class="cart-btn">
-          <form action="{% url 'shop:cart_add' 1 %}" method="post" class="cart-form">
-            {% csrf_token %}
-            <button type="button" class="add">🛒 Add to Cart</button>
+          <form action="{% url 'shop:cart_add' 1 %}" method="post">{% csrf_token %}
+            <button type="button" class="add">Add to Cart</button>
           </form>
-          <form action="{% url 'shop:buy_now' 1 %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="buy">⚡ Buy Now</button>
+          <form action="{% url 'shop:buy_now' 1 %}" method="post">{% csrf_token %}
+            <button type="submit" class="buy">Buy Now</button>
           </form>
         </div>
       </div>
@@ -418,27 +449,17 @@
   <footer>
     <div class="footer-container">
 
-      <!-- Column 1: Contact -->
       <div class="footer-column">
         <h4>Contact</h4>
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Inquiry%20from%20E-commerce%20Website&body=Hey%2C%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
-          target="_blank">
-          📧 Email
-        </a>
-
-        <a href="https://wa.me/917048856947?text=Hey,%20I%20saw%20your%20E-commerce%20portfolio%20website.%20Can%20we%20discuss%20more%20about%20it%3F"
-          target="_blank">
-          💬 WhatsApp
-        </a>
+        <a href="mailto:punitp0170@gmail.com" target="_blank">📧 Email</a>
+        <a href="https://wa.me/917048856947" target="_blank">💬 WhatsApp</a>
       </div>
 
-      <!-- Column 2: Branding -->
       <div class="footer-column">
         <h4>My Shoppings</h4>
         <p>© {{ now|date:"Y" }} All Rights Reserved</p>
       </div>
 
-      <!-- Column 3: Developed By -->
       <div class="footer-column">
         <h4>Developer</h4>
         <p>Designed & Developed by <strong>Punit Patel</strong></p>
@@ -459,16 +480,52 @@
     }
     const csrftoken = getCookie('csrftoken');
 
+    // Initialize client-side known state for unique-cart counting.
+    (function initCartState(){
+      try {
+        window._cartState = window._cartState || {};
+        const initial = parseInt(document.body.getAttribute('data-initial-cart-count') || '0', 10);
+        window._cartState.uniqueCount = isNaN(initial) ? 0 : initial;
+
+        // known ids persist to avoid double counting same product within same browser session
+        const known = localStorage.getItem('known_cart_product_ids');
+        window._cartState.knownIds = known ? JSON.parse(known) : [];
+        if (!Array.isArray(window._cartState.knownIds)) window._cartState.knownIds = [];
+      } catch (err) {
+        window._cartState = { uniqueCount: 0, knownIds: [] };
+      }
+    })();
+
+    // Helper to update badge DOM
+    function setCartBadge(count) {
+      const badge = document.getElementById('cartCountBadge');
+      if (!badge) return;
+      badge.textContent = count;
+    }
+
     // Animate cards on scroll
     const cards = document.querySelectorAll('.card');
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) entry.target.classList.add('show');
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.12 });
     cards.forEach(card => observer.observe(card));
 
-    // Add to cart via AJAX (prevents redirect) — works for any .add button inside a form targeting cart_add
+    // Whole-card navigation
+    document.addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      if (e.target.closest('button') || e.target.closest('a') || e.target.closest('form') || e.target.closest('input')) {
+        return;
+      }
+      const url = card.getAttribute('data-href');
+      if (url && url !== '#') {
+        window.location.href = url;
+      }
+    });
+
+    // Add to cart via AJAX — prevents redirect (works for any .add inside a form)
     document.addEventListener('click', async (e) => {
       if (e.target.classList.contains('add')) {
         e.preventDefault();
@@ -476,13 +533,11 @@
         const form = btn.closest('form');
         if (!form) return;
 
-        // get URL + qty if present (default 1)
         const url = form.getAttribute('action');
         let qty = 1;
         const qtyField = form.querySelector('input[name="qty"], input[type="number"]');
         if (qtyField) qty = qtyField.value || 1;
 
-        // visual feedback
         const originalText = btn.textContent;
         btn.disabled = true;
         btn.textContent = 'Adding...';
@@ -501,29 +556,49 @@
 
           if (!resp.ok) throw new Error('Network error');
 
-          const data = await resp.json();
-          // show added state
-          btn.textContent = '✅ Added';
-          btn.classList.add('added');
+          // Try parse JSON. If backend returns JSON with cart_count, use that.
+          let data = null;
+          try {
+            data = await resp.json();
+          } catch (err) {
+            data = null;
+          }
 
-          // update header badge if JSON returns cart_count
           if (data && (data.cart_count !== undefined)) {
-            const badge = document.getElementById('cartCountBadge');
-            if (badge) badge.textContent = data.cart_count;
+            // backend-provided accurate unique-product count
+            window._cartState.uniqueCount = parseInt(data.cart_count, 10) || window._cartState.uniqueCount;
+            setCartBadge(window._cartState.uniqueCount);
           } else {
-            // fallback: increment (best-effort) existing numeric badge
-            const badge = document.getElementById('cartCountBadge');
-            if (badge) {
-              const n = parseInt(badge.textContent||'0') + 1;
-              badge.textContent = n;
+            // Best-effort fallback: attempt to parse product id from form action
+            let productId = null;
+            try {
+              const m = url.match(/\/cart\/add\/(\d+)\/?$/);
+              if (m) productId = m[1];
+            } catch (err) { productId = null; }
+
+            if (productId) {
+              if (!window._cartState.knownIds.includes(productId)) {
+                window._cartState.knownIds.push(productId);
+                localStorage.setItem('known_cart_product_ids', JSON.stringify(window._cartState.knownIds));
+                window._cartState.uniqueCount = (window._cartState.uniqueCount || 0) + 1;
+                setCartBadge(window._cartState.uniqueCount);
+              } else {
+                setCartBadge(window._cartState.uniqueCount);
+              }
+            } else {
+              window._cartState.uniqueCount = (window._cartState.uniqueCount || 0) + 1;
+              setCartBadge(window._cartState.uniqueCount);
             }
           }
+
+          btn.textContent = '✅ Added';
+          btn.classList.add('added');
 
           setTimeout(() => {
             btn.textContent = originalText;
             btn.classList.remove('added');
             btn.disabled = false;
-          }, 1400);
+          }, 1200);
         } catch (err) {
           console.error(err);
           btn.textContent = 'Try again';
@@ -540,13 +615,12 @@
     const accountMenu = document.getElementById('accountMenu');
     if (accountBtn) {
       accountBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const open = accountMenu.style.display === 'block';
         accountMenu.style.display = open ? 'none' : 'block';
       });
       document.addEventListener('click', (e) => {
-        if (!accountBtn.contains(e.target) && !accountMenu.contains(e.target)) {
-          accountMenu.style.display = 'none';
-        }
+        if (!accountBtn.contains(e.target) && accountMenu) accountMenu.style.display = 'none';
       });
     }
   </script>

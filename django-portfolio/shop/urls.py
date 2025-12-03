@@ -1,3 +1,4 @@
+# shop/urls.py
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
@@ -14,6 +15,7 @@ urlpatterns = [
     path('cart/', views.cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'),
     path('cart/remove/<int:product_id>/', views.cart_remove, name='cart_remove'),
+    path('cart/update/<int:product_id>/', views.cart_update, name='cart_update'),
 
     # Checkout & Payments
     path('checkout/', views.checkout, name='checkout'),
@@ -29,20 +31,10 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', views.logout_view, name='logout'),
 
-    # Profile & Orders — IMPORTANT: point to the proper views
+    # Profile & Orders
     path('profile/', views.profile, name='profile'),
     path('orders/', views.my_orders, name='my_orders'),
 
     # Product Detail (keep last)
     path('<slug:slug>/', views.product_detail, name='product_detail'),
-
-    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
-    path('orders/<int:order_id>/cancel/', views.cancel_order, name='cancel_order'),
-    # add this import at top if not present:
-    # from . import views
-
-    path("cart/update/<int:product_id>/", views.cart_update, name="cart_update"),
-
-
-
 ]

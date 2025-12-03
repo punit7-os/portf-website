@@ -64,38 +64,59 @@ def product_detail(request, slug):
 # ADD TO CART (AJAX SAFE)
 # -------------------------
 def cart_add(request, product_id):
-    if request.method != "POST":
-        return HttpResponseBadRequest("Invalid method")
-
+    """
+    Adds a product to the session cart.
+    If request is AJAX/XHR, returns JSON with:
+      - cart_count : number of unique product IDs in cart
+      - total_qty  : total quantity (sum)
+    Otherwise redirects to cart_detail.
+    """
     product = get_object_or_404(Product, id=product_id, is_active=True)
     cart = Cart(request)
-
+    qty = 1
     try:
-        qty = int(request.POST.get("qty", 1))
-    except:
+        if request.method == "POST":
+            qty = int(request.POST.get("qty", 1))
+    except Exception:
         qty = 1
 
     cart.add(product=product, quantity=qty, update_quantity=False)
 
-    cart_count = int(len(cart))
-    total = cart.get_total_price()
-
+    # counts
     try:
-        total = float(total)
-    except:
-        total = str(total)
+        unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0  # unique product ids
+    except Exception:
+        unique_count = 0
+    try:
+        total_qty = len(cart)  # total qty (Cart.__len__ sums quantities)
+    except Exception:
+        total_qty = 0
 
-    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    is_ajax = (request.headers.get('x-requested-with') == 'XMLHttpRequest') or (request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest')
     if is_ajax:
-        return JsonResponse({"success": True, "cart_count": cart_count, "cart_total": total})
+        return JsonResponse({
+            "success": True,
+            "cart_count": unique_count,
+            "total_qty": total_qty,
+        })
 
     return redirect("shop:cart_detail")
 
 
 # -------------------------
-# UPDATE CART QTY (NEW IMPORTANT FUNCTION)
+# UPDATE CART QTY
 # -------------------------
 def cart_update(request, product_id):
+    """
+    POST only.
+    Updates quantity for product_id (set) or removes if qty <= 0.
+    Returns JSON:
+      - success (bool)
+      - row_total (float)  -> total for that product row
+      - cart_total (float) -> cart total price
+      - cart_count (int)   -> UNIQUE product count (len(cart.cart))
+      - total_qty (int)    -> sum of quantities
+    """
     if request.method != "POST":
         return HttpResponseBadRequest("Invalid")
 
@@ -106,6 +127,7 @@ def cart_update(request, product_id):
     except:
         qty = 1
 
+    # If qty <= 0 -> remove product
     if qty <= 0:
         try:
             product = Product.objects.get(id=product_id)
@@ -116,21 +138,30 @@ def cart_update(request, product_id):
         product = get_object_or_404(Product, id=product_id)
         cart.add(product=product, quantity=qty, update_quantity=True)
 
-    # row total
-    row_total = 0
+    # find row total for product_id
+    row_total = 0.0
     for item in cart:
         if item["product"].id == product_id:
             row_total = float(item["total_price"])
             break
 
     cart_total = float(cart.get_total_price())
-    cart_count = len(cart)
+    # Unique count = number of keys in cart session dict
+    try:
+        cart_unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0
+    except:
+        cart_unique_count = 0
+    try:
+        total_qty = len(cart)
+    except:
+        total_qty = 0
 
     return JsonResponse({
         "success": True,
         "row_total": row_total,
         "cart_total": cart_total,
-        "cart_count": cart_count,
+        "cart_count": cart_unique_count,
+        "total_qty": total_qty,
     })
 
 
@@ -173,6 +204,11 @@ def cart_detail(request):
 # CHECKOUT + PAYMENT
 # -------------------------
 def checkout(request):
+    """
+    If ?buy=<product_id> is present, clear cart, add only that product, then render checkout.
+    Otherwise use current cart contents.
+    Ensures template variable 'cart' is provided (list of cart items) so checkout.html works.
+    """
     buy_id = request.GET.get('buy')
     buy_qty = request.GET.get('qty')
 
@@ -188,23 +224,31 @@ def checkout(request):
             product = Product.objects.get(id=int(buy_id))
         except:
             return redirect("shop:product_list")
-
+        # Single product checkout mode: clear cart and add only this product
         cart.clear()
         cart.add(product=product, quantity=buy_qty)
 
+    # If cart is empty -> redirect to product list (keep previous behavior)
     if len(cart) == 0:
         return redirect("shop:product_list")
 
+    # POST -> place order (demo fallback)
     if request.method == "POST":
-        email = request.POST.get("email","").strip()
-
-        if not email:
-            if request.user.is_authenticated:
-                email = request.user.email
-
-        if not email:
+        posted_email = request.POST.get("email", "").strip()
+        if posted_email:
+            email = posted_email
+        elif request.user.is_authenticated and request.user.email:
+            email = request.user.email
+        else:
+            suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
+            error = "Please provide an email address to receive the receipt."
+            items = list(cart)
+            total = cart.get_total_price()
             return render(request, "shop/checkout.html", {
-                "error": "Please enter your email",
+                "cart": items,
+                "total": total,
+                "suggestions": suggestions,
+                "error": error
             })
 
         total = cart.get_total_price()
@@ -212,10 +256,14 @@ def checkout(request):
         cart.clear()
         return redirect("shop:checkout_success")
 
+    # GET -> render checkout; make sure to pass 'cart' variable the template expects
+    items = list(cart)
     total = cart.get_total_price()
+    suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
     return render(request, "shop/checkout.html", {
-        "cart_items": list(cart),
-        "total": total
+        "cart": items,
+        "total": total,
+        "suggestions": suggestions
     })
 
 

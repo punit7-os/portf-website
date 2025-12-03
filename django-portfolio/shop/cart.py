@@ -90,3 +90,7 @@ class Cart:
         for item in self.__iter__():
             total += item["total_price"]
         return total
+
+    def count_unique_items(self):
+        return len(self.cart)
+
