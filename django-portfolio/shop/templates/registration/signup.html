@@ -1,16 +1,36 @@
+{# shop/templates/registration/signup.html - full replace #}
 {% extends "shop/base.html" %}
+{% load socialaccount %}
+{% load static %}
+
 {% block title %}Signup - My Shoppings{% endblock %}
 
 {% block content %}
 <div style="max-width:520px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
   <h2 style="margin-top:0;text-align:center;">Create an account</h2>
 
-  {# show non-field errors (like password mismatch or other form-level errors) #}
+  {# non-field errors #}
   {% if form.non_field_errors %}
     <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:6px;margin-bottom:12px;">
       {{ form.non_field_errors }}
     </div>
   {% endif %}
+
+  {# SOCIAL LOGIN BUTTONS (Google) #}
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+    {# show google button only if provider is configured #}
+    {% if socialaccount_providers.google %}
+      <a href="{% provider_login_url 'google' process='signup' %}"
+         style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:8px;border:1px solid #e6edf8;text-decoration:none;font-weight:700;">
+        <img src="{% static 'images/google-logo.png' %}" alt="Google" style="width:20px;height:20px;">
+        Sign up with Google
+      </a>
+    {% endif %}
+  </div>
+
+  <div style="text-align:center;color:#666;margin-bottom:12px;">
+    <small>Or sign up with your email</small>
+  </div>
 
   <form method="post" novalidate>
     {% csrf_token %}

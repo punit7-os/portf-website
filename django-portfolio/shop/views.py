@@ -1,52 +1,34 @@
 # shop/views.py
-from datetime import timezone
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-from .models import Category, Product, Order, Profile
-from .cart import Cart
-
-# Auth imports
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, ProfileForm
-
-import razorpay
-from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
-from django.utils.html import escape
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse
-from .models import Feedback
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
-
+from django.utils.html import escape
 from django.utils import timezone
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-from .models import Category, Product, Order, Profile
+
+from .models import Category, Product, Order, Profile, Feedback
 from .cart import Cart
+from .forms import CustomUserCreationForm, ProfileForm
 
 # Auth imports
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, ProfileForm
 
 import razorpay
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
-from django.utils.html import escape
-from django.views.decorators.http import require_POST
-from .models import Feedback
+
+def is_ajax_request(request):
+    """
+    Safe AJAX detection. Some clients set X-Requested-With header.
+    """
+    return (request.headers.get('x-requested-with') == 'XMLHttpRequest') or \
+           (request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest')
+
 
 # -------------------------
 # PRODUCT LIST
@@ -78,13 +60,15 @@ def product_list(request, slug=None):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
 
+    # Related products (full queryset provided to template; template does client-side paging)
     related_products = Product.objects.filter(
         category=product.category, is_active=True
-    ).exclude(id=product.id)[:4]
+    ).exclude(id=product.id)
 
+    # fallback "all products" if none in same category
     all_products = None
     if not related_products.exists():
-        all_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:4]
+        all_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:8]
 
     # Reviews: only approved ones for public display
     reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
@@ -96,6 +80,18 @@ def product_detail(request, slug):
         reviews_page = paginator.page(1)
     except EmptyPage:
         reviews_page = paginator.page(paginator.num_pages)
+
+    # If AJAX request specifically asked for a reviews page, return only the reviews partial.
+    # This makes "See more reviews" faster (JS expects HTML fragment).
+    if is_ajax_request(request) and request.GET.get('rpage'):
+        rendered = render_to_string('shop/reviews_list.html', {
+            'reviews_page': reviews_page,
+            'product': product,
+            'avg_rating': product.average_rating(),
+            'review_count': product.review_count(),
+            'reviews_paginator': paginator,
+        }, request=request)
+        return HttpResponse(rendered)
 
     avg_rating = float(product.average_rating() or 0.0)
     review_count = product.review_count()
@@ -124,19 +120,10 @@ def product_detail(request, slug):
     })
 
 
-
-
 # -------------------------
 # ADD TO CART (AJAX SAFE)
 # -------------------------
 def cart_add(request, product_id):
-    """
-    Adds a product to the session cart.
-    If request is AJAX/XHR, returns JSON with:
-      - cart_count : number of unique product IDs in cart
-      - total_qty  : total quantity (sum)
-    Otherwise redirects to cart_detail.
-    """
     product = get_object_or_404(Product, id=product_id, is_active=True)
     cart = Cart(request)
     qty = 1
@@ -148,18 +135,16 @@ def cart_add(request, product_id):
 
     cart.add(product=product, quantity=qty, update_quantity=False)
 
-    # counts
     try:
-        unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0  # unique product ids
+        unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0
     except Exception:
         unique_count = 0
     try:
-        total_qty = len(cart)  # total qty (Cart.__len__ sums quantities)
+        total_qty = len(cart)
     except Exception:
         total_qty = 0
 
-    is_ajax = (request.headers.get('x-requested-with') == 'XMLHttpRequest') or (request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest')
-    if is_ajax:
+    if is_ajax_request(request):
         return JsonResponse({
             "success": True,
             "cart_count": unique_count,
@@ -173,16 +158,6 @@ def cart_add(request, product_id):
 # UPDATE CART QTY
 # -------------------------
 def cart_update(request, product_id):
-    """
-    POST only.
-    Updates quantity for product_id (set) or removes if qty <= 0.
-    Returns JSON:
-      - success (bool)
-      - row_total (float)  -> total for that product row
-      - cart_total (float) -> cart total price
-      - cart_count (int)   -> UNIQUE product count (len(cart.cart))
-      - total_qty (int)    -> sum of quantities
-    """
     if request.method != "POST":
         return HttpResponseBadRequest("Invalid")
 
@@ -193,7 +168,6 @@ def cart_update(request, product_id):
     except:
         qty = 1
 
-    # If qty <= 0 -> remove product
     if qty <= 0:
         try:
             product = Product.objects.get(id=product_id)
@@ -204,7 +178,6 @@ def cart_update(request, product_id):
         product = get_object_or_404(Product, id=product_id)
         cart.add(product=product, quantity=qty, update_quantity=True)
 
-    # find row total for product_id
     row_total = 0.0
     for item in cart:
         if item["product"].id == product_id:
@@ -212,7 +185,6 @@ def cart_update(request, product_id):
             break
 
     cart_total = float(cart.get_total_price())
-    # Unique count = number of keys in cart session dict
     try:
         cart_unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0
     except:
@@ -270,11 +242,6 @@ def cart_detail(request):
 # CHECKOUT + PAYMENT
 # -------------------------
 def checkout(request):
-    """
-    If ?buy=<product_id> is present, clear cart, add only that product, then render checkout.
-    Otherwise use current cart contents.
-    Ensures template variable 'cart' is provided (list of cart items) so checkout.html works.
-    """
     buy_id = request.GET.get('buy')
     buy_qty = request.GET.get('qty')
 
@@ -290,15 +257,12 @@ def checkout(request):
             product = Product.objects.get(id=int(buy_id))
         except:
             return redirect("shop:product_list")
-        # Single product checkout mode: clear cart and add only this product
         cart.clear()
         cart.add(product=product, quantity=buy_qty)
 
-    # If cart is empty -> redirect to product list (keep previous behavior)
     if len(cart) == 0:
         return redirect("shop:product_list")
 
-    # POST -> place order (demo fallback)
     if request.method == "POST":
         posted_email = request.POST.get("email", "").strip()
         if posted_email:
@@ -322,7 +286,6 @@ def checkout(request):
         cart.clear()
         return redirect("shop:checkout_success")
 
-    # GET -> render checkout; make sure to pass 'cart' variable the template expects
     items = list(cart)
     total = cart.get_total_price()
     suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
@@ -505,6 +468,7 @@ def logout_view(request):
     logout(request)
     return redirect("shop:product_list")
 
+
 # -------------------------
 # PRODUCT FEEDBACK POST (AJAX)
 # -------------------------
@@ -513,10 +477,13 @@ def product_feedback(request, product_id):
     """
     Accepts JSON (application/json) or form POST.
     Payload expected:
-      { rating: int(1-5), message: str, reviewer_name: str (optional), reviewer_email: str (optional) }
+      { rating: int(1-5), message: str, reviewer_name: str (optional), reviewer_email: str (optional),
+        update: bool (optional), feedback_id: int (optional) }
 
-    Response (JSON):
-      { success: True, approved: bool, html: "<rendered reviews snippet>" , avg_rating: float, review_count: int }
+    Behavior:
+      - If authenticated user already has a feedback for this product, it will be updated (no duplicate).
+      - If payload contains 'update' + 'feedback_id' and the feedback belongs to the user, it will be updated.
+      - Anonymous submissions create a new Feedback (approved=False).
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
 
@@ -529,46 +496,83 @@ def product_feedback(request, product_id):
             message = (payload.get('message') or '').strip()
             reviewer_name = (payload.get('reviewer_name') or '').strip()
             reviewer_email = (payload.get('reviewer_email') or '').strip()
+            update_flag = bool(payload.get('update', False))
+            feedback_id = payload.get('feedback_id') or None
         else:
             rating = int(request.POST.get('rating', 0))
             message = (request.POST.get('message') or '').strip()
             reviewer_name = (request.POST.get('reviewer_name') or '').strip()
             reviewer_email = (request.POST.get('reviewer_email') or '').strip()
+            update_flag = bool(request.POST.get('update', False))
+            feedback_id = request.POST.get('feedback_id', None)
     except Exception:
         return HttpResponseBadRequest("Invalid payload")
 
     if rating < 1 or rating > 5:
         return JsonResponse({"success": False, "error": "Invalid rating"}, status=400)
 
-    # If user is authenticated, attach and auto-approve; else require moderation (approved=False)
+    # Default values
+    approved = False
+    fb = None
+
+    # If user is authenticated, try to update existing feedback instead of creating duplicate
     if request.user.is_authenticated:
-        fb = Feedback.objects.create(
-            product=product,
-            rating=rating,
-            message=message,
-            user=request.user,
-            reviewer_name=request.user.get_full_name() or request.user.get_username(),
-            reviewer_email=(request.user.email or ''),
-            approved=True  # auto-approve for authenticated users (change if you want moderation)
-        )
-        approved = True
+        existing = Feedback.objects.filter(product=product, user=request.user).first()
+        # If an explicit feedback_id/update is provided, respect and verify ownership
+        if feedback_id:
+            try:
+                fid = int(feedback_id)
+                candidate = Feedback.objects.filter(id=fid).first()
+                if candidate and candidate.user == request.user and candidate.product_id == product.id:
+                    fb = candidate
+            except Exception:
+                fb = fb  # no-op
+
+        if not fb and existing:
+            fb = existing
+
+        if fb:
+            # update fields
+            fb.rating = rating
+            fb.message = message
+            fb.reviewer_name = request.user.get_full_name() or request.user.get_username()
+            fb.reviewer_email = request.user.email or ''
+            # auto-approve authenticated user's reviews by default
+            fb.approved = True
+            fb.save()
+            approved = fb.approved
+        else:
+            # create new for authenticated user (auto-approve)
+            fb = Feedback.objects.create(
+                product=product,
+                rating=rating,
+                message=message,
+                user=request.user,
+                reviewer_name=request.user.get_full_name() or request.user.get_username(),
+                reviewer_email=(request.user.email or ''),
+                approved=True
+            )
+            approved = True
     else:
+        # anonymous creation (moderation required)
         fb = Feedback.objects.create(
             product=product,
             rating=rating,
             message=message,
             reviewer_name=reviewer_name,
             reviewer_email=reviewer_email,
-            approved=False  # require admin approval
+            approved=False
         )
         approved = False
 
-    # If we want to immediately render updated public reviews, only include approved ones.
+    # Prepare public reviews (only approved ones), first page
     reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
     paginator = Paginator(reviews_qs, 5)
-    reviews_page = paginator.page(1) if paginator.count else []
+    try:
+        reviews_page = paginator.page(1)
+    except:
+        reviews_page = []
 
-    # Render the reviews partial to HTML so frontend can replace the reviews block (AJAX)
     rendered = render_to_string('shop/reviews_list.html', {
         'reviews_page': reviews_page,
         'product': product,
@@ -583,11 +587,12 @@ def product_feedback(request, product_id):
 
     return JsonResponse({
         "success": True,
-        "approved": approved,
+        "approved": bool(approved),
         "message": message,
         "html": rendered,
         "avg_rating": product.average_rating(),
         "review_count": product.review_count(),
+        "feedback_id": fb.id if fb else None
     })
 
 
@@ -595,37 +600,6 @@ def product_feedback(request, product_id):
 # RSS feed for product reviews
 # -------------------------
 def product_reviews_rss(request, product_id):
-    """
-    Simple RSS feed of approved reviews for a product.
-    URL: /shop/feedback/rss/<product_id>/
-    """
-    product = get_object_or_404(Product, id=product_id, is_active=True)
-    reviews = product.feedbacks.filter(approved=True).order_by('-created_at')[:50]
-
-    feed_items = []
-    for r in reviews:
-        title = f"{r.rating} stars — {escape(r.reviewer_name or (r.user.get_username() if r.user else 'Anonymous'))}"
-        link = request.build_absolute_uri(product.get_absolute_url() if hasattr(product, 'get_absolute_url') else reverse('shop:product_detail', args=[product.slug]))
-        description = escape(r.short_message(500) or '')
-        pubdate = r.created_at.strftime('%a, %d %b %Y %H:%M:%S +0000')
-        feed_items.append({
-            'title': title,
-            'link': link,
-            'description': description,
-            'pubdate': pubdate,
-            'guid': f"feedback-{r.id}"
-        })
-
-    rss = render_to_string('shop/reviews_rss.xml', {
-        'product': product,
-        'items': feed_items,
-        'build_time': timezone.now().strftime('%a, %d %b %Y %H:%M:%S +0000')
-    })
-    return HttpResponse(rss, content_type='application/rss+xml')
-    """
-    Simple RSS feed of approved reviews for a product.
-    URL: /shop/feedback/rss/<product_id>/
-    """
     product = get_object_or_404(Product, id=product_id, is_active=True)
     reviews = product.feedbacks.filter(approved=True).order_by('-created_at')[:50]
 

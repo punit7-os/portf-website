@@ -1,34 +1,12 @@
 {# templates/shop/reviews_list.html - corrected #}
 <div id="reviewsBlock">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-    <div style="font-weight:800;font-size:1.05rem;">Customer reviews</div>
-    <div aria-hidden="true" style="display:flex;align-items:center;gap:6px;">
-      {% with avg=avg_rating|floatformat:1 %}
-        <div style="font-weight:800;">{{ avg }}</div>
-      {% endwith %}
-      <div>
-        {# render 5 stars based on numeric avg_rating (float) passed from view #}
-        {% for i in "12345" %}
-          {% with i_val=forloop.counter %}
-            {% if i_val <= avg_rating %}
-              <span style="color:#ffb400;">★</span>
-            {% else %}
-              <span style="color:#cfd8e3;">★</span>
-            {% endif %}
-          {% endwith %}
-        {% endfor %}
-      </div>
-      <div style="color:#6b7280;">({{ review_count }} reviews)</div>
-    </div>
-  </div>
-
   {% if reviews_page and reviews_page.object_list %}
     <ul style="list-style:none;padding:0;margin:0;">
       {% for r in reviews_page %}
-        <li style="padding:12px 0;border-bottom:1px solid #f1f5f9;">
+        <li class="review-item" role="article" aria-label="Customer review">
           <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-size:20px;line-height:1;">
-              {% for i in "12345" %}
+            <div style="font-size:18px;line-height:1;">
+              {% for _ in "12345" %}
                 {% if forloop.counter <= r.rating %}
                   <span style="color:#ffb400;">★</span>
                 {% else %}
@@ -36,13 +14,25 @@
                 {% endif %}
               {% endfor %}
             </div>
+
             <div style="flex:1;">
-              <div style="display:flex;gap:8px;align-items:center;">
-                <strong>{{ r.reviewer_name|default:r.user.get_username|default:"Anonymous" }}</strong>
-                <span style="color:#6b7280;font-size:13px;">• {{ r.created_at|date:"M d, Y" }}</span>
+              <div class="review-meta">
+                <div>
+                  <strong>
+                    {% if r.reviewer_name %}
+                      {{ r.reviewer_name }}
+                    {% elif r.user %}
+                      {{ r.user.get_username }}
+                    {% else %}
+                      Anonymous
+                    {% endif %}
+                  </strong>
+                </div>
+                <div style="color:var(--muted);font-size:13px;">{{ r.created_at|date:"M d, Y" }}</div>
               </div>
+
               {% if r.message %}
-                <div style="margin-top:6px;color:#253147;">{{ r.message|linebreaksbr }}</div>
+                <div style="margin-top:8px;color:#253147;">{{ r.message|linebreaksbr }}</div>
               {% endif %}
             </div>
           </div>
@@ -51,17 +41,20 @@
     </ul>
 
     {% if reviews_paginator and reviews_paginator.num_pages > 1 %}
-      <div style="margin-top:10px;display:flex;gap:6px;align-items:center;">
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
         {% if reviews_page.has_previous %}
-          <a href="?rpage={{ reviews_page.previous_page_number }}" class="btn" style="background:#f1f5f9;color:#0b1724;padding:6px 10px;border-radius:8px;">← Prev</a>
+          <a href="?rpage={{ reviews_page.previous_page_number }}" class="see-more-btn" style="margin-right:6px;">← Prev</a>
         {% endif %}
-        <div style="color:#6b7280;">Page {{ reviews_page.number }} of {{ reviews_paginator.num_pages }}</div>
+
+        <div style="color:var(--muted);">Page {{ reviews_page.number }} of {{ reviews_paginator.num_pages }}</div>
+
         {% if reviews_page.has_next %}
-          <a href="?rpage={{ reviews_page.next_page_number }}" class="btn" style="background:#06b6d4;color:#fff;padding:6px 10px;border-radius:8px;">Next →</a>
+          <a href="?rpage={{ reviews_page.next_page_number }}" class="see-more-btn" style="margin-left:6px;">Next →</a>
         {% endif %}
       </div>
     {% endif %}
+
   {% else %}
-    <div style="color:#6b7280;padding:12px 0;">No reviews yet — be the first to review!</div>
+    <div style="color:var(--muted);padding:12px 0;">No reviews yet — be the first to review!</div>
   {% endif %}
 </div>
