@@ -1,0 +1,73 @@
+{% extends "shop/base.html" %}
+{% load i18n static %}
+
+{% block title %}Signup - My Shoppings{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
+  <h2 style="margin-top:0;text-align:center;">Create an account</h2>
+
+  {% if form.non_field_errors %}
+    <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:6px;margin-bottom:12px;">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  {# Social login button (if provider configured) #}
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+    {% if socialaccount_providers.google %}
+      <a href="{% provider_login_url 'google' process='signup' %}"
+         style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:8px;border:1px solid #e6edf8;text-decoration:none;font-weight:700;">
+        <img src="{% static 'images/google-logo.png' %}" alt="Google" style="width:20px;height:20px;">
+        Sign up with Google
+      </a>
+    {% endif %}
+  </div>
+
+  <div style="text-align:center;color:#666;margin-bottom:12px;">
+    <small>{% trans "Or sign up with your email" %}</small>
+  </div>
+
+  <form method="post" action="{% url 'account_signup' %}" novalidate>
+    {% csrf_token %}
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Username</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.username.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Email</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.email.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Password</label>
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.password1.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Confirm Password</label>
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.password2.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <button type="submit" style="width:100%;padding:12px;border-radius:8px;border:none;background:#007BFF;color:white;font-weight:600;">
+      {% trans "Signup" %}
+    </button>
+  </form>
+
+  <p style="text-align:center;margin-top:12px;">Already have an account? <a href="{% url 'account_login' %}">{% trans "Login" %}</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% if messages %}
+  <div style="max-width:720px;margin:20px auto;">
+    {% for message in messages %}
+      <div style="padding:10px;border-radius:6px;margin-bottom:10px;
+                  {% if message.level_tag == 'error' %}background:#fdecea;color:#b00020;
+                  {% elif message.level_tag == 'success' %}background:#ecfdf5;color:#065f46;
+                  {% else %}background:#f1f5fb;color:#0b63d6;{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

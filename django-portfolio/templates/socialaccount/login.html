@@ -1,0 +1,76 @@
+{% extends "shop/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{# socialaccount.login.html - pretty provider confirmation card #}
+{% block title %}Sign In - My Shoppings{% endblock %}
+
+{% block content %}
+<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding:48px 16px;">
+  <div style="max-width:680px;width:100%;background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(3,35,70,0.08);padding:32px;">
+
+    <div style="display:flex;gap:20px;align-items:center;">
+      <!-- left: small provider brand -->
+      <div style="flex:0 0 84px;display:flex;align-items:center;justify-content:center;">
+        <!-- inline Google "G" (will be used for google provider) -->
+        <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,#f8fafc,#ffffff);display:flex;align-items:center;justify-content:center;border:1px solid #eef2ff;">
+          <svg width="36" height="36" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#4285F4" d="M533.5 278.4c0-18.5-1.5-36.3-4.3-53.5H272v101.3h147.1c-6.3 34.1-25.1 62.9-53.3 82.2l86.1 67.3c50.2-46.3 81.6-114.3 81.6-197.3z"/>
+            <path fill="#34A853" d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.1-67.3c-23.9 16.1-54.6 25.6-92 25.6-70.7 0-130.5-47.8-152-111.9L36.2 347.2C82.8 472 170.5 544.3 272 544.3z"/>
+            <path fill="#FBBC05" d="M120 325.6c-10.6-31.7-10.6-65.9 0-97.6L36.2 180.7C12 230.6 0 283.8 0 338.1c0 54.3 12 107.5 36.2 157.4L120 325.6z"/>
+            <path fill="#EA4335" d="M272 110.7c39 0 74 13.4 101.6 39.6l76.1-76.1C405.6 24 344.6 0 272 0 170.5 0 82.8 72.3 36.2 180.7l103.9 47.1C141.5 158.5 201.3 110.7 272 110.7z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- right: message and actions -->
+      <div style="flex:1;">
+        <h2 style="margin:0 0 8px 0;font-size:20px;color:#0b2540;font-weight:800;text-align:left;">
+          Sign In Via {{ provider|default:"Google" }}
+        </h2>
+
+        <p style="margin:0 0 18px 0;color:#556074;line-height:1.5;">
+          You are about to sign in using a third-party account from {{ provider|default:"Google" }}.
+          Click <strong>Continue</strong> to proceed and allow this site to use your account information.
+        </p>
+
+        <form method="post" style="margin-top:6px;">
+          {% csrf_token %}
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button type="submit"
+                    style="background:linear-gradient(90deg,#0b63d6,#2373ff);
+                           color:white;padding:10px 20px;border-radius:8px;border:none;font-weight:700;
+                           box-shadow:0 6px 18px rgba(11,99,214,0.18);cursor:pointer;">
+              Continue
+            </button>
+
+            <a href="{% url 'shop:login' %}" style="color:#6b21a8;text-decoration:underline;padding:8px 0;">Back to login</a>
+
+            {# optional: show provider account info if allauth provides it #}
+            {% if sociallogin %}
+              <div style="margin-left:auto;color:#374151;font-size:13px;">
+                <!-- show provider account identity if available -->
+                {% if sociallogin.account.extra_data.name %}
+                  {{ sociallogin.account.extra_data.name }}
+                {% elif sociallogin.account.extra_data.email %}
+                  {{ sociallogin.account.extra_data.email }}
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{# Small responsive tweaks #}
+<style>
+  @media (max-width:720px){
+    .container, .signup-card { padding:18px; }
+    .provider-card { flex-direction:column; gap:12px; align-items:center; text-align:center; }
+  }
+</style>
+{% endblock %}
