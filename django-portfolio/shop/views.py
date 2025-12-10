@@ -21,6 +21,33 @@ from django.contrib.auth.decorators import login_required
 import razorpay
 from django.conf import settings
 
+from decimal import Decimal
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.html import escape
+from django.utils import timezone
+
+from .models import Category, Product, Order, Profile, Feedback
+from .cart import Cart
+from .forms import CustomUserCreationForm, ProfileForm
+
+# Auth imports
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+import razorpay
+
+import random
+import time
+
 
 def is_ajax_request(request):
     """
@@ -409,19 +436,145 @@ def buy_now(request, product_id):
 # AUTH / PROFILE
 # -------------------------
 def signup(request):
+    """
+    Two-step signup:
+      1) User submits username,email,password,password2,phone -> server validates -> generate OTP -> send to email -> show OTP form.
+      2) User submits OTP -> server verifies -> create user+profile -> authenticate & login -> redirect to product_list.
+    OTP is stored in session with an expiry (5 minutes).
+    """
+    OTP_SESSION_KEY = "signup_otp_data"  # will hold dict: {username,email,password,phone,otp,expires_at}
+
     if request.method == "POST":
+        # If OTP field present -> verify branch
+        if request.POST.get("otp_verify") == "1":
+            otp_provided = request.POST.get("otp", "").strip()
+            otp_data = request.session.get(OTP_SESSION_KEY)
+            if not otp_data:
+                return render(request, "registration/signup.html", {
+                    "form": CustomUserCreationForm(),
+                    "otp_error": "Session expired. Please fill the signup form again."
+                })
+            if time.time() > otp_data.get("expires_at", 0):
+                # expired
+                del request.session[OTP_SESSION_KEY]
+                return render(request, "registration/signup.html", {
+                    "form": CustomUserCreationForm(),
+                    "otp_error": "OTP expired. Please submit signup form again to receive a new OTP."
+                })
+            if otp_provided != str(otp_data.get("otp")):
+                # wrong OTP
+                return render(request, "registration/signup.html", {
+                    "form": CustomUserCreationForm(initial={
+                        "username": otp_data.get("username"),
+                        "email": otp_data.get("email"),
+                        "phone": otp_data.get("phone"),
+                    }),
+                    "show_otp": True,
+                    "otp_error": "Invalid OTP. Please check your email and try again."
+                })
+
+            # OTP correct => create user
+            username = otp_data.get("username")
+            email = otp_data.get("email")
+            password = otp_data.get("password")
+            phone = otp_data.get("phone")
+
+            from django.contrib.auth.models import User
+            if User.objects.filter(username=username).exists():
+                del request.session[OTP_SESSION_KEY]
+                return render(request, "registration/signup.html", {
+                    "form": CustomUserCreationForm(),
+                    "otp_error": "Username already taken. Please choose another."
+                })
+            if User.objects.filter(email__iexact=email).exists():
+                del request.session[OTP_SESSION_KEY]
+                return render(request, "registration/signup.html", {
+                    "form": CustomUserCreationForm(),
+                    "otp_error": "Email already registered. Try logging in instead."
+                })
+
+            user = User.objects.create_user(username=username, email=email, password=password)
+            # create profile
+            Profile.objects.create(user=user, phone=phone)
+
+            # Authenticate and login properly (this sets backend)
+            user = authenticate(username=username, password=password)
+            if user:
+                login(request, user)  # backend is present because we used authenticate()
+            # clear session OTP data
+            try:
+                del request.session[OTP_SESSION_KEY]
+            except KeyError:
+                pass
+            return redirect("shop:product_list")
+
+        # else: initial signup form submission branch (generate/send OTP)
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.email = form.cleaned_data["email"]
-            user.save()
-            Profile.objects.get_or_create(user=user)
-            login(request, user)
-            return redirect("shop:product_list")
-    else:
-        form = CustomUserCreationForm()
+            # don't create user yet — store data in session and send OTP
+            username = form.cleaned_data.get("username")
+            email = form.cleaned_data.get("email")
+            password = form.cleaned_data.get("password1")
+            phone = form.cleaned_data.get("phone")
 
-    return render(request, "registration/signup.html", {"form":form})
+            # Prevent duplicate email/username early
+            from django.contrib.auth.models import User
+            if User.objects.filter(username=username).exists():
+                form.add_error("username", "This username is already taken.")
+                return render(request, "registration/signup.html", {"form": form})
+            if User.objects.filter(email__iexact=email).exists():
+                form.add_error("email", "An account with this email already exists.")
+                return render(request, "registration/signup.html", {"form": form})
+
+            # generate 6-digit OTP
+            otp = random.randint(100000, 999999)
+            expires_at = time.time() + (5 * 60)  # 5 minutes expiry
+
+            # store temp payload in session
+            request.session[OTP_SESSION_KEY] = {
+                "username": username,
+                "email": email,
+                "password": password,
+                "phone": phone,
+                "otp": str(otp),
+                "expires_at": expires_at
+            }
+            request.session.modified = True
+
+            # send OTP email
+            subject = "Your signup OTP for My Shoppings"
+            message = f"Hi {username},\n\nYour OTP to complete signup is: {otp}\nThis OTP expires in 5 minutes.\n\nIf you did not request this, ignore this email."
+            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER if hasattr(settings, "EMAIL_HOST_USER") else None)
+            recipient_list = [email]
+
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except Exception as e:
+                # If email sending fails, clear session OTP and show error.
+                try:
+                    del request.session[OTP_SESSION_KEY]
+                except:
+                    pass
+                form.add_error(None, f"Failed to send OTP email: {e}. Check your email settings.")
+                return render(request, "registration/signup.html", {"form": form})
+
+            # render form again but show OTP input
+            return render(request, "registration/signup.html", {
+                "form": CustomUserCreationForm(initial={
+                    "username": username,
+                    "email": email,
+                    "phone": phone
+                }),
+                "show_otp": True,
+                "otp_sent_to": email
+            })
+        else:
+            # invalid form -> show errors
+            return render(request, "registration/signup.html", {"form": form})
+    else:
+        # GET
+        form = CustomUserCreationForm()
+        return render(request, "registration/signup.html", {"form": form})
 
 
 @login_required

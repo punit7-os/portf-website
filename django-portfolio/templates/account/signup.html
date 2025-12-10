@@ -1,73 +1,88 @@
 {% extends "shop/base.html" %}
-{% load i18n static %}
+{% load i18n form_tags static %}
 
 {% block title %}Signup - My Shoppings{% endblock %}
 
 {% block content %}
-<div style="max-width:520px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
-  <h2 style="margin-top:0;text-align:center;">Create an account</h2>
+<div style="max-width:540px;margin:40px auto;padding:26px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.06);">
+  <div style="text-align:center;margin-bottom:10px;">
+    <h2 style="margin:0;font-size:22px;color:#0b2545;">Create an account</h2>
+    <p style="margin:6px 0 0;color:#6b7280;font-size:14px;">Join My Shoppings — quick sign up</p>
+  </div>
 
-  {% if form.non_field_errors %}
-    <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:6px;margin-bottom:12px;">
-      {{ form.non_field_errors }}
-    </div>
-  {% endif %}
+  {% include "account/messages.html" %}
 
-  {# Social login button (if provider configured) #}
-  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-    {% if socialaccount_providers.google %}
+
+  {% if socialaccount_providers.google %}
+    <div style="display:flex;gap:10px;justify-content:center;margin:12px 0 18px;">
       <a href="{% provider_login_url 'google' process='signup' %}"
-         style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:8px;border:1px solid #e6edf8;text-decoration:none;font-weight:700;">
-        <img src="{% static 'images/google-logo.png' %}" alt="Google" style="width:20px;height:20px;">
+         style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e6edf8;background:#fff;">
+        <img src="{% static 'images/google-logo.png' %}" alt="Google" style="width:18px;height:18px;">
         Sign up with Google
       </a>
-    {% endif %}
-  </div>
-
-  <div style="text-align:center;color:#666;margin-bottom:12px;">
-    <small>{% trans "Or sign up with your email" %}</small>
-  </div>
+    </div>
+    <div style="text-align:center;color:#9aa4b2;margin-bottom:12px;">OR</div>
+  {% endif %}
 
   <form method="post" action="{% url 'account_signup' %}" novalidate>
     {% csrf_token %}
 
     <div style="margin-bottom:12px;">
-      <label style="display:block;font-weight:600;margin-bottom:6px;">Username</label>
-      {{ form.username }}
+      <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Username</label>
+      {{ form.username|add_class:"input-full" }}
       {% if form.username.errors %}
         <div style="color:#b00020;margin-top:6px;">{{ form.username.errors|join:", " }}</div>
       {% endif %}
     </div>
 
     <div style="margin-bottom:12px;">
-      <label style="display:block;font-weight:600;margin-bottom:6px;">Email</label>
-      {{ form.email }}
+      <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Email</label>
+      {{ form.email|add_class:"input-full" }}
       {% if form.email.errors %}
         <div style="color:#b00020;margin-top:6px;">{{ form.email.errors|join:", " }}</div>
       {% endif %}
     </div>
 
+    {% if form.phone %}
     <div style="margin-bottom:12px;">
-      <label style="display:block;font-weight:600;margin-bottom:6px;">Password</label>
-      {{ form.password1 }}
-      {% if form.password1.errors %}
-        <div style="color:#b00020;margin-top:6px;">{{ form.password1.errors|join:", " }}</div>
+      <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Phone (optional)</label>
+      {{ form.phone|add_class:"input-full" }}
+      {% if form.phone.errors %}
+        <div style="color:#b00020;margin-top:6px;">{{ form.phone.errors|join:", " }}</div>
       {% endif %}
     </div>
+    {% endif %}
 
-    <div style="margin-bottom:16px;">
-      <label style="display:block;font-weight:600;margin-bottom:6px;">Confirm Password</label>
-      {{ form.password2 }}
-      {% if form.password2.errors %}
-        <div style="color:#b00020;margin-top:6px;">{{ form.password2.errors|join:", " }}</div>
-      {% endif %}
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div style="flex:1;">
+        <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Password</label>
+        {{ form.password1|add_class:"input-full" }}
+        {% if form.password1.errors %}
+          <div style="color:#b00020;margin-top:6px;">{{ form.password1.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <div style="flex:1;">
+        <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Confirm</label>
+        {{ form.password2|add_class:"input-full" }}
+        {% if form.password2.errors %}
+          <div style="color:#b00020;margin-top:6px;">{{ form.password2.errors|join:", " }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <button type="submit" style="width:100%;padding:12px;border-radius:8px;border:none;background:#007BFF;color:white;font-weight:600;">
+    <button type="submit" style="width:100%;padding:12px;border-radius:10px;border:none;background:#007BFF;color:white;font-weight:700;cursor:pointer;">
       {% trans "Signup" %}
     </button>
   </form>
 
-  <p style="text-align:center;margin-top:12px;">Already have an account? <a href="{% url 'account_login' %}">{% trans "Login" %}</a></p>
+  <p style="text-align:center;margin-top:12px;color:#666;">Already have an account? <a href="{% url 'account_login' %}" style="color:#0b63d6;font-weight:600;">Login</a></p>
 </div>
+
+<style>
+.input-full { width:100%;padding:11px;border-radius:8px;border:1px solid #e6edf8;font-size:14px; }
+@media (max-width:520px) {
+  .input-full { padding:10px; }
+}
+</style>
 {% endblock %}

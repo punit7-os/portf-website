@@ -344,3 +344,13 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"  # or "mandatory" if you want verification
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 
+# settings.py (add or update)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'chhabilp01@gmail.com'           # your Gmail address
+EMAIL_HOST_PASSWORD = 'vwhe zkji stcn emim'          # app password if using 2FA
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+

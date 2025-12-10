@@ -1,0 +1,2 @@
+# shop/templatetags/__init__.py
+# This file intentionally left blank to mark the templatetags package.

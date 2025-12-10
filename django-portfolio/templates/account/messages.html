@@ -1,10 +1,12 @@
 {% if messages %}
-  <div style="max-width:720px;margin:20px auto;">
+  <div style="max-width:760px;margin:14px auto;display:flex;flex-direction:column;gap:8px;">
     {% for message in messages %}
-      <div style="padding:10px;border-radius:6px;margin-bottom:10px;
-                  {% if message.level_tag == 'error' %}background:#fdecea;color:#b00020;
-                  {% elif message.level_tag == 'success' %}background:#ecfdf5;color:#065f46;
-                  {% else %}background:#f1f5fb;color:#0b63d6;{% endif %}">
+      <div role="status" aria-live="polite"
+           style="padding:10px 12px;border-radius:8px;box-shadow:0 6px 14px rgba(2,6,23,0.04);
+                  {% if message.level_tag == 'error' %}background:#fff1f0;color:#b00020;border-left:4px solid #ff4b4b;
+                  {% elif message.level_tag == 'warning' %}background:#fff7ed;color:#92400e;border-left:4px solid #f59e0b;
+                  {% elif message.level_tag == 'success' %}background:#ecfdf5;color:#065f46;border-left:4px solid #10b981;
+                  {% else %}background:#f1f5fb;color:#0b63d6;border-left:4px solid #3b82f6;{% endif %}">
         {{ message }}
       </div>
     {% endfor %}

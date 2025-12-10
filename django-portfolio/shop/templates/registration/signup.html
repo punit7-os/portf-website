@@ -15,6 +15,12 @@
     </div>
   {% endif %}
 
+  {% if otp_error %}
+    <div style="background:#fff1f0;color:#9b1c18;padding:10px;border-radius:8px;margin:12px 0;">
+      {{ otp_error }}
+    </div>
+  {% endif %}
+
   <div style="display:flex;flex-direction:column;gap:12px;margin:18px 0;">
     <a href="{% provider_login_url 'google' process='signup' %}"
        style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px;border-radius:10px;border:1px solid #e6edf8;text-decoration:none;font-weight:700;background:#fff;">
@@ -30,7 +36,7 @@
   </div>
 
   <div style="text-align:center;color:#6b7280;margin-bottom:18px;">
-    <small>Or sign up with your email</small>
+    <small>Or sign up with your email (we'll send an OTP to verify)</small>
   </div>
 
   <form method="post" novalidate>
@@ -70,10 +76,31 @@
       </div>
     </div>
 
-    <button type="submit"
-            style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0b63d6,#2373ff);color:white;font-weight:700;margin-top:6px;">
-      Signup
-    </button>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;color:#374151;">Mobile / Phone</label>
+      {{ form.phone }}
+      {% if form.phone.errors %}
+        <div style="color:#9b1c18;margin-top:8px;">{{ form.phone.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    {% if show_otp %}
+      <div style="margin-top:12px;padding:12px;background:#f8fbff;border-radius:8px;border:1px solid #e6edf8;">
+        <p style="margin:0 0 8px;">An OTP has been sent to <strong>{{ otp_sent_to }}</strong>. Enter it below to complete signup.</p>
+        <label style="display:block;font-weight:600;margin-bottom:6px;color:#374151;">OTP</label>
+        <input type="text" name="otp" maxlength="6" style="width:100%;padding:10px 12px;border:1px solid #e6edf8;border-radius:8px;margin-bottom:8px;">
+        <input type="hidden" name="otp_verify" value="1">
+        <button type="submit" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0b63d6,#2373ff);color:white;font-weight:700;margin-top:6px;">
+          Verify OTP & Signup
+        </button>
+      </div>
+      <p style="margin-top:10px;color:#6b7280;font-size:13px;text-align:center;">Didn't receive? resubmit the signup form to request a new OTP.</p>
+    {% else %}
+      <button type="submit"
+              style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0b63d6,#2373ff);color:white;font-weight:700;margin-top:6px;">
+        Signup (Send OTP)
+      </button>
+    {% endif %}
   </form>
 
   <p style="text-align:center;margin-top:14px;color:#6b7280;">Already have an account? <a href="{% url 'shop:login' %}" style="color:#2563eb;">Login</a></p>

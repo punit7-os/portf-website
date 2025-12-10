@@ -1,0 +1,10 @@
+/* minimal auth styling — paste into shop/static/shop/css/styles.css */
+.auth-card{
+  background:#fff;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,0.06);
+  padding:28px;max-width:640px;margin:28px auto;
+}
+.auth-title{font-size:24px;margin:0 0 8px;color:#0b2545;font-weight:700}
+.auth-sub{color:#6b7280;margin:0 0 16px}
+.btn{background:#0b63d6;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700}
+.btn-outline{border:1px solid #e6edf8;padding:10px 12px;border-radius:10px;color:#0b63d6;text-decoration:none;background:#fff}
+:root{--muted:#6b7280}
