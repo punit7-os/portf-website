@@ -5,12 +5,12 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}My Shoppings{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'shop/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
 
 
   <style>
     /* keep Segoe UI as requested, improved spacing and small visual polish */
-    
+
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
       margin: 0;
@@ -20,13 +20,13 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* Header (refreshed visuals but close to your original spacing) */
     header {
-      background: linear-gradient(90deg,#007BFF 0%, #0b8fff 100%);
+      background: linear-gradient(90deg, #007BFF 0%, #0b8fff 100%);
       color: #fff;
       padding: 12px 20px;
       display: flex;
@@ -35,32 +35,38 @@
       flex-wrap: wrap;
       position: relative;
       z-index: 2;
-      box-shadow: 0 3px 10px rgba(6,40,84,0.06);
+      box-shadow: 0 3px 10px rgba(6, 40, 84, 0.06);
     }
 
     header .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      text-decoration:none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
       color: #ffd43b;
     }
+
     .brand .logo {
-      width:34px;
-      height:34px;
-      border-radius:8px;
-      background:#fff;
-      display:grid;
-      place-items:center;
-      padding:3px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      padding: 3px;
     }
-    .brand .logo svg { width:20px;height:20px; fill:#0077d9; }
+
+    .brand .logo svg {
+      width: 20px;
+      height: 20px;
+      fill: #0077d9;
+    }
 
     .brand .title {
-      font-size:20px;
-      font-weight:700;
-      color:#fff;
-      margin:0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
     }
 
     header a {
@@ -87,8 +93,8 @@
       font-weight: 600;
       cursor: pointer;
       font-size: 15px;
-      padding:6px 10px;
-      border-radius:8px;
+      padding: 6px 10px;
+      border-radius: 8px;
     }
 
     .account .account-menu {
@@ -122,14 +128,15 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       padding: 6px 10px;
       border-radius: 999px;
       color: #fff;
       font-weight: 600;
       text-decoration: none;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
+
     .cart-count {
       background: #ffd43b;
       color: #07263a;
@@ -140,7 +147,7 @@
       min-width: 22px;
       text-align: center;
       display: inline-block;
-      box-shadow: 0 2px 6px rgba(8,30,60,0.06);
+      box-shadow: 0 2px 6px rgba(8, 30, 60, 0.06);
     }
 
     /* Floating search (kept centered + width similar to your previous) */
@@ -152,14 +159,14 @@
       z-index: 1000;
       background: rgba(255, 255, 255, 0.98);
       border-radius: 30px;
-      box-shadow: 0 8px 30px rgba(6,40,84,0.06);
+      box-shadow: 0 8px 30px rgba(6, 40, 84, 0.06);
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 10px;
       width: 86%;
       max-width: 640px;
-      border: 1px solid rgba(10,40,100,0.05);
+      border: 1px solid rgba(10, 40, 100, 0.05);
     }
 
     .floating-search input[type="text"] {
@@ -173,7 +180,7 @@
     }
 
     .floating-search button {
-      background: linear-gradient(90deg,#007BFF,#00C6FF);
+      background: linear-gradient(90deg, #007BFF, #00C6FF);
       border: none;
       color: white;
       padding: 8px 12px;
@@ -212,7 +219,8 @@
       max-width: 280px;
       transition: all 0.25s ease;
       transform: translateY(10px);
-      cursor: pointer; /* whole card clickable */
+      cursor: pointer;
+      /* whole card clickable */
     }
 
     .card.show {
@@ -222,7 +230,7 @@
 
     .card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(6,40,84,0.06);
+      box-shadow: 0 12px 30px rgba(6, 40, 84, 0.06);
     }
 
     .card img {
@@ -230,7 +238,7 @@
       height: 200px;
       object-fit: contain;
       background: #f9f9f9;
-      display:block;
+      display: block;
     }
 
     .p {
@@ -238,14 +246,21 @@
       text-align: center;
     }
 
-    .p h3 { margin: 6px 0 8px 0; font-size: 15px; color:#0b2540; }
+    .p h3 {
+      margin: 6px 0 8px 0;
+      font-size: 15px;
+      color: #0b2540;
+    }
+
     .price {
       font-weight: 700;
       color: #0b76d6;
       margin-bottom: 8px;
     }
 
-    .card .card-body { padding: 10px 12px 6px 12px; }
+    .card .card-body {
+      padding: 10px 12px 6px 12px;
+    }
 
     .cart-btn {
       display: flex;
@@ -387,7 +402,9 @@
     <a class="brand" href="{% url 'shop:product_list' %}">
       <span class="logo" aria-hidden="true">
         <!-- small bag icon -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7V6a4 4 0 0 1 8 0v1h3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7h3zM9 7h6" fill="#ffd43b"/></svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M7 7V6a4 4 0 0 1 8 0v1h3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7h3zM9 7h6" fill="#ffd43b" />
+        </svg>
       </span>
       <div>
         <div class="title">My Shoppings</div>
@@ -398,7 +415,12 @@
       <!-- Cart link with badge -->
       <a href="{% url 'shop:cart_detail' %}" class="cart-badge" id="cartLink" aria-label="Cart">
         <!-- cart icon -->
-        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 6h15l-1.5 9h-12z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1" fill="#fff"/><circle cx="18" cy="20" r="1" fill="#fff"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 6h15l-1.5 9h-12z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <circle cx="9" cy="20" r="1" fill="#fff" />
+          <circle cx="18" cy="20" r="1" fill="#fff" />
+        </svg>
         <span style="font-weight:700;color:#fff;margin-left:6px;">Cart</span>
         <span id="cartCountBadge" class="cart-count" aria-live="polite" aria-atomic="true">
           {{ cart_unique_items|default:0 }}
@@ -440,9 +462,13 @@
           <form action="{% url 'shop:cart_add' 1 %}" method="post">{% csrf_token %}
             <button type="button" class="add">Add to Cart</button>
           </form>
-          <form action="{% url 'shop:buy_now' 1 %}" method="post">{% csrf_token %}
-            <button type="submit" class="buy">Buy Now</button>
+          <form action="{% url 'shop:buy_now' p.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy">
+              ⚡ Buy Now
+            </button>
           </form>
+
         </div>
       </div>
     </div>
@@ -474,159 +500,85 @@
       Made with ❤️ for learning & portfolio purpose
     </div>
   </footer>
+<script>
+/* ================= CSRF ================= */
+function getCookie(name) {
+  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return v ? v.pop() : '';
+}
+const csrftoken = getCookie('csrftoken');
 
-  <script>
-    // CSRF helper
-    function getCookie(name) {
-      const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-      return v ? v.pop() : '';
-    }
-    const csrftoken = getCookie('csrftoken');
+/* ================= ADD TO CART (AJAX) ================= */
+document.addEventListener('click', async function (e) {
+  const addBtn = e.target.closest('button.add');
+  if (!addBtn) return;
 
-    // Initialize client-side known state for unique-cart counting.
-    (function initCartState(){
-      try {
-        window._cartState = window._cartState || {};
-        const initial = parseInt(document.body.getAttribute('data-initial-cart-count') || '0', 10);
-        window._cartState.uniqueCount = isNaN(initial) ? 0 : initial;
+  e.preventDefault();
 
-        // known ids persist to avoid double counting same product within same browser session
-        const known = localStorage.getItem('known_cart_product_ids');
-        window._cartState.knownIds = known ? JSON.parse(known) : [];
-        if (!Array.isArray(window._cartState.knownIds)) window._cartState.knownIds = [];
-      } catch (err) {
-        window._cartState = { uniqueCount: 0, knownIds: [] };
-      }
-    })();
+  const form = addBtn.closest('form');
+  if (!form) return;
 
-    // Helper to update badge DOM
-    function setCartBadge(count) {
-      const badge = document.getElementById('cartCountBadge');
-      if (!badge) return;
-      badge.textContent = count;
-    }
+  const url = form.action;
 
-    // Animate cards on scroll
-    const cards = document.querySelectorAll('.card');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('show');
-      });
-    }, { threshold: 0.12 });
-    cards.forEach(card => observer.observe(card));
+  addBtn.disabled = true;
 
-    // Whole-card navigation
-    document.addEventListener('click', (e) => {
-      const card = e.target.closest('.card');
-      if (!card) return;
-      if (e.target.closest('button') || e.target.closest('a') || e.target.closest('form') || e.target.closest('input')) {
-        return;
-      }
-      const url = card.getAttribute('data-href');
-      if (url && url !== '#') {
-        window.location.href = url;
-      }
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({ qty: 1 })
     });
 
-    // Add to cart via AJAX — prevents redirect (works for any .add inside a form)
-    document.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('add')) {
-        e.preventDefault();
-        const btn = e.target;
-        const form = btn.closest('form');
-        if (!form) return;
+    const data = await resp.json();
+    if (data.cart_count !== undefined) {
+      document.getElementById('cartCountBadge').textContent = data.cart_count;
+    }
 
-        const url = form.getAttribute('action');
-        let qty = 1;
-        const qtyField = form.querySelector('input[name="qty"], input[type="number"]');
-        if (qtyField) qty = qtyField.value || 1;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    addBtn.disabled = false;
+  }
+});
 
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Adding...';
+/* ================= BUY NOW (FORCE REDIRECT) ================= */
+document.addEventListener('click', async function (e) {
+  const buyBtn = e.target.closest('button.buy');
+  if (!buyBtn) return;
 
-        try {
-          const resp = await fetch(url, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'X-CSRFToken': csrftoken,
-              'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({ qty: qty })
-          });
+  e.preventDefault();
 
-          if (!resp.ok) throw new Error('Network error');
+  const form = buyBtn.closest('form');
+  if (!form) return;
 
-          // Try parse JSON. If backend returns JSON with cart_count, use that.
-          let data = null;
-          try {
-            data = await resp.json();
-          } catch (err) {
-            data = null;
-          }
+  buyBtn.disabled = true;
 
-          if (data && (data.cart_count !== undefined)) {
-            // backend-provided accurate unique-product count
-            window._cartState.uniqueCount = parseInt(data.cart_count, 10) || window._cartState.uniqueCount;
-            setCartBadge(window._cartState.uniqueCount);
-          } else {
-            // Best-effort fallback: attempt to parse product id from form action
-            let productId = null;
-            try {
-              const m = url.match(/\/cart\/add\/(\d+)\/?$/);
-              if (m) productId = m[1];
-            } catch (err) { productId = null; }
-
-            if (productId) {
-              if (!window._cartState.knownIds.includes(productId)) {
-                window._cartState.knownIds.push(productId);
-                localStorage.setItem('known_cart_product_ids', JSON.stringify(window._cartState.knownIds));
-                window._cartState.uniqueCount = (window._cartState.uniqueCount || 0) + 1;
-                setCartBadge(window._cartState.uniqueCount);
-              } else {
-                setCartBadge(window._cartState.uniqueCount);
-              }
-            } else {
-              window._cartState.uniqueCount = (window._cartState.uniqueCount || 0) + 1;
-              setCartBadge(window._cartState.uniqueCount);
-            }
-          }
-
-          btn.textContent = '✅ Added';
-          btn.classList.add('added');
-
-          setTimeout(() => {
-            btn.textContent = originalText;
-            btn.classList.remove('added');
-            btn.disabled = false;
-          }, 1200);
-        } catch (err) {
-          console.error(err);
-          btn.textContent = 'Try again';
-          setTimeout(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-          }, 1200);
-        }
-      }
+  try {
+    await fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrftoken
+      },
+      body: new URLSearchParams({ qty: 1 })
     });
 
-    // small account dropdown toggle
-    const accountBtn = document.getElementById('accountBtn');
-    const accountMenu = document.getElementById('accountMenu');
-    if (accountBtn) {
-      accountBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const open = accountMenu.style.display === 'block';
-        accountMenu.style.display = open ? 'none' : 'block';
-      });
-      document.addEventListener('click', (e) => {
-        if (!accountBtn.contains(e.target) && accountMenu) accountMenu.style.display = 'none';
-      });
-    }
-  </script>
+    // ✅ FORCE redirect
+    window.location.href = "/shop/checkout/";
+
+  } catch (err) {
+    console.error("Buy Now failed", err);
+    buyBtn.disabled = false;
+  }
+});
+</script>
+
+
+
 </body>
 
 </html>

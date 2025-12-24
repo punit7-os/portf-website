@@ -44,17 +44,19 @@
   }
 
   .left-column { display:flex; flex-direction:column; gap:18px; }
-  .product-image {
-    width: 100%;
-    max-width: 380px;
-    height: 340px;
-    object-fit: cover;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(18, 38, 63, 0.06);
-    display: block;
-    background: linear-gradient(180deg, #fff, #f6f9ff);
-    margin: 0 auto;
-  }
+.product-image {
+  width: 100%;
+  max-width: 380px;
+  height: 340px;
+  object-fit: contain;              /* ✅ FIX: no crop */
+  background: #f8f9fb;              /* neutral background */
+  padding: 10px;                    /* breathing space */
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(18, 38, 63, 0.06);
+  display: block;
+  margin: 0 auto;
+}
+
 
   .product-info {
     padding: 6px 2px;
@@ -99,13 +101,21 @@
     font-size: 0.94rem;
   }
 
-  .controls {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-top: 8px;
-    flex-wrap: wrap;
-  }
+ .controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;            /* 🔧 tighter spacing */
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;              /* ✅ tight & clean */
+}
+
+
 
   .qty-wrap {
     display: inline-flex;
@@ -121,9 +131,39 @@
   .qty-btn { background: transparent; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; }
   .qty-input { width: 48px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 15px; }
 
-  .btn { padding: 10px 16px; border-radius: 10px; color: white; font-weight: 700; display: inline-flex; align-items:center; gap:10px; font-size:0.96rem; height:44px; }
+ .btn {
+  height: 46px;
+  min-width: 150px;     /* ✅ SAME width */
+  padding: 0 18px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+  /* .btn { padding: 10px 16px; border-radius: 10px; color: white; font-weight: 700; display: inline-flex; align-items:center; gap:10px; font-size:0.96rem; height:44px; } */
   .btn-cart { background: linear-gradient(90deg,#007bff,#00c6ff); }
-  .btn-buy { background: linear-gradient(90deg,#ff6b6b,#ff8e53); }
+ /* .btn-buy {
+  background: linear-gradient(90deg, #ff7a18, #ff9f1a);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.25); */
+/* } */
+.btn-buy {
+  background: linear-gradient(90deg, #ff7a18, #ff9f1a);
+  box-shadow: 0 4px 14px rgba(255, 140, 0, 0.25);
+}
+
+.btn-buy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 140, 0, 0.35);
+}
+
+
 
   .added-flash { margin-left:8px; color:#05683b; font-weight:700; display:inline-block; opacity:0; transform:translateY(-6px); transition:all 220ms ease; }
   .added-flash.show { opacity:1; transform:translateY(0); }
@@ -159,7 +199,26 @@
   .related-products h2 { margin:10px 0 12px; font-size:1.05rem; font-weight:700; }
   .related-scroll { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; }
   .related-scroll .card { width:180px; background:#fff; border-radius:10px; box-shadow:0 6px 18px rgba(7,22,44,0.04); padding:10px; text-align:center; }
-  .related-scroll .card img { width:100%; height:120px; object-fit:cover; border-radius:6px; }
+  .related-scroll .card img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;        /* ✅ no crop */
+  background: #f8f9fb;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.related-scroll .card .product-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  min-height: 36px;           /* ✅ equal height */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;      /* max 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
   .related-scroll .card a { color:inherit; text-decoration:none; display:block; }
   .related-scroll .card .price { color:#ff5e7a; font-weight:700; margin-top:6px; }
 
@@ -238,26 +297,43 @@
 
     <div style="color:var(--muted); margin-bottom:8px;">🕒 Fast delivery • Secure packaging • Genuine product</div>
 
-    <div class="controls">
-      <form id="addCartForm" action="{% url 'shop:cart_add' product.id %}" method="post"
-        style="display:flex;align-items:center;gap:10px;">
-        {% csrf_token %}
-        <div class="qty-wrap" aria-label="Quantity selector">
-          <button type="button" class="qty-btn" id="qty-decrease" aria-label="Decrease quantity">−</button>
-          <input type="number" name="qty" id="qty-input" class="qty-input" value="1" min="1" step="1" inputmode="numeric" />
-          <button type="button" class="qty-btn" id="qty-increase" aria-label="Increase quantity">+</button>
-        </div>
+ <div class="controls">
+  <div class="action-buttons" style="display:flex;gap:10px;flex-wrap:wrap;">
 
-        <button id="addCartBtn" type="button" class="btn btn-cart">🛒 Add to Cart</button>
-        <span id="addedFlash" class="added-flash" aria-hidden="true">✅ Added</span>
-      </form>
+    <!-- ================= ADD TO CART ================= -->
+    <form id="addCartForm"
+          action="{% url 'shop:cart_add' product.id %}"
+          method="post"
+          style="display:flex;align-items:center;gap:10px;">
+      {% csrf_token %}
 
-      <form action="{% url 'shop:buy_now' product.id %}" method="post" id="buyNowForm" style="display:inline-block;">
-        {% csrf_token %}
-        <input type="hidden" name="qty" id="buy-qty" value="1" />
-        <button type="submit" class="btn btn-buy">⚡ Buy Now</button>
-      </form>
-    </div>
+      <div class="qty-wrap">
+        <button type="button" class="qty-btn" id="qty-decrease">−</button>
+        <input type="number" name="qty" id="qty-input" class="qty-input" value="1" min="1" />
+        <button type="button" class="qty-btn" id="qty-increase">+</button>
+      </div>
+
+      <button id="addCartBtn" type="button" class="btn btn-cart">
+        🛒 Add to Cart
+      </button>
+
+      <span id="addedFlash" class="added-flash">✅ Added</span>
+    </form>
+
+    <!-- ================= BUY NOW (SEPARATE FORM) ================= -->
+    <form action="{% url 'shop:buy_now' product.id %}"
+          method="post"
+          style="display:inline;">
+      {% csrf_token %}
+      <input type="hidden" name="qty" id="buy-qty" value="1">
+      <button type="submit" class="btn btn-buy">
+        ⚡ Buy Now
+      </button>
+    </form>
+
+  </div>
+</div>
+
 
     <!-- Rate & review this product (right column) -->
     <div class="feedback-card" id="feedbackCard" aria-live="polite" style="margin-top:18px;">
@@ -331,7 +407,10 @@
         <div class="card" data-slug="{{ p.slug }}">
           <a href="{% url 'shop:product_detail' p.slug %}">
             <img src="{{ p.image_url|default:'https://via.placeholder.com/180x140' }}" alt="{{ p.name }}">
-            <div style="font-weight:700;">{{ p.name }}</div>
+            <div class="product-name" title="{{ p.name }}">
+  {{ p.name }}
+</div>
+
             <div class="price">₹ {{ p.price }}</div>
           </a>
         </div>

@@ -84,96 +84,127 @@
 </div>
 
 <!-- Razorpay checkout script -->
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-/*
- Flow:
- 1) User clicks Pay Now -> JS collects email and posts to server endpoint payment_initiate (creates local Order + razorpay order).
- 2) Server returns razorpay_order_id, key_id (public), amount.
- 3) JS opens Razorpay checkout using returned data.
- 4) On successful payment, handler posts payment response to server payment_handler to verify signature and mark order paid.
- 5) On verification success, redirect to checkout_success page.
-*/
-
 document.getElementById('pay-button').addEventListener('click', async function () {
-  // get CSRF token
-  const csrftokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
-  const csrftoken = csrftokenInput ? csrftokenInput.value : '';
 
-  // get email
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   const emailEl = document.getElementById('email-field');
   const email = emailEl ? emailEl.value.trim() : '';
+
+  if (!email) {
+    alert("Please provide an email for the receipt.");
+    return;
+  }
+
+  let resp;
+  try {
+    resp = await fetch("{% url 'shop:payment_initiate' %}", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      },
+      body: new URLSearchParams({ email }).toString()
+    });
+  } catch (err) {
+    alert("Network error. Please try again.");
+    return;
+  }
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: "Payment initiation failed" }));
+    alert(err.error || "Could not initiate payment.");
+    return;
+  }
+
+  const data = await resp.json();
+
+  // <script>
+document.getElementById('pay-button').addEventListener('click', async function () {
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  const email = document.getElementById('email-field').value.trim();
 
   if (!email) {
     alert('Please provide an email for the receipt.');
     return;
   }
 
-  // Call server to create razorpay order (payment_initiate view)
   const resp = await fetch("{% url 'shop:payment_initiate' %}", {
     method: "POST",
     headers: {
       "X-CSRFToken": csrftoken,
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: new URLSearchParams({email: email}).toString()
+    body: new URLSearchParams({ email }).toString()
   });
 
   if (!resp.ok) {
-    const err = await resp.json().catch(()=>({error:"Failed to initiate"}));
-    alert(err.error || "Could not initiate payment. Try again.");
+    const err = await resp.json().catch(()=>({error:"Failed"}));
+    alert(err.error || "Payment initiation failed");
     return;
   }
 
   const data = await resp.json();
 
-  // Razorpay options
   const options = {
-    "key": data.razorpay_key_id,
-    "amount": data.amount,
-    "currency": data.currency || "INR",
-    "name": "My Shoppings",
-    "description": "Order #" + data.order_id,
-    "order_id": data.razorpay_order_id,
-    "handler": async function (response) {
-      // verify payment on server
+    key: data.razorpay_key_id,
+    amount: data.amount,
+    currency: data.currency || "INR",
+    name: "My Shoppings",
+    description: "Order #" + data.order_id,
+    order_id: data.razorpay_order_id,
+
+    handler: async function (response) {
       const verifyResp = await fetch("{% url 'shop:payment_handler' %}", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+          "Content-Type": "application/x-www-form-urlencoded"
         },
         body: new URLSearchParams({
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razpay_signature || response.razorpay_signature,
+          razorpay_signature: response.razorpay_signature,
           order_id: data.order_id
         }).toString()
       });
 
-      if (!verifyResp.ok) {
-        alert("Payment verification failed. Please contact support.");
-        return;
-      }
-
-      const verifyData = await verifyResp.json();
-      if (verifyData.status === 'paid') {
-        // redirect to success page
+      if (verifyResp.ok) {
         window.location.href = "{% url 'shop:checkout_success' %}";
       } else {
-        alert("Payment verification failed. Please contact support.");
+        alert("Payment verification failed");
       }
     },
-    "prefill": {
-      "email": email
+
+    modal: {
+      ondismiss: function () {
+        // ✅ CRITICAL FIX: clear buy-now intent on cancel
+        fetch("{% url 'shop:clear_buy_now' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken
+          }
+        });
+      }
     },
-    "theme": {
-      "color": "#007bff"
-    }
+
+    prefill: { email },
+    theme: { color: "#007bff" }
   };
+
+  new Razorpay(options).open();
+});
+
+
+
 
   const rzp = new Razorpay(options);
   rzp.open();
 });
 </script>
+
 {% endblock %}

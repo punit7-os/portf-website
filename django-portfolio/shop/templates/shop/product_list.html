@@ -3,118 +3,208 @@
 {% block title %}Shop - My Shoppings{% endblock %}
 {% block content %}
 <style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-  }
+/* ================= GRID & CARD ================= */
 
-  .card {
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  }
+.card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  .card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
 
-  .p {
-    padding: 16px;
-    text-align: center;
-  }
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #f8f9fb;
+  padding: 8px;
+}
 
-  .p a {
-    text-decoration: none;
-    color: #222;
-  }
+/* ================= PRODUCT INFO ================= */
 
-  .price {
-    color: #007BFF;
-    font-weight: 600;
-    margin: 8px 0 16px;
-    font-size: 1.1em;
-  }
+.p {
+  padding: 16px;
+  text-align: center;
+}
 
+.p a {
+  text-decoration: none;
+  color: #222;
+}
+
+.product-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.3;
+  min-height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.price {
+  color: #007BFF;
+  font-weight: 600;
+  margin: 8px 0 16px;
+  font-size: 1.1em;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.cart-btn {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+
+/* remove base.html form width restriction */
+.cart-btn form {
+  max-width: none !important;
+}
+
+/* COMMON BUTTON SIZE — MATCHING SCREENSHOT */
+.cart-btn .add,
+.cart-btn .buy,
+.cart-btn .buy-link {
+  width: 150px;          /* ✅ EXACT WIDTH LIKE SCREENSHOT */
+  height: 44px;          /* ✅ SAME HEIGHT */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  border-radius: 12px;
+  text-decoration: none !important;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+/* ================= ADD TO CART ================= */
+
+.cart-btn .add {
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: #fff;
+  border: none;
+
+  /* allow two-line text like screenshot */
+  white-space: normal;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+.cart-btn .add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+}
+
+.cart-btn .add.added {
+  background: #28a745 !important;
+}
+
+/* ================= BUY NOW ================= */
+
+.cart-btn .buy,
+.cart-btn .buy-link {
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+  color: #fff !important;
+  border: none;
+
+  white-space: nowrap;      /* stays single-line */
+  padding: 0 16px;
+  box-shadow: 0 4px 14px rgba(255, 140, 0, 0.35);
+}
+
+.cart-btn .buy:hover,
+.cart-btn .buy-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.45);
+}
+
+.cart-btn .buy:active,
+.cart-btn .buy-link:active {
+  transform: scale(0.97);
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 480px) {
   .cart-btn {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+    flex-direction: column;
   }
 
-  .add,
-  .buy {
-    border: none;
-    padding: 10px 18px;
-    font-size: 15px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  .cart-btn .add,
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    width: 100%;
   }
-
-  .add {
-    background: linear-gradient(90deg, #007bff, #00c6ff);
-    color: white;
-  }
-
-  .add:hover {
-    background: linear-gradient(90deg, #0056d1, #0094ff);
-    transform: scale(1.05);
-    box-shadow: 0 4px 14px rgba(0, 123, 255, 0.3);
-  }
-
-  .add.added {
-    background: #28a745 !important;
-    color: white;
-  }
-
-  .buy {
-    background: linear-gradient(90deg, #ff6b6b, #ff8e53);
-    color: white;
-  }
-
-  .buy:hover {
-    background: linear-gradient(90deg, #e85a5a, #ff7043);
-    transform: scale(1.05);
-    box-shadow: 0 4px 14px rgba(255, 107, 107, 0.3);
-  }
+}
 </style>
+
+
 
 <div class="grid">
   {% for p in products %}
   <div class="card">
-    <a href="{% url 'shop:product_detail' p.slug %}">
+    <a href="{% url 'shop:product_detail' p.slug %}" onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
       <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
     </a>
     <div class="p">
-      <div><a href="{% url 'shop:product_detail' p.slug %}"><strong>{{ p.name }}</strong></a></div>
+      <div class="product-title" title="{{ p.name }}">
+        <a href="{% url 'shop:product_detail' p.slug %}" onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
+          {{ p.name }}
+        </a>
+      </div>
+
       <div class="price">₹ {{ p.price }}</div>
 
-      <div class="cart-btn">
-        <!-- ✅ Add to Cart -->
+      <!-- <div class="cart-btn" onclick="event.stopPropagation();"> -->
+        <div class="cart-btn">
+
+        <!-- Add to Cart -->
         <form action="{% url 'shop:cart_add' p.id %}" method="post" class="cart-form">
           {% csrf_token %}
-          <button type="submit" class="add">🛒 Add to Cart</button>
+          <button type="button" class="add" data-product-id="{{ p.id }}">
+            🛒 Add to Cart
+          </button>
         </form>
 
-        <!-- ✅ Buy Now -->
-        <form action="{% url 'shop:buy_now' p.id %}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="buy">⚡ Buy Now</button>
-        </form>
+        <!-- Buy Now -->
+        <!-- <form action="{% url 'shop:buy_now' p.id %}" method="post" class="buy-form">
+  {% csrf_token %}
+  <input type="hidden" name="qty" value="1">
+  <button type="submit" class="buy">
+    ⚡ Buy Now
+  </button>
+</form> -->
+<!-- <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy">
+  ⚡ Buy Now
+</a> -->
+<a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1"
+   class="buy buy-link">
+  ⚡ Buy Now
+</a>
+
       </div>
     </div>
   </div>
@@ -122,27 +212,75 @@
   <p>No products found.</p>
   {% endfor %}
 </div>
-
 <script>
-  // Add to Cart – AJAX feedback
-  document.querySelectorAll('.cart-form').forEach(form => {
-    const button = form.querySelector('.add');
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
-      const response = await fetch(form.action, {
+/* ================================
+   HOME PAGE – ADD TO CART (AJAX)
+   Same behavior as product_detail
+================================ */
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+document.querySelectorAll('.cart-form').forEach(form => {
+  const button = form.querySelector('.add');
+
+  button.addEventListener('click', async function (e) {
+    e.preventDefault();
+
+    const url = form.action;
+    const csrf = getCookie('csrftoken');
+
+    button.disabled = true;
+    const originalText = button.textContent;
+    button.textContent = 'Adding...';
+
+    try {
+      const resp = await fetch(url, {
         method: 'POST',
-        headers: { 'X-CSRFToken': csrf }
+        headers: {
+          'X-CSRFToken': csrf,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ qty: 1 }).toString()
       });
-      if (response.ok) {
+
+      if (!resp.ok) throw new Error('Request failed');
+
+      const data = await resp.json();
+
+      if (data.success) {
         button.classList.add('added');
-        button.textContent = 'Added ✅'; // ✅ Only one checkmark now
+        button.textContent = '✅ Added';
+
+        // Update cart badge if exists
+        const badge = document.getElementById('cartCountBadge');
+        if (badge && data.cart_count !== undefined) {
+          badge.textContent = data.cart_count;
+        }
+
         setTimeout(() => {
+          button.textContent = originalText;
           button.classList.remove('added');
-          button.textContent = '🛒 Add to Cart';
-        }, 1500);
+          button.disabled = false;
+        }, 1200);
+      } else {
+        throw new Error('Add failed');
       }
-    });
+
+    } catch (err) {
+      console.error(err);
+      button.textContent = 'Try again';
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+      }, 1200);
+    }
   });
+});
 </script>
+
 {% endblock %}

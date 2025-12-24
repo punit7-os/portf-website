@@ -9,6 +9,8 @@ from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.html import escape
 from django.utils import timezone
+from .models import OrderItem
+
 
 from .models import Category, Product, Order, Profile, Feedback
 from .cart import Cart
@@ -17,34 +19,12 @@ from .forms import CustomUserCreationForm, ProfileForm
 # Auth imports
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-
-import razorpay
-from django.conf import settings
-
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils.html import escape
-from django.utils import timezone
-
-from .models import Category, Product, Order, Profile, Feedback
-from .cart import Cart
-from .forms import CustomUserCreationForm, ProfileForm
-
-# Auth imports
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from django.core.mail import send_mail
 from django.conf import settings
 
 import razorpay
-
 import random
 import time
 
@@ -53,8 +33,10 @@ def is_ajax_request(request):
     """
     Safe AJAX detection. Some clients set X-Requested-With header.
     """
-    return (request.headers.get('x-requested-with') == 'XMLHttpRequest') or \
-           (request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest')
+    return (
+        request.headers.get("x-requested-with") == "XMLHttpRequest"
+        or request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
+    )
 
 
 # -------------------------
@@ -62,14 +44,14 @@ def is_ajax_request(request):
 # -------------------------
 def product_list(request, slug=None):
     categories = Category.objects.all()
-    products = Product.objects.filter(is_active=True).order_by('-created_at')
+    products = Product.objects.filter(is_active=True).order_by("-created_at")
     current_category = None
 
     if slug:
         current_category = get_object_or_404(Category, slug=slug)
         products = products.filter(category=current_category)
 
-    query = request.GET.get('q')
+    query = request.GET.get("q")
     if query:
         products = products.filter(name__icontains=query)
 
@@ -82,94 +64,95 @@ def product_list(request, slug=None):
 
 
 # -------------------------
-# PRODUCT DETAIL (updated)
+# PRODUCT DETAIL
 # -------------------------
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
 
-    # Related products (full queryset provided to template; template does client-side paging)
     related_products = Product.objects.filter(
         category=product.category, is_active=True
     ).exclude(id=product.id)
 
-    # fallback "all products" if none in same category
     all_products = None
     if not related_products.exists():
         all_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:8]
 
-    # Reviews: only approved ones for public display
-    reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
-    page = request.GET.get('rpage', 1)
-    paginator = Paginator(reviews_qs, 5)  # 5 reviews per page
+    reviews_qs = product.feedbacks.filter(approved=True).order_by("-created_at")
+    page = request.GET.get("rpage", 1)
+    paginator = Paginator(reviews_qs, 5)
+
     try:
         reviews_page = paginator.page(page)
-    except PageNotAnInteger:
+    except (PageNotAnInteger, EmptyPage):
         reviews_page = paginator.page(1)
-    except EmptyPage:
-        reviews_page = paginator.page(paginator.num_pages)
 
-    # If AJAX request specifically asked for a reviews page, return only the reviews partial.
-    # This makes "See more reviews" faster (JS expects HTML fragment).
-    if is_ajax_request(request) and request.GET.get('rpage'):
-        rendered = render_to_string('shop/reviews_list.html', {
-            'reviews_page': reviews_page,
-            'product': product,
-            'avg_rating': product.average_rating(),
-            'review_count': product.review_count(),
-            'reviews_paginator': paginator,
-        }, request=request)
+    if is_ajax_request(request) and request.GET.get("rpage"):
+        rendered = render_to_string(
+            "shop/reviews_list.html",
+            {
+                "reviews_page": reviews_page,
+                "product": product,
+                "avg_rating": product.average_rating(),
+                "review_count": product.review_count(),
+                "reviews_paginator": paginator,
+            },
+            request=request,
+        )
         return HttpResponse(rendered)
 
-    avg_rating = float(product.average_rating() or 0.0)
-    review_count = product.review_count()
+    display_name = (
+        request.user.get_full_name() or request.user.get_username()
+        if request.user.is_authenticated else ""
+    )
 
-    # compute display name once in the view to avoid template expression issues
-    if request.user.is_authenticated:
-        display_name = request.user.get_full_name() or request.user.get_username()
-    else:
-        display_name = ''
+    user_feedback = (
+        product.feedbacks.filter(user=request.user).first()
+        if request.user.is_authenticated else None
+    )
 
-    # Provide user_feedback if exists (may be pending or approved)
-    user_feedback = None
-    if request.user.is_authenticated:
-        user_feedback = product.feedbacks.filter(user=request.user).first()
-
-    return render(request, 'shop/product_detail.html', {
-        'product': product,
-        'related_products': related_products,
-        'all_products': all_products,
-        'reviews_page': reviews_page,
-        'avg_rating': avg_rating,
-        'review_count': review_count,
-        'reviews_paginator': paginator,
-        'display_name': display_name,
-        'user_feedback': user_feedback,
+    return render(request, "shop/product_detail.html", {
+        "product": product,
+        "related_products": related_products,
+        "all_products": all_products,
+        "reviews_page": reviews_page,
+        "avg_rating": float(product.average_rating() or 0),
+        "review_count": product.review_count(),
+        "reviews_paginator": paginator,
+        "display_name": display_name,
+        "user_feedback": user_feedback,
     })
 
 
 # -------------------------
-# ADD TO CART (AJAX SAFE)
+# ADD TO CART (LOGIN REQUIRED + TOAST + REDIRECT BACK)
 # -------------------------
 def cart_add(request, product_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please login to continue")
+        login_url = f"{reverse('shop:login')}?next={request.path}"
+
+        if is_ajax_request(request):
+            return JsonResponse({
+                "login_required": True,
+                "redirect_url": login_url,
+                "message": "Please login to continue"
+            }, status=401)
+
+        return redirect(login_url)
+
     product = get_object_or_404(Product, id=product_id, is_active=True)
     cart = Cart(request)
+
     qty = 1
     try:
-        if request.method == "POST":
-            qty = int(request.POST.get("qty", 1))
-    except Exception:
+        qty = int(request.POST.get("qty", 1))
+    except:
         qty = 1
 
     cart.add(product=product, quantity=qty, update_quantity=False)
 
-    try:
-        unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0
-    except Exception:
-        unique_count = 0
-    try:
-        total_qty = len(cart)
-    except Exception:
-        total_qty = 0
+    unique_count = len(cart.cart) if hasattr(cart, "cart") else 0
+    total_qty = len(cart)
 
     if is_ajax_request(request):
         return JsonResponse({
@@ -211,22 +194,12 @@ def cart_update(request, product_id):
             row_total = float(item["total_price"])
             break
 
-    cart_total = float(cart.get_total_price())
-    try:
-        cart_unique_count = len(cart.cart) if hasattr(cart, 'cart') else 0
-    except:
-        cart_unique_count = 0
-    try:
-        total_qty = len(cart)
-    except:
-        total_qty = 0
-
     return JsonResponse({
         "success": True,
         "row_total": row_total,
-        "cart_total": cart_total,
-        "cart_count": cart_unique_count,
-        "total_qty": total_qty,
+        "cart_total": float(cart.get_total_price()),
+        "cart_count": len(cart.cart),
+        "total_qty": len(cart),
     })
 
 
@@ -262,64 +235,126 @@ def cart_detail(request):
         })
         total += item["total_price"]
 
-    return render(request, "shop/cart_detail.html", {"items": items, "total": total})
+    return render(request, "shop/cart_detail.html", {
+        "items": items,
+        "total": total
+    })
+
+
+# -------------------------
+# BUY NOW (LOGIN REQUIRED + TOAST + REDIRECT BACK)
+# -------------------------
+# -------------------------
+
+#BUY NOW (LOGIN REQUIRED → REDIRECT TO CHECKOUT)
+def buy_now(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect(f"{reverse('shop:login')}?next={request.path}")
+
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+
+    try:
+        qty = int(request.POST.get("qty", 1))
+    except:
+        qty = 1
+
+
+    cart = Cart(request)
+
+    # ✅ Remove ONLY this product from cart (if already present)
+    product_key = str(product.id)
+    if product_key in cart.cart:
+        del cart.cart[product_key]
+        cart.session.modified = True
+
+    # ✅ Store buy-now intent (isolated checkout)
+    request.session["buy_now_product_id"] = product.id
+    request.session["buy_now_qty"] = qty
+    request.session.modified = True
+
+    # ✅ Go to isolated checkout
+    return redirect(f"{reverse('shop:checkout')}?buy={product.id}&qty={qty}")
+
+# -------------------------
+# BUY NOW (STRICT ISOLATED FLOW)
+# -------------------------
+# @login_required
+# def buy_now(request, product_id):
+#     product = get_object_or_404(Product, id=product_id, is_active=True)
+
+#     try:
+#         qty = int(request.POST.get("qty", 1))
+#     except:
+#         qty = 1
+
+#     cart = Cart(request)
+#     cart.clear()                       # ✅ ALWAYS clear old cart
+#     cart.add(product=product, quantity=qty, update_quantity=True)
+
+#     request.session.modified = True
+#     return redirect("shop:checkout")
+
+
 
 
 # -------------------------
 # CHECKOUT + PAYMENT
 # -------------------------
 def checkout(request):
-    buy_id = request.GET.get('buy')
-    buy_qty = request.GET.get('qty')
-
-    cart = Cart(request)
+    buy_id = request.GET.get("buy")
+    buy_qty = request.GET.get("qty")
 
     try:
         buy_qty = int(buy_qty) if buy_qty else 1
     except:
         buy_qty = 1
 
+    cart = Cart(request)
+
+    # ================================
+    # ✅ BUY NOW MODE (READ-ONLY CART)
+    # ================================
     if buy_id:
         try:
-            product = Product.objects.get(id=int(buy_id))
-        except:
+            product = Product.objects.get(id=int(buy_id), is_active=True)
+        except Product.DoesNotExist:
             return redirect("shop:product_list")
-        cart.clear()
-        cart.add(product=product, quantity=buy_qty)
 
+    # ✅ CRITICAL FIX:
+    # Ensure buy-now session is ALWAYS set (home page Buy Now was missing this)
+    request.session["buy_now_product_id"] = product.id
+    request.session["buy_now_qty"] = buy_qty
+    request.session.modified = True
+
+    # 🚫 DO NOT touch cart
+
+    buy_now_items = [{
+        "product": product,
+        "price": product.price,
+        "quantity": buy_qty,
+        "total_price": product.price * buy_qty,
+    }]
+
+    total = product.price * buy_qty
+
+    return render(request, "shop/checkout.html", {
+        "cart": buy_now_items,
+        "total": total,
+        "suggestions": Product.objects.filter(is_active=True)
+            .exclude(id=product.id)
+            .order_by("?")[:4],
+    })
+
+    # ================================
+    # ✅ NORMAL CART CHECKOUT
+    # ================================
     if len(cart) == 0:
         return redirect("shop:product_list")
 
-    if request.method == "POST":
-        posted_email = request.POST.get("email", "").strip()
-        if posted_email:
-            email = posted_email
-        elif request.user.is_authenticated and request.user.email:
-            email = request.user.email
-        else:
-            suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
-            error = "Please provide an email address to receive the receipt."
-            items = list(cart)
-            total = cart.get_total_price()
-            return render(request, "shop/checkout.html", {
-                "cart": items,
-                "total": total,
-                "suggestions": suggestions,
-                "error": error
-            })
-
-        total = cart.get_total_price()
-        Order.objects.create(email=email, total_amount=total)
-        cart.clear()
-        return redirect("shop:checkout_success")
-
-    items = list(cart)
-    total = cart.get_total_price()
-    suggestions = Product.objects.filter(is_active=True).order_by('?')[:4]
     return render(request, "shop/checkout.html", {
-        "cart": items,
-        "total": total,
-        "suggestions": suggestions
+        "cart": list(cart),
+        "total": cart.get_total_price(),
+        "suggestions": Product.objects.filter(is_active=True).order_by("?")[:4],
     })
 
 
@@ -327,33 +362,80 @@ def initiate_payment(request):
     if request.method != "POST":
         return HttpResponseBadRequest("Invalid")
 
+    email = request.POST.get("email", "").strip()
+    if not email and request.user.is_authenticated:
+        email = request.user.email
+
+    if not email:
+        return JsonResponse({"error": "Email required"}, status=400)
+
     cart = Cart(request)
-    if len(cart) == 0:
-        return JsonResponse({"error": "Cart empty"}, status=400)
 
-    email = request.POST.get("email","").strip()
-    if not email:
-        if request.user.is_authenticated:
-            email = request.user.email
+    # ================================
+    # ✅ BUY NOW PAYMENT MODE
+    # ================================
+    buy_id = request.session.get("buy_now_product_id")
+    buy_qty = request.session.get("buy_now_qty", 1)
 
-    if not email:
-        return JsonResponse({"error":"Email required"}, status=400)
+    if buy_id:
+        try:
+            product = Product.objects.get(id=int(buy_id), is_active=True)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Invalid product"}, status=400)
 
-    total = cart.get_total_price()
+        total = product.price * int(buy_qty)
+
+        # Create order
+        order = Order.objects.create(
+            email=email,
+            total_amount=total
+        )
+
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            price=product.price,
+            quantity=int(buy_qty)
+        )
+
+    # ================================
+    # ✅ NORMAL CART PAYMENT MODE
+    # ================================
+    else:
+        if len(cart) == 0:
+            return JsonResponse({"error": "Cart empty"}, status=400)
+
+        total = cart.get_total_price()
+
+        order = Order.objects.create(
+            email=email,
+            total_amount=total
+        )
+
+        for item in cart:
+            OrderItem.objects.create(
+                order=order,
+                product=item["product"],
+                price=item["price"],
+                quantity=item["quantity"]
+            )
+
     paise = int(total * 100)
 
-    order = Order.objects.create(email=email, total_amount=total)
+    # ================================
+    # RAZORPAY ORDER
+    # ================================
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
 
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-
-    data = {
+    rzp_order = client.order.create({
         "amount": paise,
-        "currency":"INR",
+        "currency": "INR",
         "receipt": f"order_{order.id}",
         "notes": {"order_id": str(order.id)}
-    }
+    })
 
-    rzp_order = client.order.create(data=data)
     order.razorpay_order_id = rzp_order["id"]
     order.save()
 
@@ -365,7 +447,7 @@ def initiate_payment(request):
         "razorpay_key_id": settings.RAZORPAY_KEY_ID,
     })
 
-
+@csrf_exempt
 @csrf_exempt
 def payment_handler(request):
     if request.method != "POST":
@@ -379,7 +461,9 @@ def payment_handler(request):
     if not all([order_id, payment_id, signature, razorpay_order_id]):
         return HttpResponseBadRequest("Missing params")
 
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
 
     try:
         client.utility.verify_payment_signature({
@@ -391,49 +475,65 @@ def payment_handler(request):
         Order.objects.filter(id=order_id).update(status="failed")
         return HttpResponseBadRequest("Signature failed")
 
+    # ✅ Mark order paid
     Order.objects.filter(id=order_id).update(
         status="paid",
         razorpay_payment_id=payment_id,
         razorpay_signature=signature
     )
 
-    Cart(request).clear()
-    return JsonResponse({"status":"paid"})
+    # ✅ CLEAR CART ONLY FOR NORMAL CART CHECKOUT
+    if not request.session.get("buy_now_product_id"):
+        Cart(request).clear()
+
+    return JsonResponse({"status": "paid"})
+
+from django.views.decorators.http import require_POST
+
+@require_POST
+def clear_buy_now_session(request):
+    """
+    Called when Razorpay popup is dismissed.
+    Clears ONLY buy-now intent, not the cart.
+    """
+    request.session.pop("buy_now_product_id", None)
+    request.session.pop("buy_now_qty", None)
+    request.session.modified = True
+    return JsonResponse({"cleared": True})
 
 
+# -------------------------
+# CHECKOUT SUCCESS
+# -------------------------
 def checkout_success(request):
+    # ✅ Clear ONLY buy-now session (cart must remain untouched)
+    request.session.pop("buy_now_product_id", None)
+    request.session.pop("buy_now_qty", None)
+    request.session.modified = True
+
     return render(request, "shop/checkout_success.html")
 
 
+
 # -------------------------
-# SEARCH ROUTES
+# SEARCH
 # -------------------------
 def search_products(request):
-    query = request.GET.get('q','')
+    query = request.GET.get("q", "")
     products = Product.objects.filter(name__icontains=query)
-    return render(request, "shop/product_list_partial.html", {"products":products})
+    return render(request, "shop/product_list_partial.html", {"products": products})
 
 
 def ajax_search(request):
-    q = request.GET.get('q','')
+    q = request.GET.get("q", "")
     products = Product.objects.filter(name__icontains=q)[:10]
-    data = [{"name":p.name, "slug":p.slug, "price":float(p.price)} for p in products]
-    return JsonResponse({"results":data})
+    return JsonResponse({
+        "results": [{"name": p.name, "slug": p.slug, "price": float(p.price)} for p in products]
+    })
 
 
 # -------------------------
-# BUY NOW
-# -------------------------
-def buy_now(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    qty = int(request.POST.get("qty",1))
-    cart = Cart(request)
-    cart.add(product, qty)
-    return redirect("shop:checkout")
-
-
-# -------------------------
-# AUTH / PROFILE
+# AUTH / PROFILE / ORDERS / FEEDBACK
 # -------------------------
 def signup(request):
     """
@@ -442,9 +542,29 @@ def signup(request):
       2) User submits OTP -> server verifies -> create user+profile -> authenticate & login -> redirect to product_list.
     OTP is stored in session with an expiry (5 minutes).
     """
-    OTP_SESSION_KEY = "signup_otp_data"  # will hold dict: {username,email,password,phone,otp,expires_at}
+    OTP_SESSION_KEY = "signup_otp_data"
 
     if request.method == "POST":
+
+        # 🔁 RESEND OTP (AJAX)
+        if request.POST.get("resend_otp") == "1":
+            otp_data = request.session.get(OTP_SESSION_KEY)
+            if not otp_data:
+                return JsonResponse({"success": False}, status=400)
+
+            otp = random.randint(100000, 999999)
+            otp_data["otp"] = str(otp)
+            otp_data["expires_at"] = time.time() + (5 * 60)
+            request.session[OTP_SESSION_KEY] = otp_data
+            request.session.modified = True
+
+            subject = "Your signup OTP for My Shoppings"
+            message = f"Hi {otp_data['username']},\n\nYour new OTP is: {otp}"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            send_mail(subject, message, from_email, [otp_data["email"]])
+
+            return JsonResponse({"success": True})
+
         # If OTP field present -> verify branch
         if request.POST.get("otp_verify") == "1":
             otp_provided = request.POST.get("otp", "").strip()
@@ -455,14 +575,12 @@ def signup(request):
                     "otp_error": "Session expired. Please fill the signup form again."
                 })
             if time.time() > otp_data.get("expires_at", 0):
-                # expired
                 del request.session[OTP_SESSION_KEY]
                 return render(request, "registration/signup.html", {
                     "form": CustomUserCreationForm(),
                     "otp_error": "OTP expired. Please submit signup form again to receive a new OTP."
                 })
             if otp_provided != str(otp_data.get("otp")):
-                # wrong OTP
                 return render(request, "registration/signup.html", {
                     "form": CustomUserCreationForm(initial={
                         "username": otp_data.get("username"),
@@ -494,30 +612,25 @@ def signup(request):
                 })
 
             user = User.objects.create_user(username=username, email=email, password=password)
-            # create profile
             Profile.objects.create(user=user, phone=phone)
 
-            # Authenticate and login properly (this sets backend)
             user = authenticate(username=username, password=password)
             if user:
-                login(request, user)  # backend is present because we used authenticate()
-            # clear session OTP data
+                login(request, user)
             try:
                 del request.session[OTP_SESSION_KEY]
             except KeyError:
                 pass
             return redirect("shop:product_list")
 
-        # else: initial signup form submission branch (generate/send OTP)
+        # Initial signup form submission
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            # don't create user yet — store data in session and send OTP
             username = form.cleaned_data.get("username")
             email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password1")
             phone = form.cleaned_data.get("phone")
 
-            # Prevent duplicate email/username early
             from django.contrib.auth.models import User
             if User.objects.filter(username=username).exists():
                 form.add_error("username", "This username is already taken.")
@@ -526,11 +639,9 @@ def signup(request):
                 form.add_error("email", "An account with this email already exists.")
                 return render(request, "registration/signup.html", {"form": form})
 
-            # generate 6-digit OTP
             otp = random.randint(100000, 999999)
-            expires_at = time.time() + (5 * 60)  # 5 minutes expiry
+            expires_at = time.time() + (5 * 60)
 
-            # store temp payload in session
             request.session[OTP_SESSION_KEY] = {
                 "username": username,
                 "email": email,
@@ -541,7 +652,6 @@ def signup(request):
             }
             request.session.modified = True
 
-            # send OTP email
             subject = "Your signup OTP for My Shoppings"
             message = f"Hi {username},\n\nYour OTP to complete signup is: {otp}\nThis OTP expires in 5 minutes.\n\nIf you did not request this, ignore this email."
             from_email = getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER if hasattr(settings, "EMAIL_HOST_USER") else None)
@@ -550,7 +660,6 @@ def signup(request):
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except Exception as e:
-                # If email sending fails, clear session OTP and show error.
                 try:
                     del request.session[OTP_SESSION_KEY]
                 except:
@@ -558,7 +667,6 @@ def signup(request):
                 form.add_error(None, f"Failed to send OTP email: {e}. Check your email settings.")
                 return render(request, "registration/signup.html", {"form": form})
 
-            # render form again but show OTP input
             return render(request, "registration/signup.html", {
                 "form": CustomUserCreationForm(initial={
                     "username": username,
@@ -569,10 +677,8 @@ def signup(request):
                 "otp_sent_to": email
             })
         else:
-            # invalid form -> show errors
             return render(request, "registration/signup.html", {"form": form})
     else:
-        # GET
         form = CustomUserCreationForm()
         return render(request, "registration/signup.html", {"form": form})
 
@@ -589,13 +695,13 @@ def profile(request):
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, "shop/profile.html", {"form":form})
+    return render(request, "shop/profile.html", {"form": form})
 
 
 @login_required
 def my_orders(request):
     orders = Order.objects.filter(email=request.user.email).order_by("-created_at")
-    return render(request, "shop/my_orders.html", {"orders":orders})
+    return render(request, "shop/my_orders.html", {"orders": orders})
 
 
 @login_required
@@ -603,7 +709,7 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if order.email != request.user.email:
         return redirect("shop:my_orders")
-    return render(request, "shop/order_detail.html", {"order":order})
+    return render(request, "shop/order_detail.html", {"order": order})
 
 
 @login_required
@@ -611,10 +717,44 @@ def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if order.email != request.user.email:
         return redirect("shop:my_orders")
-    if order.status not in ["paid","cancelled"]:
+    if order.status not in ["paid", "cancelled"]:
         order.status = "cancelled"
         order.save()
     return redirect("shop:my_orders")
+
+from django.contrib.auth.models import User
+
+def login_view(request):
+    if request.method == "POST":
+        identifier = request.POST.get("identifier", "").strip()
+        password = request.POST.get("password", "")
+        next_url = request.POST.get("next") or reverse("shop:product_list")
+
+        user = None
+
+        # 🔹 If email entered → get username
+        if "@" in identifier:
+            try:
+                user_obj = User.objects.get(email__iexact=identifier)
+                user = authenticate(username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+        else:
+            # 🔹 Username login
+            user = authenticate(username=identifier, password=password)
+
+        if user:
+            login(request, user)
+            return redirect(next_url)
+
+        return render(request, "registration/login.html", {
+            "error": "Invalid email/username or password",
+            "next": next_url
+        })
+
+    return render(request, "registration/login.html", {
+        "next": request.GET.get("next", "")
+    })
 
 
 def logout_view(request):
@@ -640,7 +780,6 @@ def product_feedback(request, product_id):
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
 
-    # Support both JSON body and form-encoded
     try:
         if request.content_type and 'application/json' in request.content_type:
             import json
@@ -664,14 +803,11 @@ def product_feedback(request, product_id):
     if rating < 1 or rating > 5:
         return JsonResponse({"success": False, "error": "Invalid rating"}, status=400)
 
-    # Default values
     approved = False
     fb = None
 
-    # If user is authenticated, try to update existing feedback instead of creating duplicate
     if request.user.is_authenticated:
         existing = Feedback.objects.filter(product=product, user=request.user).first()
-        # If an explicit feedback_id/update is provided, respect and verify ownership
         if feedback_id:
             try:
                 fid = int(feedback_id)
@@ -679,23 +815,20 @@ def product_feedback(request, product_id):
                 if candidate and candidate.user == request.user and candidate.product_id == product.id:
                     fb = candidate
             except Exception:
-                fb = fb  # no-op
+                pass
 
         if not fb and existing:
             fb = existing
 
         if fb:
-            # update fields
             fb.rating = rating
             fb.message = message
             fb.reviewer_name = request.user.get_full_name() or request.user.get_username()
             fb.reviewer_email = request.user.email or ''
-            # auto-approve authenticated user's reviews by default
             fb.approved = True
             fb.save()
             approved = fb.approved
         else:
-            # create new for authenticated user (auto-approve)
             fb = Feedback.objects.create(
                 product=product,
                 rating=rating,
@@ -707,7 +840,6 @@ def product_feedback(request, product_id):
             )
             approved = True
     else:
-        # anonymous creation (moderation required)
         fb = Feedback.objects.create(
             product=product,
             rating=rating,
@@ -718,7 +850,6 @@ def product_feedback(request, product_id):
         )
         approved = False
 
-    # Prepare public reviews (only approved ones), first page
     reviews_qs = product.feedbacks.filter(approved=True).order_by('-created_at')
     paginator = Paginator(reviews_qs, 5)
     try:
@@ -734,14 +865,14 @@ def product_feedback(request, product_id):
         'reviews_paginator': paginator,
     }, request=request)
 
-    message = "Review submitted."
+    message_text = "Review submitted."
     if not approved:
-        message = "Thanks — your review is submitted and will appear once approved."
+        message_text = "Thanks — your review is submitted and will appear once approved."
 
     return JsonResponse({
         "success": True,
         "approved": bool(approved),
-        "message": message,
+        "message": message_text,
         "html": rendered,
         "avg_rating": product.average_rating(),
         "review_count": product.review_count(),

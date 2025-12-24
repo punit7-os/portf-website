@@ -5,73 +5,145 @@
 
 {% block content %}
 <div class="auth-wrapper" style="max-width:430px;margin:40px auto;padding:22px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.06);">
-  <div style="text-align:center;margin-bottom:10px;">
+
+  <!-- WELCOME (AUTO HIDE AFTER 20s) -->
+  <div id="welcomeBlock" style="text-align:center;margin-bottom:12px;">
     <h2 style="margin:0;font-size:22px;color:#0b2545;">Welcome back</h2>
-    <p style="margin:6px 0 0;color:#6b7280;font-size:14px;">Sign in to continue to My Shoppings</p>
+    <p style="margin:6px 0 0;color:#6b7280;font-size:14px;">
+      Sign in to continue to My Shoppings
+    </p>
   </div>
 
- {% include "account/messages.html" %}
+  <!-- SUCCESS / INFO MESSAGES (AUTO HIDE AFTER 12s) -->
+  <div id="messageBlock">
+    {% include "account/messages.html" %}
+  </div>
 
-
-  <form method="post" action="{% url 'account_login' %}" style="margin-top:14px;">
+  <form method="post" action="{% url 'account_login' %}" style="margin-top:16px;">
     {% csrf_token %}
 
-    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Username or email</label>
-    <div style="margin-bottom:14px;">
+    <!-- USERNAME / EMAIL -->
+    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">
+      Username or Email
+    </label>
+    <div style="margin-bottom:16px;">
       {{ form.login|add_class:"input-full" }}
       {% if form.login.errors %}
-        <div style="color:#b00020;margin-top:6px;">{{ form.login.errors|join:", " }}</div>
+        <div style="color:#b00020;margin-top:6px;">
+          {{ form.login.errors|join:", " }}
+        </div>
       {% endif %}
     </div>
 
-    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">Password</label>
-    <div style="margin-bottom:10px;">
-      {{ form.password|add_class:"input-full" }}
-      {% if form.password.errors %}
-        <div style="color:#b00020;margin-top:6px;">{{ form.password.errors|join:", " }}</div>
-      {% endif %}
+    <!-- PASSWORD WITH SHOW / HIDE -->
+    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">
+      Password
+    </label>
+    <div style="
+      display:flex;
+      align-items:center;
+      border:1px solid #e6edf8;
+      border-radius:8px;
+      margin-bottom:18px;
+    ">
+      <input
+        type="password"
+        name="{{ form.password.html_name }}"
+        id="passwordField"
+        class="input-full"
+        style="border:none;flex:1;"
+        required
+      >
+
+      <button type="button"
+              id="togglePassword"
+              style="
+                background:none;
+                border:none;
+                padding:0 12px;
+                color:#007BFF;
+                font-weight:700;
+                font-size:13px;
+                cursor:pointer;
+              ">
+        SHOW
+      </button>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:#555;">
-        <input type="checkbox" name="remember" style="transform:scale(1.05);margin-right:6px;">
-        Remember me
-      </label>
-      <a href="{% url 'account_reset_password' %}" style="color:#0b63d6;text-decoration:none;font-weight:600;font-size:14px;">Forgot?</a>
-    </div>
+    {% if form.password.errors %}
+      <div style="color:#b00020;margin-top:-10px;margin-bottom:10px;">
+        {{ form.password.errors|join:", " }}
+      </div>
+    {% endif %}
 
-    <div style="display:flex;gap:10px;">
-      <button type="submit" style="flex:1;padding:12px;border-radius:10px;border:none;background:#007BFF;color:white;font-weight:700;cursor:pointer;">{% trans "Login" %}</button>
+    <!-- LOGIN BUTTON -->
+    <button type="submit"
+            style="
+              width:100%;
+              padding:12px;
+              border-radius:10px;
+              border:none;
+              background:#007BFF;
+              color:white;
+              font-weight:700;
+              cursor:pointer;
+            ">
+      {% trans "Login" %}
+    </button>
 
-      <a href="{% url 'account_signup' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:10px;border:1px solid #e6eefc;background:#f8fbff;color:#007BFF;text-decoration:none;font-weight:700;">
-        Signup
-      </a>
-    </div>
+    <!-- ✅ SAFE HIDDEN FIELDS RENDER (NO []) -->
+    {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+    {% endfor %}
 
-    {{ form.hidden_fields }}
     <input type="hidden" name="next" value="{{ next }}">
   </form>
-
-  <div style="text-align:center;margin-top:14px;color:#666;font-size:13px;">
-    Or sign in with
-  </div>
-
-  <div style="display:flex;gap:10px;margin-top:10px;justify-content:center;">
-    <a href="#" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e6edf8;background:#fff;text-decoration:none;color:#222;">
-      <img src="{% static 'images/google-logo.png' %}" alt="Google" style="width:18px;height:18px;">
-      Google
-    </a>
-  </div>
-
-  <p style="text-align:center;margin-top:14px;font-size:13px;color:#666;">
-    Don't have an account? <a href="{% url 'account_signup' %}" style="color:#0b63d6;font-weight:600;">Create one</a>
-  </p>
 </div>
 
+<!-- INPUT STYLE -->
 <style>
-.input-full { width:100%;padding:11px;border-radius:8px;border:1px solid #e6edf8;font-size:14px; }
+.input-full {
+  width:100%;
+  padding:11px;
+  font-size:14px;
+  border-radius:8px;
+  border:1px solid #e6edf8;
+  outline:none;
+}
 @media (max-width:480px) {
   .auth-wrapper { margin:20px 12px; padding:18px; }
 }
 </style>
+
+<!-- PASSWORD TOGGLE + AUTO HIDE -->
+<script>
+  const toggleBtn = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("passwordField");
+
+  toggleBtn.addEventListener("click", () => {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleBtn.textContent = "HIDE";
+    } else {
+      passwordInput.type = "password";
+      toggleBtn.textContent = "SHOW";
+    }
+  });
+
+  // Auto-hide messages after 12 seconds
+  const messageBlock = document.getElementById("messageBlock");
+  if (messageBlock) {
+    setTimeout(() => {
+      messageBlock.style.display = "none";
+    }, 12000);
+  }
+
+  // Auto-hide welcome after 20 seconds
+  const welcomeBlock = document.getElementById("welcomeBlock");
+  if (welcomeBlock) {
+    setTimeout(() => {
+      welcomeBlock.style.display = "none";
+    }, 20000);
+  }
+</script>
 {% endblock %}

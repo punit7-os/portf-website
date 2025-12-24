@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 app_name = 'shop'
 
 urlpatterns = [
+    # Home / Products
     path('', views.product_list, name='product_list'),
     path('search/', views.search_products, name='search_products'),
     path('c/<slug:slug>/', views.product_list, name='product_list_by_category'),
@@ -28,20 +29,30 @@ urlpatterns = [
 
     # Authentication
     path('signup/', views.signup, name='signup'),
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    # path('login/', auth_views.LoginView.as_view(
+    #     template_name='registration/login.html'
+    # ), name='login'),
+    path('login/', views.login_view, name='login'),
+
     path('logout/', views.logout_view, name='logout'),
 
     # Profile & Orders
     path('profile/', views.profile, name='profile'),
     path('orders/', views.my_orders, name='my_orders'),
 
-    # Product Detail (keep last)
-    path('<slug:slug>/', views.product_detail, name='product_detail'),
-    # near other urlpatterns
-    path('feedback/<int:product_id>/', views.product_feedback, name='product_feedback'),
+    path('payment/clear-buy-now/', views.clear_buy_now_session, name='clear_buy_now'),
+
+
+    # ✅ ORDER DETAIL (FIX FOR YOUR ERROR)
+    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
+
+    # ✅ CANCEL ORDER (USED IN TEMPLATE)
+    path('orders/<int:order_id>/cancel/', views.cancel_order, name='cancel_order'),
+
+    # Product Feedback
     path('feedback/<int:product_id>/', views.product_feedback, name='product_feedback'),
     path('feedback/rss/<int:product_id>/', views.product_reviews_rss, name='product_reviews_rss'),
-    # product detail last
-    path('<slug:slug>/', views.product_detail, name='product_detail'),
 
+    # Product Detail (KEEP LAST)
+    path('<slug:slug>/', views.product_detail, name='product_detail'),
 ]
