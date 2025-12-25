@@ -60,4 +60,7 @@ urlpatterns = [
     path("profile/address/add/", views.add_address, name="add_address"),
     path("profile/address/delete/<int:address_id>/", views.delete_address, name="delete_address"),
 
+    path("wishlist/", views.wishlist_page, name="wishlist"),
+    path("wishlist/toggle/<int:product_id>/", views.toggle_wishlist, name="toggle_wishlist"),
+
 ]

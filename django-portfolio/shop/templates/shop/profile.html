@@ -11,7 +11,8 @@
   padding: 18px;
   display: grid;
   grid-template-columns: 380px 1fr; /* wider left card */
-  gap: 28px;                  /* slightly more breathing space */
+  gap: 36px;        
+  align-items: start; /* 🔥 STOP vertical stretching */       /* slightly more breathing space */
 }
 
 
@@ -33,7 +34,8 @@
     }
 
 .card hr {
-  margin: 6px 0;
+  margin: 4px 0 6px;
+  height: 1px;
   border: none;
   border-top: 1px solid #eef2f7; /* light divider like image */
 }
@@ -53,16 +55,21 @@
     color: #0b63d6;
   }
 
+  .quick-links {
+  margin-top: 26px; /* 🔽 tighter than default */
+}
+
   .quick-links a {
     display: block;
-    margin-top: 8px;
-    padding: 10px;
+    margin-top: 16px;
+    padding: 8px 10px;
     border-radius: 10px;
     border: 1px solid #e8f1ff;
     text-decoration: none;
     font-weight: 600;
     color: #0b63d6;
     cursor: pointer;
+
   }
 
   input,
@@ -165,6 +172,9 @@
 
 .profile-wrap > .card:first-child {
   padding-top: 16px; /* 🔽 from 20px */
+   display: flex;
+  flex-direction: column;
+  gap: 6px; /* controls spacing between all sections */
 }
 
 .saved-address-hover {
@@ -183,7 +193,8 @@
 
 /* LEFT CARD INFO STYLE (Email / Phone) */
 .info-block {
-  margin-top: 6px;
+  margin-top: 0;
+  margin: 2px;
 }
 
 .info-label {
@@ -197,6 +208,13 @@
   font-size: 14px;
   color: #6b7280; /* muted gray like screenshot */
   word-break: break-all;
+}
+
+/* Kill default margins inside left card */
+.profile-wrap > .card:first-child h3,
+.profile-wrap > .card:first-child small,
+.profile-wrap > .card:first-child p {
+  margin: 0;
 }
 
 </style>
@@ -250,7 +268,8 @@
 </div>
 
 
-      <a href="#">Wishlist →</a>
+      <a href="{% url 'shop:wishlist' %}">Wishlist →</a>
+
       <a href="{% url 'shop:logout' %}" style="color:#b00020;">Logout</a>
     </div>
   </div>

@@ -945,3 +945,31 @@ def delete_address(request, address_id):
 
     return redirect("shop:profile")
 
+# shop/views.py
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Wishlist, Product
+
+
+@login_required
+def toggle_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    wish, created = Wishlist.objects.get_or_create(
+        user=request.user,
+        product=product
+    )
+
+    if not created:
+        wish.delete()
+        return JsonResponse({"status": "removed"})
+    else:
+        return JsonResponse({"status": "added"})
+
+
+@login_required
+def wishlist_page(request):
+    items = Wishlist.objects.filter(user=request.user).select_related("product")
+    return render(request, "shop/wishlist.html", {"items": items})
