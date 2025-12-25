@@ -6,6 +6,10 @@
   <meta charset="utf-8">
   <title>{% block title %}My Shoppings{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
 
 
   <style>
@@ -501,81 +505,115 @@
     </div>
   </footer>
 <script>
-/* ================= CSRF ================= */
-function getCookie(name) {
-  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return v ? v.pop() : '';
-}
-const csrftoken = getCookie('csrftoken');
+  /* ================= CSRF ================= */
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
+  const csrftoken = getCookie('csrftoken');
 
-/* ================= ADD TO CART (AJAX) ================= */
-document.addEventListener('click', async function (e) {
-  const addBtn = e.target.closest('button.add');
-  if (!addBtn) return;
+  /* ================= ACCOUNT DROPDOWN (FIXED) ================= */
+  document.addEventListener("DOMContentLoaded", function () {
+    const accountBtn = document.getElementById("accountBtn");
+    const accountMenu = document.getElementById("accountMenu");
 
-  e.preventDefault();
+    if (!accountBtn || !accountMenu) return;
 
-  const form = addBtn.closest('form');
-  if (!form) return;
-
-  const url = form.action;
-
-  addBtn.disabled = true;
-
-  try {
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': csrftoken,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: new URLSearchParams({ qty: 1 })
+    // Toggle menu on button click
+    accountBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation(); // 🔥 VERY IMPORTANT
+      const isOpen = accountMenu.style.display === "block";
+      accountMenu.style.display = isOpen ? "none" : "block";
+      accountMenu.setAttribute("aria-hidden", isOpen ? "true" : "false");
     });
 
-    const data = await resp.json();
-    if (data.cart_count !== undefined) {
-      document.getElementById('cartCountBadge').textContent = data.cart_count;
+    // Close menu when clicking outside
+    document.addEventListener("click", function (e) {
+      if (!accountMenu.contains(e.target) && !accountBtn.contains(e.target)) {
+        accountMenu.style.display = "none";
+        accountMenu.setAttribute("aria-hidden", "true");
+      }
+    });
+  });
+
+  /* ================= ADD TO CART (AJAX) ================= */
+  document.addEventListener('click', async function (e) {
+    const addBtn = e.target.closest('button.add');
+    if (!addBtn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const form = addBtn.closest('form');
+    if (!form) return;
+
+    addBtn.disabled = true;
+
+    try {
+      const resp = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ qty: 1 })
+      });
+
+      const data = await resp.json();
+      if (data.cart_count !== undefined) {
+        document.getElementById('cartCountBadge').textContent = data.cart_count;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      addBtn.disabled = false;
     }
+  });
 
-  } catch (err) {
-    console.error(err);
-  } finally {
-    addBtn.disabled = false;
-  }
-});
+  /* ================= BUY NOW ================= */
+  document.addEventListener('click', async function (e) {
+    const buyBtn = e.target.closest('button.buy');
+    if (!buyBtn) return;
 
-/* ================= BUY NOW (FORCE REDIRECT) ================= */
-document.addEventListener('click', async function (e) {
-  const buyBtn = e.target.closest('button.buy');
-  if (!buyBtn) return;
+    e.preventDefault();
+    e.stopPropagation();
 
-  e.preventDefault();
+    const form = buyBtn.closest('form');
+    if (!form) return;
 
-  const form = buyBtn.closest('form');
-  if (!form) return;
+    buyBtn.disabled = true;
 
-  buyBtn.disabled = true;
+    try {
+      await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrftoken
+        },
+        body: new URLSearchParams({ qty: 1 })
+      });
 
-  try {
-    await fetch(form.action, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': csrftoken
-      },
-      body: new URLSearchParams({ qty: 1 })
+      window.location.href = "/shop/checkout/";
+    } catch (err) {
+      console.error("Buy Now failed", err);
+      buyBtn.disabled = false;
+    }
+  });
+
+  /* ================= PAGE VISIBILITY REFRESH ================= */
+  (function () {
+    let wasHidden = false;
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") wasHidden = true;
+      if (document.visibilityState === "visible" && wasHidden) {
+        window.location.reload();
+      }
     });
-
-    // ✅ FORCE redirect
-    window.location.href = "/shop/checkout/";
-
-  } catch (err) {
-    console.error("Buy Now failed", err);
-    buyBtn.disabled = false;
-  }
-});
+  })();
 </script>
+
 
 
 

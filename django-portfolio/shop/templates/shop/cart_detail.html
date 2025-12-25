@@ -2,6 +2,8 @@
 {% block title %}Your Shopping Cart{% endblock %}
 
 {% block content %}
+
+
 <div style="max-width:900px; margin:20px auto; background:#fff; padding:25px; border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
 
     <h2 style="margin-top:0;">🛒 Your Shopping Cart</h2>
@@ -42,13 +44,7 @@
 
     <h3 id="cartTotal" style="margin-top:20px;">Total: <strong>₹ {{ total }}</strong></h3>
 
-    <div style="margin-top:25px;">
-        <a href="{% url 'shop:checkout' %}">
-            <button style="padding:12px 18px; background:#007BFF; color:#fff; border:none; border-radius:10px; cursor:pointer;">
-                Proceed to Checkout
-            </button>
-        </a>
-    </div>
+    
 
     {% else %}
       <p style="font-size:18px; padding:20px;">Your cart is empty.</p>
@@ -159,5 +155,8 @@
   });
 
 })();
+
+
+
 </script>
 {% endblock %}
