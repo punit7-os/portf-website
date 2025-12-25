@@ -55,4 +55,9 @@ urlpatterns = [
 
     # Product Detail (KEEP LAST)
     path('<slug:slug>/', views.product_detail, name='product_detail'),
+    # urls.py (ADD BELOW profile path)
+
+    path("profile/address/add/", views.add_address, name="add_address"),
+    path("profile/address/delete/<int:address_id>/", views.delete_address, name="delete_address"),
+
 ]

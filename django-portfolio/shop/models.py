@@ -77,12 +77,26 @@ class OrderItem(models.Model):
         return f"{self.product.name if self.product else 'Item'} × {self.quantity}"
 
 
+# models.py
+
+# models.py
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+
+    # ✅ NEW: signup source
+    signup_provider = models.CharField(
+        max_length=20,
+        choices=(("manual", "Manual"), ("google", "Google")),
+        default="manual"
+    )
 
     def __str__(self):
         return f"{self.user.username} profile"
+
+
 
 # ---------- Feedback model ----------
 class Feedback(models.Model):
@@ -109,3 +123,19 @@ class Feedback(models.Model):
 
     def short_message(self, length=150):
         return (self.message[:length] + '...') if self.message and len(self.message) > length else (self.message or '')
+# models.py (ADD BELOW Profile model)
+
+class Address(models.Model):
+    profile = models.ForeignKey(
+        Profile,
+        related_name="addresses",
+        on_delete=models.CASCADE
+    )
+    address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Address for {self.profile.user.username}"

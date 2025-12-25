@@ -32,10 +32,16 @@ class CustomUserCreationForm(UserCreationForm):
             raise ValidationError("Enter a valid phone number (6-15 digits).")
         return phone
 
+# forms.py
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['phone']
+        fields = ['phone', 'address']  # ✅ include address
         widgets = {
-            'phone': forms.TextInput(attrs={'placeholder': 'e.g. 9876543210'})
+            'phone': forms.TextInput(attrs={'placeholder': 'e.g. 9876543210'}),
+            'address': forms.Textarea(attrs={
+                'placeholder': 'Add delivery address...',
+                'rows': 4
+            }),
         }

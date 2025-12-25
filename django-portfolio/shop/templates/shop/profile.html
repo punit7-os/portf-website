@@ -5,212 +5,351 @@
 
 {% block content %}
 <style>
-  /* Desktop-first layout: two-column card layout aligned with base.html widths */
-  .profile-wrap {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 18px;
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 22px;
-  }
+ .profile-wrap {
+  max-width: 1280px;          /* wider cards */
+  margin: 16px auto 40px;     /* reduce space from header */
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 380px 1fr; /* wider left card */
+  gap: 28px;                  /* slightly more breathing space */
+}
 
-  /* MOBILE VIEW — apply only for small phones/tablets */
-  @media (max-width: 600px) {
-    .profile-wrap {
-      grid-template-columns: 1fr;
-      padding: 10px;
-      margin: 16px auto;
-    }
-
-    .avatar .img { width:72px; height:72px; font-size:24px; }
-    .profile-left .card, .profile-right .card { padding:14px; }
-  }
 
   .card {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 28px rgba(11, 35, 77, 0.06);
     padding: 20px;
+    max-width: 100%;
+
+
   }
 
   .avatar {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: center;
-  }
+    margin-bottom: 4px; /* 🔽 reduced spacing */
+    }
+
+.card hr {
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid #eef2f7; /* light divider like image */
+}
+
+
 
   .avatar .img {
-    width: 84px;
-    height: 84px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e9f2ff, #fff);
-    display: inline-flex;
+    background: #e9f2ff;
+    display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
+    font-size: 22px;
     color: #0b63d6;
-    font-size: 28px;
-    overflow: hidden;
-    border: 3px solid #f0f7ff;
-    box-shadow: 0 6px 18px rgba(11, 99, 214, 0.06);
-  }
-
-  .meta h3 { margin: 0 0 6px 0; font-size: 18px; }
-  .meta small { color: #6b7280; }
-
-  .quick-links {
-    display:flex;
-    flex-direction: column;
-    gap:10px;
-    margin-top:10px;
   }
 
   .quick-links a {
-    text-decoration:none;
-    padding:10px;
-    border-radius:10px;
-    background:#fbfdff;
-    border:1px solid #e8f1ff;
-    font-weight:600;
-    color:#0b63d6;
+    display: block;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e8f1ff;
+    text-decoration: none;
+    font-weight: 600;
+    color: #0b63d6;
+    cursor: pointer;
   }
 
-  .profile-form-row {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-bottom:12px;
-    flex-wrap:wrap;
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e6eefc;
+    background: #fbfcff;
   }
 
-  .profile-form-row label {
-    min-width:110px;
-    font-weight:700;
-    color:#374151;
-  }
-
-  input[type="text"], input[type="email"], input[type="tel"], textarea {
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #e6eefc;
-    background:#fbfcff;
-    font-size:14px;
-  }
-
-  textarea { min-height:100px; }
-
-  .actions {
-    display:flex;
-    gap:10px;
-    margin-top:12px;
+  textarea {
+    min-height: 90px;
   }
 
   .btn-primary {
-    padding:10px 14px;
-    border-radius:10px;
-    background: linear-gradient(90deg,#007bff,#00c6ff);
-    color:white;
-    border:none;
-    cursor:pointer;
-    font-weight:700;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
   }
 
-  .small { font-size:13px; color:#6b7280; }
-  .divider { height:1px;background:#f1f6ff;margin:12px 0; }
+  /* ADDRESS POPOVER */
+  .popover {
+    display: none;
+    position: absolute;
+    top: -12px;
+    left: 0;
+    transform: translateY(-100%);
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 14px;
+    z-index: 9999
+  }
+
+  .popover.show {
+    display: block;
+  }
+
+
+ .addr-card {
+  background: #fbfdff;
+  border: 1px solid #e6eefc;
+  border-radius: 10px;
+  padding: 12px 40px 12px 12px; /* ✅ extra right padding */
+  margin-bottom: 10px;
+  position: relative;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+/* Close button */
+.addr-card a {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fdecea;
+  color: #b00020;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* Hover effect */
+.addr-card a:hover {
+  background: #f9d6d3;
+}
+
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+  }
+  .profile-wrap > .card {
+  overflow: visible;
+}
+
+.profile-wrap > .card:first-child {
+  padding-top: 16px; /* 🔽 from 20px */
+}
+
+.saved-address-hover {
+  position: relative;
+}
+
+/* hide by default */
+.saved-address-hover .popover {
+  display: none;
+}
+
+/* show on hover */
+.saved-address-hover:hover .popover {
+  display: block;
+}
+
+/* LEFT CARD INFO STYLE (Email / Phone) */
+.info-block {
+  margin-top: 6px;
+}
+
+.info-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111827; /* dark gray */
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #6b7280; /* muted gray like screenshot */
+  word-break: break-all;
+}
 
 </style>
 
 <div class="profile-wrap">
 
-  <!-- LEFT CARD: summary & quick links -->
-  <div class="profile-left">
-    <div class="card">
-      <div class="avatar">
-        <!-- Avatar: first letter of username -->
-        <div class="img" aria-hidden="true">
-          {% if request.user.first_name %}
-            {{ request.user.first_name|slice:":1"|upper }}
-          {% else %}
-            {{ request.user.username|slice:":1"|upper }}
-          {% endif %}
-        </div>
+  <!-- LEFT -->
+  <div class="card" style="position:relative;">
 
-        <div class="meta">
-          <h3>{{ request.user.get_username }}</h3>
-          <small>Member since {{ request.user.date_joined|date:"M Y" }}</small>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div style="font-weight:700">Email</div>
-      <div class="small" style="margin-bottom:8px;">{{ request.user.email }}</div>
-
-      <div style="font-weight:700">Phone</div>
-      <div class="small">{{ profile.phone|default:"Not added" }}</div>
-
-      <div class="quick-links" style="margin-top:14px;">
-        <a href="{% url 'shop:my_orders' %}">Orders →</a>
-        <a href="{% url 'shop:checkout' %}?buy=0">Saved Addresses →</a>
-        <a href="{% url 'shop:product_list' %}">Wishlist →</a>
-        <a href="{% url 'shop:logout' %}" style="color:#b00020;">Logout</a>
+    <div class="avatar">
+      <div class="img">{{ request.user.username|slice:":1"|upper }}</div>
+      <div>
+        <h3>{{ request.user.username }}</h3>
+        <small>Member since {{ request.user.date_joined|date:"M Y" }}</small>
       </div>
     </div>
-  </div>
 
-  <!-- RIGHT: editable profile form -->
-  <div class="profile-right">
-    <div class="card">
-      <h2 style="margin:0 0 10px 0;">Your Profile</h2>
-      <div class="small" style="margin-bottom:12px;">Manage your personal information</div>
+    <hr>
 
-      <form method="post" novalidate>
-        {% csrf_token %}
-
-        <!-- Editable Username -->
-        <div class="profile-form-row">
-          <label for="id_username">Username</label>
-          <div class="value">
-            <input id="id_username" type="text" name="username" value="{{ request.user.username }}">
-          </div>
-        </div>
-
-        <!-- NON Editable Email -->
-        <div class="profile-form-row">
-          <label>Email</label>
-          <div class="value">
-            <input type="email" value="{{ request.user.email }}" readonly>
-          </div>
-        </div>
-
-        <!-- NON Editable Phone -->
-        <div class="profile-form-row">
-          <label>Phone</label>
-          <div class="value">
-            <input type="text" value="{{ profile.phone|default:'Not added' }}" readonly>
-          </div>
-        </div>
-
-        <!-- Editable Address -->
-        <div class="profile-form-row" style="align-items:flex-start;">
-          <label for="id_address">Address</label>
-          <div class="value">
-            <textarea id="id_address" name="address" placeholder="Add delivery address...">{% if profile.address %}{{ profile.address }}{% endif %}</textarea>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button type="submit" class="btn-primary">Save changes</button>
-        </div>
-
-        <div style="margin-top:10px;" class="small">
-          Last updated: {{ request.user.last_login|date:"d M Y H:i" }}
-        </div>
-      </form>
-    </div>
-  </div>
-
+    <div class="info-block">
+  <div class="info-label">Email</div>
+  <div class="info-value">{{ request.user.email }}</div>
 </div>
-{% endblock %}
+
+<div class="info-block">
+  <div class="info-label">Phone</div>
+  <div class="info-value">{{ profile.phone|default:"Not added" }}</div>
+</div>
+
+
+    <div class="quick-links">
+      <a href="{% url 'shop:my_orders' %}">Orders →</a>
+      <!-- <a onclick="toggleAddresses()">Saved Addresses →</a> -->
+     <div class="saved-address-hover">
+  <a href="javascript:void(0)" class="saved-address-trigger">
+    Saved Addresses →
+  </a>
+
+  <div class="popover">
+    <strong>Saved Addresses</strong>
+
+    {% for addr in profile.addresses.all %}
+      <div class="addr-card">
+        {{ addr.address }}
+        <a href="{% url 'shop:delete_address' addr.id %}" title="Remove address">✕</a>
+      </div>
+    {% empty %}
+      <div class="small">No saved addresses yet.</div>
+    {% endfor %}
+  </div>
+</div>
+
+
+      <a href="#">Wishlist →</a>
+      <a href="{% url 'shop:logout' %}" style="color:#b00020;">Logout</a>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="card">
+    <h2>Your Profile</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" value="{{ request.user.username }}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" value="{{ request.user.email }}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" name="phone" value="{{ profile.phone|default:'' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Current Address</label>
+        <textarea
+          readonly>{% with profile.addresses.first as addr %}{% if addr %}{{ addr.address }}{% endif %}{% endwith %}</textarea>
+      </div>
+
+      <!-- <button class="btn-primary" type="submit">Save changes</button> -->
+    </form>
+
+<form method="post" action="{% url 'shop:add_address' %}" style="margin-top:16px;">
+  {% csrf_token %}
+
+  <div class="form-group" style="position:relative;">
+    <label>Add New Address</label>
+
+    {% if address_limit_reached %}
+    <div id="addressLimitMsg" style="
+      background:#fdecea;
+      color:#b00020;
+      padding:6px 10px;
+      border-radius:8px;
+      font-size:12px;
+      margin-bottom:8px;
+    ">
+      Address can be changed max 3 times.
+    </div>
+    {% endif %}
+
+    <textarea
+      name="address"
+      placeholder="Add new address..."
+      {% if address_limit_reached %}disabled{% endif %}
+      required
+    ></textarea>
+  </div>
+
+  <button
+    class="btn-primary"
+    type="submit"
+    {% if address_limit_reached %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}
+  >
+    Add Address
+  </button>
+</form>
+
+
+
+
+    <!-- ADDRESS POPOVER -->
+<script>
+  (function () {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile) return;
+
+    const wrapper = document.querySelector(".saved-address-hover");
+    const trigger = wrapper?.querySelector(".saved-address-trigger");
+    const popover = wrapper?.querySelector(".popover");
+
+    if (!trigger || !popover) return;
+
+    trigger.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      popover.style.display =
+        popover.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", function () {
+      popover.style.display = "none";
+    });
+  })();
+</script>
+
+
+   
+    {% endblock %}

@@ -12,7 +12,7 @@ from django.utils import timezone
 from .models import OrderItem
 
 
-from .models import Category, Product, Order, Profile, Feedback
+from .models import Category, Product, Order, Profile, Feedback, Address
 from .cart import Cart
 from .forms import CustomUserCreationForm, ProfileForm
 
@@ -27,6 +27,8 @@ from django.conf import settings
 import razorpay
 import random
 import time
+
+
 
 
 def is_ajax_request(request):
@@ -612,7 +614,9 @@ def signup(request):
                 })
 
             user = User.objects.create_user(username=username, email=email, password=password)
-            Profile.objects.create(user=user, phone=phone)
+            Profile.objects.create(user=user, phone=phone, signup_provider="manual")
+        
+
 
             user = authenticate(username=username, password=password)
             if user:
@@ -685,17 +689,22 @@ def signup(request):
 
 @login_required
 def profile(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
+    profile, _ = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={"signup_provider": "google"}  # Google fallback
+    )
 
     if request.method == "POST":
-        form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect("shop:profile")
-    else:
-        form = ProfileForm(instance=profile)
+        profile.phone = request.POST.get("phone", "").strip()
+        profile.address = request.POST.get("address", "").strip()
+        profile.save()
+        return redirect("shop:profile")
 
-    return render(request, "shop/profile.html", {"form": form})
+    return render(request, "shop/profile.html", {
+    "profile": profile,
+    "address_limit_reached": profile.addresses.count() >= 3
+})
+
 
 
 @login_required
@@ -907,3 +916,32 @@ def product_reviews_rss(request, product_id):
         'build_time': timezone.now().strftime('%a, %d %b %Y %H:%M:%S +0000')
     })
     return HttpResponse(rss, content_type='application/rss+xml')
+
+@login_required
+def add_address(request):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        if profile.addresses.count() >= 3:
+            return redirect("shop:profile")
+
+        address_text = request.POST.get("address", "").strip()
+        if address_text:
+            Address.objects.create(
+                profile=profile,
+                address=address_text
+            )
+
+    return redirect("shop:profile")
+
+@login_required
+def delete_address(request, address_id):
+    profile = request.user.profile
+    try:
+        addr = profile.addresses.get(id=address_id)
+        addr.delete()
+    except:
+        pass
+
+    return redirect("shop:profile")
+
