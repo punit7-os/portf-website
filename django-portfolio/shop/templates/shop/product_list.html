@@ -168,64 +168,38 @@
 
 <div class="grid">
   {% for p in products %}
-  <div class="card">
-    <div style="position:relative;">
-      <a href="{% url 'shop:product_detail' p.slug %}"
-        onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
-        <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
-      </a>
+<div class="card" data-href="{% url 'shop:product_detail' p.slug %}">
+  <div style="position:relative;">
+    <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
 
-      <!-- ❤️ WISHLIST HEART -->
-      <span class="wishlist-heart {% if p.id in wishlist_ids %}active{% endif %}" data-product="{{ p.id }}"
-        title="Add to wishlist">♥</span>
+    <!-- ❤️ WISHLIST HEART -->
+    <span
+      class="wishlist-heart {% if p.id in wishlist_ids %}active{% endif %}"
+      data-product="{{ p.id }}"
+      title="Add to wishlist"
+    >♥</span>
+  </div>
+
+  <div class="p">
+    <div class="product-title" title="{{ p.name }}">
+      {{ p.name }}
     </div>
 
-    <div class="p">
-      <div class="product-title" title="{{ p.name }}">
-        <a href="{% url 'shop:product_detail' p.slug %}"
-          onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
-          {{ p.name }}
-        </a>
-      </div>
+    <div class="price">₹ {{ p.price }}</div>
 
-      <div class="price">₹ {{ p.price }}</div>
+    <div class="cart-btn">
+      <form action="{% url 'shop:cart_add' p.id %}" method="post">
+        {% csrf_token %}
+        <button type="button" class="add">🛒 Add to Cart</button>
+      </form>
 
-      <!-- <div class="cart-btn" onclick="event.stopPropagation();"> -->
-      <div class="cart-btn">
-
-        <!-- Add to Cart -->
-        <form action="{% url 'shop:cart_add' p.id %}" method="post" class="cart-form">
-          {% csrf_token %}
-          <button type="button" class="add" data-product-id="{{ p.id }}">
-            🛒 Add to Cart
-          </button>
-        </form>
-
-        <!-- Buy Now -->
-        <!-- <form action="{% url 'shop:buy_now' p.id %}" method="post" class="buy-form">
-  {% csrf_token %}
-  <input type="hidden" name="qty" value="1">
-  <button type="submit" class="buy">
-    ⚡ Buy Now
-  </button>
-</form> -->
-        <!-- <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy">
-  ⚡ Buy Now
-</a> -->
-        <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy buy-link">
-          ⚡ Buy Now
-        </a>
-        <!-- <form action="{% url 'shop:buy_now' p.id %}" method="post">
-  {% csrf_token %}
-  <button type="submit" class="buy">
-    ⚡ Buy Now
-  </button>
-</form> -->
-
-
-      </div>
+      <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy buy-link">
+        ⚡ Buy Now
+      </a>
     </div>
   </div>
+</div>
+
   {% empty %}
   <p>No products found.</p>
   {% endfor %}
@@ -309,6 +283,23 @@
       }, 1200);
     }
   });
+
+  document.addEventListener("click", function (e) {
+
+  /* ❌ Ignore cart buttons */
+  if (e.target.closest(".cart-btn")) return;
+
+  /* ❌ Ignore wishlist heart */
+  if (e.target.closest(".wishlist-heart")) return;
+
+  const card = e.target.closest(".card");
+  if (!card) return;
+
+  const url = card.getAttribute("data-href");
+  if (url) {
+    window.location.href = url;
+  }
+});
 </script>
 
 {% endblock %}
