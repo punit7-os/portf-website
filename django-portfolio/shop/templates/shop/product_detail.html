@@ -450,7 +450,14 @@
   <div class="left-column">
     <div>
       {% if product.image_url %}
-      <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+      <div style="position:relative;">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+
+        <!-- ❤️ WISHLIST HEART -->
+        <span class="wishlist-heart {% if product.id in wishlist_ids %}active{% endif %}"
+          data-product="{{ product.id }}" title="Add to wishlist">♥</span>
+      </div>
+
       {% else %}
       <img src="https://via.placeholder.com/400x300" alt="No Image" class="product-image">
       {% endif %}

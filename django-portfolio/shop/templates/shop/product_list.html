@@ -169,10 +169,17 @@
 <div class="grid">
   {% for p in products %}
   <div class="card">
-    <a href="{% url 'shop:product_detail' p.slug %}"
-      onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
-      <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
-    </a>
+    <div style="position:relative;">
+      <a href="{% url 'shop:product_detail' p.slug %}"
+        onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
+        <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
+      </a>
+
+      <!-- ❤️ WISHLIST HEART -->
+      <span class="wishlist-heart {% if p.id in wishlist_ids %}active{% endif %}" data-product="{{ p.id }}"
+        title="Add to wishlist">♥</span>
+    </div>
+
     <div class="p">
       <div class="product-title" title="{{ p.name }}">
         <a href="{% url 'shop:product_detail' p.slug %}"
@@ -225,83 +232,83 @@
 </div>
 
 <script>
-/* =========================================
-   HOME PAGE – ADD TO CART (SAME AS DETAIL)
-   ========================================= */
+  /* =========================================
+     HOME PAGE – ADD TO CART (SAME AS DETAIL)
+     ========================================= */
 
-function getCookie(name) {
-  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return v ? v.pop() : '';
-}
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
 
-document.addEventListener('click', async function (e) {
-  const btn = e.target.closest('button.add');
-  if (!btn) return;
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('button.add');
+    if (!btn) return;
 
-  e.preventDefault();
-  e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-  const form = btn.closest('form');
-  if (!form) return;
+    const form = btn.closest('form');
+    if (!form) return;
 
-  const url = form.action;
-  const originalText = btn.textContent;
+    const url = form.action;
+    const originalText = btn.textContent;
 
-  try {
-    btn.disabled = true;
-    btn.textContent = 'Adding...';
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
 
-    const resp = await fetch(url, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': getCookie('csrftoken'),
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: new URLSearchParams({ qty: 1 })
-    });
+      const resp = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ qty: 1 })
+      });
 
-    /* 🔐 NOT LOGGED IN → REDIRECT */
-    if (resp.status === 401) {
+      /* 🔐 NOT LOGGED IN → REDIRECT */
+      if (resp.status === 401) {
+        const data = await resp.json();
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+          return;
+        }
+      }
+
+      if (!resp.ok) throw new Error('Add failed');
+
       const data = await resp.json();
-      if (data.redirect_url) {
-        window.location.href = data.redirect_url;
-        return;
+
+      if (data.success) {
+        btn.classList.add('added');
+        btn.textContent = '✅ Added';
+
+        const badge = document.getElementById('cartCountBadge');
+        if (badge && data.cart_count !== undefined) {
+          badge.textContent = data.cart_count;
+        }
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('added');
+          btn.disabled = false;
+        }, 1200);
+      } else {
+        throw new Error('Add failed');
       }
-    }
 
-    if (!resp.ok) throw new Error('Add failed');
-
-    const data = await resp.json();
-
-    if (data.success) {
-      btn.classList.add('added');
-      btn.textContent = '✅ Added';
-
-      const badge = document.getElementById('cartCountBadge');
-      if (badge && data.cart_count !== undefined) {
-        badge.textContent = data.cart_count;
-      }
-
+    } catch (err) {
+      console.error(err);
+      btn.textContent = 'Try again';
       setTimeout(() => {
         btn.textContent = originalText;
-        btn.classList.remove('added');
         btn.disabled = false;
       }, 1200);
-    } else {
-      throw new Error('Add failed');
     }
-
-  } catch (err) {
-    console.error(err);
-    btn.textContent = 'Try again';
-    setTimeout(() => {
-      btn.textContent = originalText;
-      btn.disabled = false;
-    }, 1200);
-  }
-});
+  });
 </script>
 
 {% endblock %}

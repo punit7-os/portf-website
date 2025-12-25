@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.html import escape
 from django.utils import timezone
 from .models import OrderItem
+from .models import Wishlist   # ✅ ADD THIS IMPORT AT TOP (once)
 
 
 from .models import Category, Product, Order, Profile, Feedback, Address
@@ -44,6 +45,8 @@ def is_ajax_request(request):
 # -------------------------
 # PRODUCT LIST
 # -------------------------
+
+
 def product_list(request, slug=None):
     categories = Category.objects.all()
     products = Product.objects.filter(is_active=True).order_by("-created_at")
@@ -57,11 +60,21 @@ def product_list(request, slug=None):
     if query:
         products = products.filter(name__icontains=query)
 
+    # ===============================
+    # ✅ WISHLIST IDS (SAFE ADDITION)
+    # ===============================
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_ids = Wishlist.objects.filter(
+            user=request.user
+        ).values_list("product_id", flat=True)
+
     return render(request, "shop/product_list.html", {
         "categories": categories,
         "products": products,
         "current_category": current_category,
-        "query": query or ""
+        "query": query or "",
+        "wishlist_ids": wishlist_ids,   # ✅ ADDED
     })
 
 
@@ -112,6 +125,15 @@ def product_detail(request, slug):
         if request.user.is_authenticated else None
     )
 
+    # ===============================
+    # ✅ WISHLIST IDS (SAFE ADDITION)
+    # ===============================
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_ids = Wishlist.objects.filter(
+            user=request.user
+        ).values_list("product_id", flat=True)
+
     return render(request, "shop/product_detail.html", {
         "product": product,
         "related_products": related_products,
@@ -122,7 +144,9 @@ def product_detail(request, slug):
         "reviews_paginator": paginator,
         "display_name": display_name,
         "user_feedback": user_feedback,
+        "wishlist_ids": wishlist_ids,   # ✅ ADDED
     })
+
 
 
 # -------------------------
@@ -953,23 +977,42 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Wishlist, Product
 
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Wishlist, Product
+
+from django.views.decorators.http import require_POST
+
+@require_POST
 @login_required
 def toggle_wishlist(request, product_id):
+    if not is_ajax_request(request):
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
     product = get_object_or_404(Product, id=product_id)
 
-    wish, created = Wishlist.objects.get_or_create(
+    wishlist_obj, created = Wishlist.objects.get_or_create(
         user=request.user,
         product=product
     )
 
     if not created:
-        wish.delete()
+        wishlist_obj.delete()
         return JsonResponse({"status": "removed"})
-    else:
-        return JsonResponse({"status": "added"})
 
+    return JsonResponse({"status": "added"})
+
+
+
+
+# 
+
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def wishlist_page(request):
     items = Wishlist.objects.filter(user=request.user).select_related("product")
-    return render(request, "shop/wishlist.html", {"items": items})
+
+    return render(request, "shop/wishlist.html", {
+        "wishlist_items": items
+    })

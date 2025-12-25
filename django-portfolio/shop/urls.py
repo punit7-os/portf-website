@@ -6,6 +6,9 @@ from django.contrib.auth import views as auth_views
 app_name = 'shop'
 
 urlpatterns = [
+
+    path("wishlist/", views.wishlist_page, name="wishlist"),
+    path("wishlist/toggle/<int:product_id>/", views.toggle_wishlist, name="toggle_wishlist"),
     # Home / Products
     path('', views.product_list, name='product_list'),
     path('search/', views.search_products, name='search_products'),
@@ -53,14 +56,11 @@ urlpatterns = [
     path('feedback/<int:product_id>/', views.product_feedback, name='product_feedback'),
     path('feedback/rss/<int:product_id>/', views.product_reviews_rss, name='product_reviews_rss'),
 
-    # Product Detail (KEEP LAST)
-    path('<slug:slug>/', views.product_detail, name='product_detail'),
-    # urls.py (ADD BELOW profile path)
-
     path("profile/address/add/", views.add_address, name="add_address"),
     path("profile/address/delete/<int:address_id>/", views.delete_address, name="delete_address"),
 
-    path("wishlist/", views.wishlist_page, name="wishlist"),
-    path("wishlist/toggle/<int:product_id>/", views.toggle_wishlist, name="toggle_wishlist"),
+    # Product Detail (KEEP LAST)
+    path('<slug:slug>/', views.product_detail, name='product_detail'),
+    # urls.py (ADD BELOW profile path)
 
 ]

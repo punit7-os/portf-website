@@ -389,6 +389,24 @@
         width: 100%;
       }
     }
+    .wishlist-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #ccc;
+  transition: 0.2s;
+}
+
+.wishlist-heart.active {
+  color: #e11d48;
+}
+
+.wishlist-heart:hover {
+  transform: scale(1.15);
+}
+
   </style>
 </head>
 
@@ -674,6 +692,38 @@ document.addEventListener("click", function (e) {
     );
   }
 })();
+
+
+document.addEventListener("click", function (e) {
+  const heart = e.target.closest(".wishlist-heart");
+  if (!heart) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const productId = heart.dataset.product;
+
+  fetch(`/shop/wishlist/toggle/${productId}/`, {
+    method: "POST",
+    credentials: "same-origin", // 🔥 REQUIRED
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  })
+  .then(res => {
+    if (res.status === 403 || res.status === 401) {
+      window.location.href = "{% url 'shop:login' %}?next=" + window.location.pathname;
+      return;
+    }
+    return res.json();
+  })
+  .then(data => {
+    if (!data) return;
+    heart.classList.toggle("active", data.status === "added");
+  })
+  .catch(err => console.error("Wishlist error:", err));
+});
 
 </script>
 
