@@ -1,4 +1,6 @@
-IMPORTANT: Do NOT skip any code. Do NOT use ellipsis (...) Return FULL, COMPLETE, READY-TO-PASTE code. If output is too long, STOP and wait for me to say "continue".and if you cant provide full file then give me the affected section directly that should i change in file and whichever section is not affected dont give me so it will be more clear for me and above section give small explaination of that why this section is affected and previouus content functionality should not be changed.If there are are multiple issues we will solve one if it has some errors will solve it and then will jump to next one like step by step.
+IMPORTANT: Do NOT skip any code. Do NOT use ellipsis (...) Return FULL, COMPLETE, READY-TO-PASTE code. If output is too long, STOP and wait for me to say "continue".and if you cant provide full file then give me the affected section directly that should i change in file and whichever section is not affected dont give me so it will be more clear for me and above section give small explaination of that why this section is affected and previouus content functionality should not be changed.
+2.If there are are multiple issues we will solve one if it has some errors will solve it and then will jump to next one like step by step.
+3.if any front end issue possible without backend changes then do it in first priority, if thats not works then we will do the changes in backend.
 
 
 

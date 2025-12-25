@@ -537,70 +537,98 @@
     });
   });
 
-  /* ================= ADD TO CART (AJAX) ================= */
-  document.addEventListener('click', async function (e) {
-    const addBtn = e.target.closest('button.add');
-    if (!addBtn) return;
 
-    e.preventDefault();
-    e.stopPropagation();
+/* ================= ADD TO CART (AJAX) – LOGIN SAFE ================= */
+document.addEventListener('click', async function (e) {
+  const addBtn = e.target.closest('button.add');
+  if (!addBtn) return;
 
-    const form = addBtn.closest('form');
-    if (!form) return;
+  e.preventDefault();
+  e.stopPropagation();
 
-    addBtn.disabled = true;
+  const form = addBtn.closest('form');
+  if (!form) return;
 
-    try {
-      const resp = await fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrftoken,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: new URLSearchParams({ qty: 1 })
-      });
+  addBtn.disabled = true;
 
+  try {
+    const resp = await fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({ qty: 1 })
+    });
+
+    /* 🔐 LOGIN REQUIRED */
+    if (resp.status === 401) {
       const data = await resp.json();
-      if (data.cart_count !== undefined) {
-        document.getElementById('cartCountBadge').textContent = data.cart_count;
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      addBtn.disabled = false;
     }
-  });
 
-  /* ================= BUY NOW ================= */
-  document.addEventListener('click', async function (e) {
-    const buyBtn = e.target.closest('button.buy');
-    if (!buyBtn) return;
+    const data = await resp.json();
 
-    e.preventDefault();
-    e.stopPropagation();
-
-    const form = buyBtn.closest('form');
-    if (!form) return;
-
-    buyBtn.disabled = true;
-
-    try {
-      await fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrftoken
-        },
-        body: new URLSearchParams({ qty: 1 })
-      });
-
-      window.location.href = "/shop/checkout/";
-    } catch (err) {
-      console.error("Buy Now failed", err);
-      buyBtn.disabled = false;
+    if (data.cart_count !== undefined) {
+      document.getElementById('cartCountBadge').textContent = data.cart_count;
     }
-  });
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    addBtn.disabled = false;
+  }
+});
+
+
+
+
+/* ================= BUY NOW (LOGIN SAFE) ================= */
+document.addEventListener('click', async function (e) {
+  const buyBtn = e.target.closest('button.buy');
+  if (!buyBtn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const form = buyBtn.closest('form');
+  if (!form) return;
+
+  buyBtn.disabled = true;
+
+  try {
+    const resp = await fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({ qty: 1 })
+    });
+
+    /* 🔐 LOGIN REQUIRED */
+    if (resp.status === 401) {
+      const data = await resp.json();
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
+      }
+    }
+
+    /* ✅ Logged-in user → proceed to checkout */
+    window.location.href = "/shop/checkout/";
+
+  } catch (err) {
+    console.error("Buy Now failed", err);
+    buyBtn.disabled = false;
+  }
+});
+
 
   /* ================= PAGE VISIBILITY REFRESH ================= */
   (function () {
@@ -612,6 +640,41 @@
       }
     });
   })();
+
+
+/* =====================================================
+   FRONTEND-ONLY LOGIN GUARD (NO BACKEND TOUCH)
+   ===================================================== */
+
+/* Django auth state injected safely */
+const IS_AUTHENTICATED = "{{ request.user.is_authenticated|yesno:'1,0' }}" === "1";
+
+/* 1️⃣ BUY NOW ANCHOR PROTECTION */
+document.addEventListener("click", function (e) {
+  const buyLink = e.target.closest("a.buy-link");
+  if (!buyLink) return;
+
+  if (!IS_AUTHENTICATED) {
+    e.preventDefault();
+    const nextUrl = buyLink.getAttribute("href");
+    window.location.href =
+      "{% url 'shop:login' %}?next=" + encodeURIComponent(nextUrl);
+  }
+});
+
+/* 2️⃣ DIRECT CHECKOUT URL PROTECTION */
+(function () {
+  const path = window.location.pathname;
+  const isCheckout = path === "/shop/checkout/";
+
+  if (isCheckout && !IS_AUTHENTICATED) {
+    const nextUrl = window.location.pathname + window.location.search;
+    window.location.replace(
+      "{% url 'shop:login' %}?next=" + encodeURIComponent(nextUrl)
+    );
+  }
+})();
+
 </script>
 
 

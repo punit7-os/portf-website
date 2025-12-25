@@ -3,162 +3,165 @@
 {% block title %}Shop - My Shoppings{% endblock %}
 {% block content %}
 <style>
-/* ================= GRID & CARD ================= */
+  /* ================= GRID & CARD ================= */
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: contain;
-  background: #f8f9fb;
-  padding: 8px;
-}
-
-/* ================= PRODUCT INFO ================= */
-
-.p {
-  padding: 16px;
-  text-align: center;
-}
-
-.p a {
-  text-decoration: none;
-  color: #222;
-}
-
-.product-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #222;
-  line-height: 1.3;
-  min-height: 40px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.price {
-  color: #007BFF;
-  font-weight: 600;
-  margin: 8px 0 16px;
-  font-size: 1.1em;
-}
-
-/* ================= ACTION BUTTONS ================= */
-
-.cart-btn {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding-bottom: 14px;
-}
-
-/* remove base.html form width restriction */
-.cart-btn form {
-  max-width: none !important;
-}
-
-/* COMMON BUTTON SIZE — MATCHING SCREENSHOT */
-.cart-btn .add,
-.cart-btn .buy,
-.cart-btn .buy-link {
-  width: 150px;          /* ✅ EXACT WIDTH LIKE SCREENSHOT */
-  height: 44px;          /* ✅ SAME HEIGHT */
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
-
-  border-radius: 12px;
-  text-decoration: none !important;
-
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-sizing: border-box;
-}
-
-/* ================= ADD TO CART ================= */
-
-.cart-btn .add {
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: #fff;
-  border: none;
-
-  /* allow two-line text like screenshot */
-  white-space: normal;
-  text-align: center;
-  padding: 6px 10px;
-}
-
-.cart-btn .add:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
-}
-
-.cart-btn .add.added {
-  background: #28a745 !important;
-}
-
-/* ================= BUY NOW ================= */
-
-.cart-btn .buy,
-.cart-btn .buy-link {
-  background: linear-gradient(135deg, #ff7a18, #ffb347);
-  color: #fff !important;
-  border: none;
-
-  white-space: nowrap;      /* stays single-line */
-  padding: 0 16px;
-  box-shadow: 0 4px 14px rgba(255, 140, 0, 0.35);
-}
-
-.cart-btn .buy:hover,
-.cart-btn .buy-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.45);
-}
-
-.cart-btn .buy:active,
-.cart-btn .buy-link:active {
-  transform: scale(0.97);
-}
-
-/* ================= MOBILE ================= */
-
-@media (max-width: 480px) {
-  .cart-btn {
-    flex-direction: column;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
   }
 
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: #f8f9fb;
+    padding: 8px;
+  }
+
+  /* ================= PRODUCT INFO ================= */
+
+  .p {
+    padding: 16px;
+    text-align: center;
+  }
+
+  .p a {
+    text-decoration: none;
+    color: #222;
+  }
+
+  .product-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.3;
+    min-height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .price {
+    color: #007BFF;
+    font-weight: 600;
+    margin: 8px 0 16px;
+    font-size: 1.1em;
+  }
+
+  /* ================= ACTION BUTTONS ================= */
+
+  .cart-btn {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 14px;
+  }
+
+  /* remove base.html form width restriction */
+  .cart-btn form {
+    max-width: none !important;
+  }
+
+  /* COMMON BUTTON SIZE — MATCHING SCREENSHOT */
   .cart-btn .add,
   .cart-btn .buy,
   .cart-btn .buy-link {
-    width: 100%;
+    width: 150px;
+    /* ✅ EXACT WIDTH LIKE SCREENSHOT */
+    height: 44px;
+    /* ✅ SAME HEIGHT */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    border-radius: 12px;
+    text-decoration: none !important;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
   }
-}
+
+  /* ================= ADD TO CART ================= */
+
+  .cart-btn .add {
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: #fff;
+    border: none;
+
+    /* allow two-line text like screenshot */
+    white-space: normal;
+    text-align: center;
+    padding: 6px 10px;
+  }
+
+  .cart-btn .add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+  }
+
+  .cart-btn .add.added {
+    background: #28a745 !important;
+  }
+
+  /* ================= BUY NOW ================= */
+
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    background: linear-gradient(135deg, #ff7a18, #ffb347);
+    color: #fff !important;
+    border: none;
+
+    white-space: nowrap;
+    /* stays single-line */
+    padding: 0 16px;
+    box-shadow: 0 4px 14px rgba(255, 140, 0, 0.35);
+  }
+
+  .cart-btn .buy:hover,
+  .cart-btn .buy-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 140, 0, 0.45);
+  }
+
+  .cart-btn .buy:active,
+  .cart-btn .buy-link:active {
+    transform: scale(0.97);
+  }
+
+  /* ================= MOBILE ================= */
+
+  @media (max-width: 480px) {
+    .cart-btn {
+      flex-direction: column;
+    }
+
+    .cart-btn .add,
+    .cart-btn .buy,
+    .cart-btn .buy-link {
+      width: 100%;
+    }
+  }
 </style>
 
 
@@ -166,12 +169,14 @@
 <div class="grid">
   {% for p in products %}
   <div class="card">
-    <a href="{% url 'shop:product_detail' p.slug %}" onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
+    <a href="{% url 'shop:product_detail' p.slug %}"
+      onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
       <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
     </a>
     <div class="p">
       <div class="product-title" title="{{ p.name }}">
-        <a href="{% url 'shop:product_detail' p.slug %}" onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
+        <a href="{% url 'shop:product_detail' p.slug %}"
+          onclick="if(event.target.closest('.cart-btn')) { event.preventDefault(); return false; }">
           {{ p.name }}
         </a>
       </div>
@@ -179,7 +184,7 @@
       <div class="price">₹ {{ p.price }}</div>
 
       <!-- <div class="cart-btn" onclick="event.stopPropagation();"> -->
-        <div class="cart-btn">
+      <div class="cart-btn">
 
         <!-- Add to Cart -->
         <form action="{% url 'shop:cart_add' p.id %}" method="post" class="cart-form">
@@ -197,13 +202,19 @@
     ⚡ Buy Now
   </button>
 </form> -->
-<!-- <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy">
+        <!-- <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy">
   ⚡ Buy Now
 </a> -->
-<a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1"
-   class="buy buy-link">
-  ⚡ Buy Now
-</a>
+        <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy buy-link">
+          ⚡ Buy Now
+        </a>
+        <!-- <form action="{% url 'shop:buy_now' p.id %}" method="post">
+  {% csrf_token %}
+  <button type="submit" class="buy">
+    ⚡ Buy Now
+  </button>
+</form> -->
+
 
       </div>
     </div>
@@ -212,74 +223,84 @@
   <p>No products found.</p>
   {% endfor %}
 </div>
+
 <script>
-/* ================================
-   HOME PAGE – ADD TO CART (AJAX)
-   Same behavior as product_detail
-================================ */
+/* =========================================
+   HOME PAGE – ADD TO CART (SAME AS DETAIL)
+   ========================================= */
 
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return v ? v.pop() : '';
 }
 
-document.querySelectorAll('.cart-form').forEach(form => {
-  const button = form.querySelector('.add');
+document.addEventListener('click', async function (e) {
+  const btn = e.target.closest('button.add');
+  if (!btn) return;
 
-  button.addEventListener('click', async function (e) {
-    e.preventDefault();
+  e.preventDefault();
+  e.stopPropagation();
 
-    const url = form.action;
-    const csrf = getCookie('csrftoken');
+  const form = btn.closest('form');
+  if (!form) return;
 
-    button.disabled = true;
-    const originalText = button.textContent;
-    button.textContent = 'Adding...';
+  const url = form.action;
+  const originalText = btn.textContent;
 
-    try {
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': csrf,
-          'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({ qty: 1 }).toString()
-      });
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
 
-      if (!resp.ok) throw new Error('Request failed');
+    const resp = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': getCookie('csrftoken'),
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({ qty: 1 })
+    });
 
+    /* 🔐 NOT LOGGED IN → REDIRECT */
+    if (resp.status === 401) {
       const data = await resp.json();
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
+      }
+    }
 
-      if (data.success) {
-        button.classList.add('added');
-        button.textContent = '✅ Added';
+    if (!resp.ok) throw new Error('Add failed');
 
-        // Update cart badge if exists
-        const badge = document.getElementById('cartCountBadge');
-        if (badge && data.cart_count !== undefined) {
-          badge.textContent = data.cart_count;
-        }
+    const data = await resp.json();
 
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove('added');
-          button.disabled = false;
-        }, 1200);
-      } else {
-        throw new Error('Add failed');
+    if (data.success) {
+      btn.classList.add('added');
+      btn.textContent = '✅ Added';
+
+      const badge = document.getElementById('cartCountBadge');
+      if (badge && data.cart_count !== undefined) {
+        badge.textContent = data.cart_count;
       }
 
-    } catch (err) {
-      console.error(err);
-      button.textContent = 'Try again';
       setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
+        btn.textContent = originalText;
+        btn.classList.remove('added');
+        btn.disabled = false;
       }, 1200);
+    } else {
+      throw new Error('Add failed');
     }
-  });
+
+  } catch (err) {
+    console.error(err);
+    btn.textContent = 'Try again';
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }, 1200);
+  }
 });
 </script>
 
