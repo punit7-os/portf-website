@@ -87,12 +87,14 @@
   color: #666;
   margin-bottom: 40px;
 }
-
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
+  max-width: 1100px;
+  margin: auto;
 }
+
 
 .project-card {
   background: #fff;
@@ -162,6 +164,75 @@
   .project-img { height: 160px; }
 }
 
+/* ===== Work In Progress Modal ===== */
+.wip-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.wip-modal-content {
+  background: #fff;
+  padding: 30px 25px;
+  max-width: 420px;
+  width: 90%;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: fadeUp 0.35s ease;
+}
+
+.wip-modal-content h2 {
+  margin-bottom: 12px;
+  color: #007BFF;
+}
+
+.wip-modal-content p {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+.wip-modal-content button {
+  margin-top: 20px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #007BFF;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wip-modal-content button:hover {
+  background: #0056b3;
+}
+
+.wip-close {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
   </style>
 </head>
 <body>
@@ -223,7 +294,7 @@
 
     <!-- Project 2 Placeholder -->
     <div class="project-card">
-      <img src="images/ecommerce.jpg" alt="E-commerce Store">
+      <img src="{% static 'images/projects/locked.png' %}" alt="E-commerce Store">
       <div class="project-content">
         <h3>E-commerce Store</h3>
         <p>A fully functional e-commerce website with product management, cart, and payment gateway integration.</p>
@@ -233,57 +304,90 @@
 
     <!-- Project 3 Placeholder -->
     <div class="project-card">
-      <img src="images/blog.jpg" alt="Blog System">
+      <img src="{% static 'images/projects/locked.png' %}" alt="Blog System">
       <div class="project-content">
         <h3>Blog System</h3>
         <p>A blog/CMS platform with categories, comments, and SEO-friendly design.</p>
-        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+        <!-- <a href="#" target="_blank" class="project-link">🔗 View Project</a> -->
+         <a href="#" class="project-link" onclick="openWipModal(event)">  🔗 View Project</a>
+
       </div>
     </div>
 
     <!-- Project 4 Placeholder -->
     <div class="project-card">
-      <img src="images/api.jpg" alt="API Integration">
+      <img src="{% static 'images/projects/locked.png' %}" alt="API Integration">
       <div class="project-content">
         <h3>API Integration</h3>
         <p>Project using REST APIs to fetch and display live weather, stock market, or crypto data.</p>
-        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+        <a href="#" class="project-link" onclick="openWipModal(event)">🔗 View Project</a>
       </div>
     </div>
 
     <!-- Project 5 Placeholder -->
     <div class="project-card">
-      <img src="images/dashboard.jpg" alt="Data Dashboard">
+      <img src="{% static 'images/projects/locked.png' %}" alt="Data Dashboard">
       <div class="project-content">
         <h3>Data Dashboard</h3>
         <p>An interactive analytics dashboard with charts, filters, and insights.</p>
-        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+        <a href="#" class="project-link" onclick="openWipModal(event)">🔗 View Project</a>
       </div>
     </div>
 
     <!-- Project 6 Placeholder -->
     <div class="project-card">
-      <img src="images/automation.jpg" alt="Automation Project">
+      <img src="{% static 'images/projects/locked.png' %}" alt="Automation Project">
       <div class="project-content">
-        <h3>Automation/Bot</h3>
-        <p>Automation scripts (like scrapers, trading bots, or email senders) to showcase technical problem-solving skills.</p>
-        <a href="#" target="_blank" class="project-link">🔗 View Project</a>
+        <h3>Automation Bot</h3>
+        <p>Automation scripts Email Senders </p>
+        <a href="#" class="project-link" onclick="openWipModal(event)">🔗 View Project</a>
       </div>
     </div>
   </div>
 </section>
 
   <!-- Contact -->
-  <section id="contact">
-    <h2>📬 Contact Me</h2>
+<!-- Contact -->
+<section id="contact">
+  <h2>📬 Contact Me</h2>
+  <p>
+    Let's build something amazing together! Reach out to me via email or collaboration.
+  </p>
+
+  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Project%20Enquiry&body=Hi%20Punit,%0A%0AI%20would%20like%20to%20discuss%20a%20new%20project%20with%20you."
+     target="_blank" class="btn-hire">
+    📩 Hire Me
+  </a>
+
+  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Work%20Together&body=Hi%20Punit,%0A%0AI%20have%20a%20collaboration%20idea%20and%20would%20love%20to%20work%20with%20you."
+     target="_blank" class="btn-work">
+    🤝 Work Together
+  </a>
+
+  <!-- 🐞 Report a Bug -->
+  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Bug%20Report%20-%20Portfolio%20Website&body=Hi%20Punit,%0A%0AI%20found%20a%20bug%20on%20your%20portfolio%20website.%0A%0APage%3A%20%0AIssue%20Description%3A%20%0ASteps%20to%20Reproduce%3A%20%0AExpected%20Result%3A%20%0AActual%20Result%3A%20%0A%0AThanks."
+     target="_blank" class="btn-work">
+    🐞 Report a Bug
+  </a>
+</section>
+
+<!-- 🚧 Work In Progress Modal -->
+<div id="wipModal" class="wip-modal">
+  <div class="wip-modal-content">
+    <span class="wip-close" onclick="closeWipModal()">&times;</span>
+    <h2>🚧 Project Under Development</h2>
     <p>
-      Let's build something amazing together! Reach out to me via email or collaboration.
+      This project is currently under active development.
+      I’m working on refining features, improving performance,
+      and ensuring a polished experience.
     </p>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Project%20Enquiry&body=Hi%20Punit,%0A%0AI%20would%20like%20to%20discuss%20a%20new%20project%20with%20you."
-       target="_blank" class="btn-hire">📩 Hire Me</a>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Work%20Together&body=Hi%20Punit,%0A%0AI%20have%20a%20collaboration%20idea%20and%20would%20love%20to%20work%20with%20you."
-       target="_blank" class="btn-work">🤝 Work Together</a>
-  </section>
+    <p style="margin-top:10px;">
+      🔔 <strong>Coming soon!</strong> You’ll be able to explore this project shortly.
+    </p>
+    <button onclick="closeWipModal()">Got it 👍</button>
+  </div>
+</div>
+
 
   <!-- Footer -->
   <footer>
@@ -291,4 +395,92 @@
   </footer>
 
 </body>
+<script>
+
+  function openWipModal(e) {
+    e.preventDefault();
+    document.getElementById("wipModal").style.display = "flex";
+  }
+
+  function closeWipModal() {
+    document.getElementById("wipModal").style.display = "none";
+  }
+
+  // Close modal on outside click
+  window.addEventListener("click", function (e) {
+    const modal = document.getElementById("wipModal");
+    if (e.target === modal) {
+      closeWipModal();
+    }
+  });
+
+  const sections = document.querySelectorAll("section");
+  const navLinks = document.querySelectorAll("nav a");
+
+  /* ================= ScrollSpy ================= */
+  function activateScrollSpy() {
+    let current = "";
+
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 120;
+      const sectionHeight = section.offsetHeight;
+
+      if (
+        window.scrollY >= sectionTop &&
+        window.scrollY < sectionTop + sectionHeight
+      ) {
+        current = section.getAttribute("id");
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove("active");
+      if (link.getAttribute("href") === "#" + current) {
+        link.classList.add("active");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", activateScrollSpy);
+  window.addEventListener("load", activateScrollSpy);
+
+  /* ================= Slow Smooth Scroll ================= */
+  function smoothScrollTo(targetY, duration = 900) {
+    const startY = window.scrollY;
+    const diff = targetY - startY;
+    let startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const time = timestamp - startTime;
+      const percent = Math.min(time / duration, 1);
+
+      // easeInOut
+      const easing = percent < 0.5
+        ? 2 * percent * percent
+        : 1 - Math.pow(-2 * percent + 2, 2) / 2;
+
+      window.scrollTo(0, startY + diff * easing);
+
+      if (time < duration) {
+        requestAnimationFrame(step);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute("href").substring(1);
+      const targetSection = document.getElementById(targetId);
+      if (!targetSection) return;
+
+      const targetY = targetSection.offsetTop - 90;
+      smoothScrollTo(targetY, 800); // ⏱️ CHANGE THIS VALUE
+    });
+  });
+</script>
+
 </html>
