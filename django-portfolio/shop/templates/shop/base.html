@@ -725,6 +725,61 @@ document.addEventListener("click", function (e) {
   .catch(err => console.error("Wishlist error:", err));
 });
 
+
+(function () {
+  const searchInput = document.querySelector('.floating-search input[name="q"]');
+  const mainContent = document.querySelector('main');
+
+  if (!searchInput || !mainContent) return;
+
+  let controller = null;
+
+  function highlight(text, keyword) {
+    if (!keyword) return text;
+    const regex = new RegExp(`(${keyword})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+  }
+
+  async function performSearch(query) {
+    if (controller) controller.abort();
+    controller = new AbortController();
+
+    if (!query.trim()) {
+      window.location.href = "{% url 'shop:product_list' %}";
+      return;
+    }
+
+    try {
+      const resp = await fetch(
+        `{% url 'shop:search_products' %}?q=${encodeURIComponent(query)}`,
+        {
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+          signal: controller.signal
+        }
+      );
+
+      if (!resp.ok) return;
+
+      const html = await resp.text();
+      mainContent.innerHTML = html;
+
+      /* ✨ Highlight matches */
+      document.querySelectorAll('.product-name').forEach(el => {
+        el.innerHTML = highlight(el.textContent, query);
+      });
+
+    } catch (err) {
+      if (err.name !== "AbortError") console.error(err);
+    }
+  }
+
+  let debounceTimer;
+  searchInput.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    const q = this.value;
+    debounceTimer = setTimeout(() => performSearch(q), 250);
+  });
+})();
 </script>
 
 

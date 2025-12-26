@@ -1,108 +1,141 @@
-<!-- shop/templates/shop/wishlist.html -->
-
 {% extends "shop/base.html" %}
 {% block title %}Wishlist{% endblock %}
 
 {% block content %}
 <style>
-  /* ================= WISHLIST GRID ================= */
+/* ================= WISHLIST GRID ================= */
 
-  .wishlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 22px;
-  }
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+}
 
-  /* ================= CARD ================= */
+/* ================= CARD ================= */
 
-  .wishlist-card {
-    background: #fff;
-    padding: 14px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    position: relative;
-    cursor: pointer;
+.wishlist-card {
+  background: #fff;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
 
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
+.wishlist-card.removing {
+  opacity: 0;
+  transform: scale(0.9);
+}
 
-  /* 🔥 HOVER EFFECT */
-  .wishlist-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.14);
-  }
+.wishlist-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+}
 
-  .wishlist-card img {
-    width: 100%;
-    height: 160px;
-    object-fit: contain;
-    border-radius: 10px;
-    background: #f8f9fb;
-  }
+.wishlist-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #f8f9fb;
+}
 
-  .wishlist-title {
-    margin: 10px 0 4px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #222;
-    line-height: 1.3;
-  }
+.wishlist-title {
+  margin: 10px 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+}
 
-  .wishlist-price {
-    font-weight: 700;
-    color: #007BFF;
-  }
+.wishlist-price {
+  font-weight: 700;
+  color: #007BFF;
+}
 
-  /* ================= HEART ================= */
+/* ================= HEART ================= */
 
-  .wishlist-heart {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    font-size: 22px;
-    cursor: pointer;
-    color: #e11d48;
-    transition: transform 0.2s ease;
-    z-index: 5;
-  }
+.wishlist-heart {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #e11d48;
+  z-index: 5;
+  transition: transform 0.2s ease;
+}
 
-  .wishlist-heart:hover {
-    transform: scale(1.2);
-  }
+.wishlist-heart:hover {
+  transform: scale(1.2);
+}
+
+/* ================= TOP CENTER TOAST ================= */
+
+.toast {
+  position: fixed;
+  top: 90px; /* below header */
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+
+  background: #111827;
+  color: #fff;
+
+  padding: 8px 14px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast button {
+  background: transparent;
+  border: none;
+  color: #60a5fa;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
 </style>
 
 <div style="max-width:1100px;margin:30px auto;">
   <h2>Your Wishlist</h2>
 
   {% if wishlist_items %}
-    <div class="wishlist-grid">
+    <div class="wishlist-grid" id="wishlistGrid">
       {% for item in wishlist_items %}
         <div
           class="wishlist-card"
           data-href="{% url 'shop:product_detail' item.product.slug %}"
+          data-product="{{ item.product.id }}"
         >
 
-          <!-- ❤️ REMOVE WISHLIST -->
-          <span
-            class="wishlist-heart active"
-            data-product="{{ item.product.id }}"
-            title="Remove from wishlist"
-          >♥</span>
+          <span class="wishlist-heart active" data-product="{{ item.product.id }}">♥</span>
 
           <img
             src="{{ item.product.image_url|default:'https://via.placeholder.com/300x200' }}"
             alt="{{ item.product.name }}"
           >
 
-          <!-- Product name (clickable) -->
-          <div class="wishlist-title">
-            {{ item.product.name }}
-          </div>
-
-          <div class="wishlist-price">
-            ₹ {{ item.product.price }}
-          </div>
-
+          <div class="wishlist-title">{{ item.product.name }}</div>
+          <div class="wishlist-price">₹ {{ item.product.price }}</div>
         </div>
       {% endfor %}
     </div>
@@ -111,22 +144,105 @@
   {% endif %}
 </div>
 
+<!-- 🔔 TOAST -->
+<div id="undoToast" class="toast">
+  <span>Removed from wishlist</span>
+  <button id="undoBtn">UNDO</button>
+</div>
+
 <script>
-/* ===================================================
-   MAKE WHOLE CARD CLICKABLE (EXCEPT HEART)
-   =================================================== */
+function getCookie(name) {
+  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return v ? v.pop() : '';
+}
+
+let lastRemoved = null;
+let undoTimer = null;
+
+const toast = document.getElementById("undoToast");
+const undoBtn = document.getElementById("undoBtn");
+
+/* ================= REMOVE FROM WISHLIST ================= */
 
 document.addEventListener("click", function (e) {
   const heart = e.target.closest(".wishlist-heart");
-  if (heart) return; // ❌ do not navigate when heart clicked
+  if (!heart) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const productId = heart.dataset.product;
+  const card = heart.closest(".wishlist-card");
+
+  fetch(`/shop/wishlist/toggle/${productId}/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "removed") {
+      lastRemoved = {
+        productId,
+        html: card.outerHTML
+      };
+
+      card.classList.add("removing");
+      setTimeout(() => card.remove(), 200);
+
+      showToast();
+    }
+  })
+  .catch(err => console.error("Wishlist remove error:", err));
+});
+
+/* ================= TOAST ================= */
+
+function showToast() {
+  toast.classList.add("show");
+
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(() => {
+    toast.classList.remove("show");
+    lastRemoved = null;
+  }, 5000);
+}
+
+/* ================= UNDO ================= */
+
+undoBtn.addEventListener("click", function () {
+  if (!lastRemoved) return;
+
+  fetch(`/shop/wishlist/toggle/${lastRemoved.productId}/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  })
+  .then(() => {
+    const grid = document.getElementById("wishlistGrid");
+    grid.insertAdjacentHTML("afterbegin", lastRemoved.html);
+
+    toast.classList.remove("show");
+    lastRemoved = null;
+  })
+  .catch(err => console.error("Undo wishlist error:", err));
+});
+
+/* ================= CARD NAVIGATION ================= */
+
+document.addEventListener("click", function (e) {
+  if (e.target.closest(".wishlist-heart")) return;
+  if (e.target.closest("#undoToast")) return;
 
   const card = e.target.closest(".wishlist-card");
   if (!card) return;
 
-  const url = card.getAttribute("data-href");
-  if (url) {
-    window.location.href = url;
-  }
+  window.location.href = card.dataset.href;
 });
 </script>
+
 {% endblock %}
