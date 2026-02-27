@@ -1,0 +1,30 @@
+Category,Name,Slug,Description,Price,Image_URLs,Active
+electronics,Wireless Bluetooth Earbuds,wireless-bluetooth-earbuds,True wireless earbuds with noise cancellation and long battery life,2999,https://picsum.photos/seed/earbuds/600/600,Yes
+electronics,Smart Fitness Watch,smart-fitness-watch,Smartwatch with heart rate monitor sleep tracking and AMOLED display,4999,https://picsum.photos/seed/smartwatch/600/600,Yes
+electronics,Power Bank 20000mAh,power-bank-20000mah,Fast charging power bank with dual USB output and LED indicator,1999,https://picsum.photos/seed/powerbank/600/600,Yes
+electronics,Bluetooth Neckband Earphones,bluetooth-neckband-earphones,Magnetic neckband earphones with deep bass and fast charging,1499,https://picsum.photos/seed/neckband/600/600,Yes
+electronics,Wireless Mouse,wireless-mouse,Ergonomic wireless mouse suitable for work and gaming,799,https://picsum.photos/seed/mouse/600/600,Yes
+
+fashion-men,Men Slim Fit Jeans,men-slim-fit-jeans,Slim fit stretchable denim jeans for everyday wear,2299,https://picsum.photos/seed/jeans/600/600,Yes
+fashion-men,Men Casual Sneakers,men-casual-sneakers,Stylish casual sneakers with cushioned sole for daily use,2999,https://picsum.photos/seed/sneakers/600/600,Yes
+fashion-men,Men Cotton T-Shirt,men-cotton-tshirt,Soft cotton round neck t-shirt with regular fit,999,https://picsum.photos/seed/tshirt/600/600,Yes
+fashion-men,Men Formal Shirt,men-formal-shirt,Classic formal shirt suitable for office and meetings,1799,https://picsum.photos/seed/formalshirt/600/600,Yes
+
+fashion-women,Women Printed Kurti,women-printed-kurti,Printed ethnic kurti suitable for daily and festive wear,1899,https://picsum.photos/seed/kurti/600/600,Yes
+fashion-women,Women Casual Sneakers,women-casual-sneakers,Comfortable sneakers designed for all-day wear,2799,https://picsum.photos/seed/womenshoes/600/600,Yes
+fashion-women,Women Handbag,women-handbag,Stylish handbag with spacious compartments and premium finish,3499,https://picsum.photos/seed/handbag/600/600,Yes
+
+beauty-personal-care,Face Wash for Men,face-wash-for-men,Oil control face wash suitable for daily skincare routine,299,https://picsum.photos/seed/facewash/600/600,Yes
+beauty-personal-care,Moisturizing Face Cream,moisturizing-face-cream,Hydrating face cream for soft and glowing skin,499,https://picsum.photos/seed/facecream/600/600,Yes
+beauty-personal-care,Hair Dryer 1200W,hair-dryer-1200w,Compact hair dryer with heat and speed control settings,1299,https://picsum.photos/seed/hairdryer/600/600,Yes
+beauty-personal-care,Beard Grooming Kit,beard-grooming-kit,Complete beard grooming set for trimming and styling,1599,https://picsum.photos/seed/beardkit/600/600,Yes
+beauty-personal-care,Matte Finish Lipstick,matte-finish-lipstick,Long-lasting matte lipstick with smooth texture,599,https://picsum.photos/seed/lipstick/600/600,Yes
+
+home-kitchen,Stainless Steel Water Bottle 1L,stainless-steel-water-bottle-1l,Insulated stainless steel bottle for hot and cold beverages,899,https://picsum.photos/seed/bottle/600/600,Yes
+home-kitchen,Electric Kettle 1.5L,electric-kettle-1-5l,Fast boiling electric kettle with auto shut-off feature,699,https://picsum.photos/seed/kettle/600/600,Yes
+home-kitchen,Mixer Grinder 750W,mixer-grinder-750w,Powerful mixer grinder with stainless steel jars,3299,https://picsum.photos/seed/mixer/600/600,Yes
+home-kitchen,Air Fryer 4L,air-fryer-4l,Oil-free air fryer for healthy home cooking,7999,https://picsum.photos/seed/airfryer/600/600,Yes
+
+accessories,Analog Wrist Watch,analog-wrist-watch,Classic analog wrist watch with premium leather strap,2499,https://picsum.photos/seed/watch/600/600,Yes
+accessories,Travel Backpack 35L,travel-backpack-35l,Durable backpack suitable for travel office and college use,2199,https://picsum.photos/seed/backpack/600/600,Yes
+accessories,Sunglasses UV Protection,sunglasses-uv-protection,Stylish sunglasses with UV protection lenses,1499,https://picsum.photos/seed/sunglasses/600/600,Yes

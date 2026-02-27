@@ -1,0 +1,266 @@
+{% extends "shop/base.html" %}
+{% block title %}Order Placed - My Shoppings{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ================= SUCCESS PAGE ================= */
+
+  .success-wrap {
+    max-width: 860px;
+    margin: 36px auto 60px;
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 42px;
+    animation: pop 0.6s ease;
+  }
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .success-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 10px 0 6px;
+    color: #0f172a;
+  }
+
+  .success-text {
+    color: #475569;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  .redirect-text {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 18px;
+  }
+
+  .redirect-text span {
+    font-weight: 700;
+    color: #0b63d6;
+  }
+
+  .success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+
+  .success-btn {
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+  }
+
+  .btn-home {
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: #fff;
+  }
+
+  .btn-home:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-orders {
+    background: #f1f5fb;
+    color: #0b63d6;
+  }
+
+  /* ================= SUGGESTIONS ================= */
+
+  .suggest-title {
+    text-align: left;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 18px 0 12px;
+  }
+
+  .suggest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+  }
+
+  .suggest-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: transform 0.25s ease;
+  }
+
+  .suggest-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .suggest-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+
+  .suggest-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin: 8px 0 4px;
+  }
+
+  .suggest-price {
+    color: #ff5e7a;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  /* ================= MOBILE ================= */
+
+  @media (max-width: 768px) {
+    .success-wrap {
+      margin: 24px 12px 40px;
+      padding: 22px;
+    }
+
+    .success-title {
+      font-size: 1.35rem;
+    }
+
+    .success-text {
+      font-size: 0.95rem;
+    }
+
+    .success-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .suggest-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .suggest-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="success-wrap">
+
+  <div class="success-icon">✓</div>
+
+  <div class="success-title">Order Placed Successfully!</div>
+  <div class="success-text">
+    Thank you for shopping with us. Your order has been received and is being processed.
+  </div>
+
+  <div class="redirect-text">
+    Redirecting to home in <span id="countdown">5</span> seconds…
+  </div>
+
+  <div class="success-actions">
+    <a href="{% url 'shop:product_list' %}" class="success-btn btn-home">
+      🛍 Continue Shopping
+    </a>
+    <a href="{% url 'shop:my_orders' %}" class="success-btn btn-orders">
+      📦 My Orders
+    </a>
+  </div>
+
+  {% if suggestions %}
+  <hr style="margin:20px 0;border:none;border-top:1px solid #eef3fb;">
+
+  <div class="suggest-title">You may also like</div>
+
+  <div class="suggest-grid">
+    {% for p in suggestions %}
+    <a href="{% url 'shop:product_detail' p.slug %}" style="text-decoration:none;color:inherit;">
+      <div class="suggest-card">
+        <img src="{{ p.image_url|default:'https://via.placeholder.com/180x140' }}" alt="{{ p.name }}">
+        <div class="suggest-name">{{ p.name }}</div>
+        <div class="suggest-price">₹ {{ p.price }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  /* ================= AUTO REDIRECT COUNTDOWN (CANCELABLE) ================= */
+
+  let seconds = 5;
+  const el = document.getElementById('countdown');
+  let timer = null;
+  let cancelled = false;
+
+  /* start countdown */
+  timer = setInterval(() => {
+    if (cancelled) {
+      clearInterval(timer);
+      return;
+    }
+
+    seconds--;
+    if (el) el.textContent = seconds;
+
+    if (seconds <= 0) {
+      clearInterval(timer);
+      window.location.href = "{% url 'shop:product_list' %}";
+    }
+  }, 1000);
+
+  /* cancel redirect if user clicks My Orders (anywhere) */
+  document.addEventListener('click', function (e) {
+    const target = e.target.closest('a');
+
+    if (!target) return;
+
+    // if clicked link goes to My Orders
+    if (target.href && target.href.includes("{% url 'shop:my_orders' %}")) {
+      cancelled = true;
+      clearInterval(timer);
+    }
+  });
+</script>
+
+
+{% endblock %}

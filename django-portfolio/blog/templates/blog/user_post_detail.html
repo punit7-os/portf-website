@@ -1,0 +1,152 @@
+{% extends "blog/base.html" %}
+{% block title %}{{ post.title }} | SourCEO{% endblock %}
+
+{% block content %}
+<section class="py-14">
+  <div class="max-w-3xl mx-auto px-4">
+
+    <!-- TITLE -->
+    <h1 class="text-3xl font-bold text-dark mb-2">
+      {{ post.title }}
+    </h1>
+
+    <p class="text-sm text-slate-500 mb-6">
+      {{ post.category.name|default:"General" }}
+      • {{ post.reading_time }} min read
+
+      • {{ post.created_at|date:"M d, Y" }}
+  • by
+<a href="{% url 'blog:public_profile' post.user.username %}"
+   class="text-primary hover:underline font-medium">
+  {{ post.user.username }}
+</a>
+
+      • 👁️ {{ post.views }} views
+    </p>
+
+
+    <!-- IMAGE -->
+    {% if post.image %}
+    <img src="{{ post.image.url }}" class="w-full max-h-[420px] object-cover rounded-xl shadow-sm mb-8"
+      alt="{{ post.title }}">
+    {% endif %}
+
+    <!-- VIDEO -->
+    {% if post.video %}
+    <video controls class="w-full max-h-[420px] rounded-xl shadow-sm mb-8">
+      <source src="{{ post.video.url }}">
+    </video>
+    {% endif %}
+
+    <!-- CONTENT -->
+    <div class="prose prose-slate max-w-none leading-relaxed mb-10">
+      {{ post.description|linebreaks }}
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="flex items-center gap-6 mb-14">
+
+      <!-- LIKE -->
+      <button id="likeBtn"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg text-sm hover:bg-slate-200 transition">
+        👍 <span id="likeCount">{{ post.likes.count }}</span>
+      </button>
+
+      <!-- COMMENT COUNT -->
+      <span class="text-sm text-slate-500">
+        💬 {{ comments.count }} comments
+      </span>
+    </div>
+
+    <!-- COMMENTS -->
+    <div>
+      <h3 class="text-xl font-semibold mb-4">Comments</h3>
+
+      {% if user.is_authenticated %}
+      <textarea id="commentInput" class="w-full border rounded-lg p-3 mb-3" placeholder="Write a comment..."></textarea>
+
+      <button id="commentSubmit" class="px-5 py-2 bg-primary text-white rounded-lg">
+        Post Comment
+      </button>
+      {% else %}
+      <a href="{% url 'blog:login' %}?next={{ request.path }}" class="text-primary font-medium">
+        Login to comment
+      </a>
+      {% endif %}
+
+      <div id="commentList" class="mt-8 space-y-4">
+        {% for comment in comments %}
+        <div id="comment-{{ comment.id }}" class="border rounded-lg p-4">
+          <div class="flex justify-between text-sm mb-1">
+            <strong>{{ comment.user.username }}</strong>
+            {% if comment.user == request.user %}
+            <button onclick="deleteComment({{ comment.id }})" class="text-red-600">
+              Delete
+            </button>
+            {% endif %}
+          </div>
+          <p class="text-slate-700">{{ comment.content }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  const csrftoken = "{{ csrf_token }}";
+
+  // LIKE
+  document.getElementById("likeBtn")?.addEventListener("click", () => {
+    fetch("{% url 'blog:userpost_like' post.id %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken }
+    })
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("likeCount").innerText = d.count;
+      });
+  });
+
+  // ADD COMMENT
+  document.getElementById("commentSubmit")?.addEventListener("click", () => {
+    const input = document.getElementById("commentInput");
+    if (!input.value.trim()) return;
+
+    fetch("{% url 'blog:userpost_comment_add' post.id %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        content: input.value
+      })
+    })
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("commentList").insertAdjacentHTML("afterbegin", `
+      <div id="comment-${d.id}" class="border rounded-lg p-4">
+        <div class="flex justify-between text-sm mb-1">
+          <strong>${d.user}</strong>
+          <button onclick="deleteComment(${d.id})" class="text-red-600">Delete</button>
+        </div>
+        <p class="text-slate-700">${d.content}</p>
+      </div>
+    `);
+        input.value = "";
+      });
+  });
+
+  // DELETE COMMENT
+  function deleteComment(id) {
+    fetch("{% url 'blog:userpost_comment_delete' 0 %}".replace("0", id), {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken }
+    }).then(() => {
+      document.getElementById(`comment-${id}`)?.remove();
+    });
+  }
+</script>
+{% endblock %}

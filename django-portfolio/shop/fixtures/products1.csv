@@ -1,0 +1,30 @@
+Category,Name,Slug,Description,Price,Image_URLs,Active
+Electronics,Wireless Bluetooth Earphones,wireless-bluetooth-earphones,Neckband wireless earphones with deep bass and fast charging,1299,https://picsum.photos/seed/earphones/600/600,Yes
+Electronics,Android Smartphone Budget,android-smartphone-budget,Affordable Android smartphone with large display and long battery life,6999,https://picsum.photos/seed/smartphone/600/600,Yes
+Electronics,Laptop 15 Inch,laptop-15-inch,15.6 inch laptop suitable for office and study use,42990,https://picsum.photos/seed/laptop/600/600,Yes
+Electronics,Smart Fitness Watch,smart-fitness-watch,Smartwatch with heart rate and SpO2 monitoring,1999,https://picsum.photos/seed/smartwatch/600/600,Yes
+Electronics,LED Smart TV 32 Inch,led-smart-tv-32-inch,HD ready smart LED television with streaming apps,13499,https://picsum.photos/seed/tv/600/600,Yes
+
+Home & Kitchen,Mixer Grinder 750W,mixer-grinder-750w,High power mixer grinder with stainless steel jars,3299,https://picsum.photos/seed/mixer/600/600,Yes
+Home & Kitchen,Electric Kettle 1.5L,electric-kettle-1-5l,Stainless steel electric kettle with auto shut off,699,https://picsum.photos/seed/kettle/600/600,Yes
+Home & Kitchen,Steel Water Bottle 1L,steel-water-bottle-1l,Insulated stainless steel water bottle for hot and cold drinks,899,https://picsum.photos/seed/bottle/600/600,Yes
+Home & Kitchen,Air Fryer,air-fryer,Oil free air fryer for healthy cooking,7999,https://picsum.photos/seed/airfryer/600/600,Yes
+Home & Kitchen,Room Heater,room-heater,Compact electric room heater with thermostat control,2199,https://picsum.photos/seed/heater/600/600,Yes
+
+Fashion,Men Slim Fit Jeans,men-slim-fit-jeans,Stylish slim fit denim jeans for men,2299,https://picsum.photos/seed/jeans/600/600,Yes
+Fashion,Men Casual Shirt,men-casual-shirt,Cotton casual shirt suitable for daily wear,1799,https://picsum.photos/seed/shirt/600/600,Yes
+Fashion,Running Shoes,running-shoes,Lightweight sports shoes for running and gym,3499,https://picsum.photos/seed/shoes/600/600,Yes
+Fashion,Women Ethnic Kurta,women-ethnic-kurta,Traditional printed kurta for women,2599,https://picsum.photos/seed/kurta/600/600,Yes
+Fashion,Analog Wrist Watch,analog-wrist-watch,Classic analog watch with leather strap,1499,https://picsum.photos/seed/watch/600/600,Yes
+
+Beauty & Personal Care,Matte Foundation,matte-foundation,Matte finish foundation suitable for all skin types,549,https://picsum.photos/seed/foundation/600/600,Yes
+Beauty & Personal Care,Men Face Wash,men-face-wash,Oil control refreshing face wash for men,299,https://picsum.photos/seed/facewash/600/600,Yes
+Beauty & Personal Care,Hair Dryer,hair-dryer,Compact hair dryer with heat control,1099,https://picsum.photos/seed/hairdryer/600/600,Yes
+Beauty & Personal Care,Beard Oil,beard-oil,Natural beard oil for grooming and growth,499,https://picsum.photos/seed/beardoil/600/600,Yes
+Beauty & Personal Care,Matte Lipstick,matte-lipstick,Long lasting matte finish lipstick,450,https://picsum.photos/seed/lipstick/600/600,Yes
+
+Books,Atomic Habits Book,atomic-habits-book,Self improvement book on habit building,499,https://picsum.photos/seed/book1/600/600,Yes
+Books,Rich Dad Poor Dad Book,rich-dad-poor-dad-book,Personal finance and investing book,399,https://picsum.photos/seed/book2/600/600,Yes
+Books,The Psychology of Money Book,psychology-of-money-book,Book about financial behavior and mindset,349,https://picsum.photos/seed/book3/600/600,Yes
+Books,Think and Grow Rich Book,think-and-grow-rich-book,Classic success and motivation book,299,https://picsum.photos/seed/book4/600/600,Yes
+Books,Ikigai Book,ikigai-book,Book about purpose and happiness in life,389,https://picsum.photos/seed/book5/600/600,Yes

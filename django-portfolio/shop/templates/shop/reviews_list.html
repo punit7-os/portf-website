@@ -1,0 +1,60 @@
+{# templates/shop/reviews_list.html - corrected #}
+<div id="reviewsBlock">
+  {% if reviews_page and reviews_page.object_list %}
+    <ul style="list-style:none;padding:0;margin:0;">
+      {% for r in reviews_page %}
+        <li class="review-item" role="article" aria-label="Customer review">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="font-size:18px;line-height:1;">
+              {% for _ in "12345" %}
+                {% if forloop.counter <= r.rating %}
+                  <span style="color:#ffb400;">★</span>
+                {% else %}
+                  <span style="color:#cfd8e3;">★</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div style="flex:1;">
+              <div class="review-meta">
+                <div>
+                  <strong>
+                    {% if r.reviewer_name %}
+                      {{ r.reviewer_name }}
+                    {% elif r.user %}
+                      {{ r.user.get_username }}
+                    {% else %}
+                      Anonymous
+                    {% endif %}
+                  </strong>
+                </div>
+                <div style="color:var(--muted);font-size:13px;">{{ r.created_at|date:"M d, Y" }}</div>
+              </div>
+
+              {% if r.message %}
+                <div style="margin-top:8px;color:#253147;">{{ r.message|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if reviews_paginator and reviews_paginator.num_pages > 1 %}
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
+        {% if reviews_page.has_previous %}
+          <a href="?rpage={{ reviews_page.previous_page_number }}" class="see-more-btn" style="margin-right:6px;">← Prev</a>
+        {% endif %}
+
+        <div style="color:var(--muted);">Page {{ reviews_page.number }} of {{ reviews_paginator.num_pages }}</div>
+
+        {% if reviews_page.has_next %}
+          <a href="?rpage={{ reviews_page.next_page_number }}" class="see-more-btn" style="margin-left:6px;">Next →</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div style="color:var(--muted);padding:12px 0;">No reviews yet — be the first to review!</div>
+  {% endif %}
+</div>

@@ -1,0 +1,494 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}Profile - My Shoppings{% endblock %}
+
+{% block content %}
+<style>
+  .profile-wrap {
+    max-width: 1280px;
+    /* wider cards */
+    margin: 16px auto 40px;
+    /* reduce space from header */
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    /* wider left card */
+    gap: 36px;
+    align-items: start;
+    /* 🔥 STOP vertical stretching */
+    /* slightly more breathing space */
+  }
+
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(11, 35, 77, 0.06);
+    padding: 20px;
+    max-width: 100%;
+
+
+  }
+
+  .avatar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 4px;
+    /* 🔽 reduced spacing */
+  }
+
+  .card hr {
+    margin: 4px 0 6px;
+    height: 1px;
+    border: none;
+    border-top: 1px solid #eef2f7;
+    /* light divider like image */
+  }
+
+
+
+  .avatar .img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #e9f2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 22px;
+    color: #0b63d6;
+  }
+
+  .quick-links {
+    margin-top: 26px;
+    /* 🔽 tighter than default */
+  }
+
+  .quick-links a {
+    display: block;
+    margin-top: 16px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #e8f1ff;
+    text-decoration: none;
+    font-weight: 600;
+    color: #0b63d6;
+    cursor: pointer;
+
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e6eefc;
+    background: #fbfcff;
+  }
+
+  textarea {
+    min-height: 90px;
+  }
+
+  .btn-primary {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  /* ADDRESS POPOVER */
+  .popover {
+    display: none;
+    position: absolute;
+    top: -12px;
+    left: 0;
+    transform: translateY(-100%);
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 14px;
+    z-index: 9999
+  }
+
+  .popover.show {
+    display: block;
+  }
+
+
+  .addr-card {
+    background: #fbfdff;
+    border: 1px solid #e6eefc;
+    border-radius: 10px;
+    padding: 12px 40px 12px 12px;
+    /* ✅ extra right padding */
+    margin-bottom: 10px;
+    position: relative;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #374151;
+  }
+
+  /* Close button */
+  .addr-card a {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fdecea;
+    color: #b00020;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* Hover effect */
+  .addr-card a:hover {
+    background: #f9d6d3;
+  }
+
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+  }
+
+  .profile-wrap>.card {
+    overflow: visible;
+  }
+
+  .profile-wrap>.card:first-child {
+    padding-top: 16px;
+    /* 🔽 from 20px */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    /* controls spacing between all sections */
+  }
+
+  .saved-address-hover {
+    position: relative;
+  }
+
+  /* hide by default */
+  .saved-address-hover .popover {
+    display: none;
+  }
+
+  /* show on hover */
+  .saved-address-hover:hover .popover {
+    display: block;
+  }
+
+  /* LEFT CARD INFO STYLE (Email / Phone) */
+  .info-block {
+    margin-top: 0;
+    margin: 2px;
+  }
+
+  .info-label {
+    font-weight: 700;
+    font-size: 14px;
+    color: #111827;
+    /* dark gray */
+    margin-bottom: 2px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    color: #6b7280;
+    /* muted gray like screenshot */
+    word-break: break-all;
+  }
+
+  /* Kill default margins inside left card */
+  .profile-wrap>.card:first-child h3,
+  .profile-wrap>.card:first-child small,
+  .profile-wrap>.card:first-child p {
+    margin: 0;
+  }
+
+  /* ================= RESPONSIVE FIXES (ADD ONLY) ================= */
+
+  /* ---------- TABLET & BELOW ---------- */
+  @media (max-width: 1024px) {
+    .profile-wrap {
+      grid-template-columns: 1fr;
+      /* stack cards */
+      gap: 24px;
+    }
+
+    .popover {
+      width: 100%;
+      left: 0;
+    }
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width: 768px) {
+    .profile-wrap {
+      padding: 12px;
+      margin-top: 8px;
+    }
+
+    .card {
+      padding: 16px;
+    }
+
+    .avatar .img {
+      width: 54px;
+      height: 54px;
+      font-size: 18px;
+    }
+
+    .quick-links a {
+      padding: 10px;
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      /* buttons full width on mobile */
+    }
+
+    /* Popover becomes inline block on mobile */
+    .popover {
+      position: static;
+      transform: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    /* Disable hover behavior on touch devices */
+    .saved-address-hover:hover .popover {
+      display: none;
+    }
+  }
+
+  /* ===== Mobile toggle icon for Saved Addresses ===== */
+
+  .saved-address-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .addr-toggle-icon {
+    font-size: 14px;
+    margin-left: 8px;
+    transition: transform 0.25s ease;
+  }
+
+  /* rotate icon when open */
+  .popover.show+.addr-toggle-icon,
+  .saved-address-hover.open .addr-toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Mobile only */
+  @media (max-width: 768px) {
+    .saved-address-trigger {
+      font-weight: 600;
+    }
+  }
+  /* ===== Remove Android tap highlight / blue flash ===== */
+
+.saved-address-trigger {
+  -webkit-tap-highlight-color: transparent; /* Android Chrome */
+  outline: none;
+  user-select: none;
+}
+
+.saved-address-trigger:focus,
+.saved-address-trigger:active {
+  outline: none;
+  background: transparent;
+}
+.card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+</style>
+
+<div class="profile-wrap">
+
+  <!-- LEFT -->
+  <div class="card" style="position:relative;">
+
+    <div class="avatar">
+      <div class="img">{{ request.user.username|slice:":1"|upper }}</div>
+      <div>
+        <h3>{{ request.user.username }}</h3>
+        <small>Member since {{ request.user.date_joined|date:"M Y" }}</small>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="info-block">
+      <div class="info-label">Email</div>
+      <div class="info-value">{{ request.user.email }}</div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-label">Phone</div>
+      <div class="info-value">{{ profile.phone|default:"Not added" }}</div>
+    </div>
+
+
+    <div class="quick-links">
+      <a href="{% url 'shop:my_orders' %}">Orders →</a>
+      <!-- <a onclick="toggleAddresses()">Saved Addresses →</a> -->
+      <div class="saved-address-hover">
+        <a href="javascript:void(0)" class="saved-address-trigger">
+          Saved Addresses
+          <span class="addr-toggle-icon">▼</span>
+        </a>
+
+
+        <div class="popover">
+          <strong>Saved Addresses</strong>
+
+          {% for addr in profile.addresses.all %}
+          <div class="addr-card">
+            {{ addr.address }}
+            <a href="{% url 'shop:delete_address' addr.id %}" title="Remove address">✕</a>
+          </div>
+          {% empty %}
+          <div class="small">No saved addresses yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- <a href="{% url 'shop:wishlist' %}">Wishlist →</a> -->
+      <a href="{% url 'shop:wishlist' %}">Wishlist →</a>
+
+
+      <a href="{% url 'shop:logout' %}" style="color:#b00020;">Logout</a>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="card">
+    <h2>Your Profile</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" value="{{ request.user.username }}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" value="{{ request.user.email }}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" name="phone" value="{{ profile.phone|default:'' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Current Address</label>
+        <textarea
+          readonly>{% with profile.addresses.first as addr %}{% if addr %}{{ addr.address }}{% endif %}{% endwith %}</textarea>
+      </div>
+
+      <!-- <button class="btn-primary" type="submit">Save changes</button> -->
+    </form>
+
+    <form method="post" action="{% url 'shop:add_address' %}" style="margin-top:16px;">
+      {% csrf_token %}
+
+      <div class="form-group" style="position:relative;">
+        <label>Add New Address</label>
+
+        {% if address_limit_reached %}
+        <div id="addressLimitMsg" style="
+      background:#fdecea;
+      color:#b00020;
+      padding:6px 10px;
+      border-radius:8px;
+      font-size:12px;
+      margin-bottom:8px;
+    ">
+          Address can be changed max 3 times.
+        </div>
+        {% endif %}
+
+        <textarea name="address" placeholder="Add new address..." {% if address_limit_reached %}disabled{% endif %}
+          required></textarea>
+      </div>
+
+      <button class="btn-primary" type="submit" {% if address_limit_reached %}disabled
+        style="opacity:0.6;cursor:not-allowed;" {% endif %}>
+        Add Address
+      </button>
+    </form>
+
+
+
+
+    <!-- ADDRESS POPOVER -->
+    <script>
+      (function () {
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        if (!isMobile) return;
+
+        const wrapper = document.querySelector(".saved-address-hover");
+        const trigger = wrapper?.querySelector(".saved-address-trigger");
+        const popover = wrapper?.querySelector(".popover");
+
+        if (!trigger || !popover) return;
+
+        trigger.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const icon = trigger.querySelector(".addr-toggle-icon");
+          const isOpen = popover.style.display === "block";
+
+          popover.style.display = isOpen ? "none" : "block";
+
+          /* toggle icon */
+          if (icon) {
+            icon.textContent = isOpen ? "▼" : "▲";
+          }
+
+
+        });
+
+        document.addEventListener("click", function () {
+          popover.style.display = "none";
+        });
+      })();
+    </script>
+
+
+
+    {% endblock %}

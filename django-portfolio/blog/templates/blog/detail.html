@@ -1,0 +1,131 @@
+{% extends "blog/base.html" %}
+{% block title %}{{ post.title }} | SourCEO{% endblock %}
+
+{% block content %}
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-4xl mx-auto px-4 py-14">
+    <h1 class="text-3xl font-bold text-dark">{{ post.title }}</h1>
+    <p class="text-sm text-slate-500 mb-6">
+      {{ post.category.name }} • {{ post.reading_time }} min read
+    </p>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-3xl mx-auto px-4">
+
+    <article class="prose max-w-none">
+      {{ post.content|linebreaks }}
+    </article>
+
+    <!-- LIKE BUTTON -->
+    <div class="mt-6">
+      <button id="likeBtn" class="px-4 py-2 bg-slate-100 rounded-lg text-sm">
+        👍 <span id="likeCount">{{ post.likes.count }}</span>
+      </button>
+    </div>
+
+    <!-- COMMENTS -->
+    <div class="mt-16">
+      <h3 class="text-xl font-semibold mb-4">Comments</h3>
+
+      {% if user.is_authenticated %}
+      <textarea id="commentInput" class="w-full border rounded-lg p-3" placeholder="Write a comment..."></textarea>
+
+      <button id="commentSubmit" class="mt-3 px-5 py-2 bg-primary text-white rounded-lg">
+        Post
+      </button>
+      {% else %}
+      <a href="{% url 'blog:login' %}?next={{ request.path }}" class="text-primary font-medium">Login to comment</a>
+      {% endif %}
+
+      <div id="commentList" class="mt-8 space-y-6">
+        {% for comment in comments %}
+        <div id="comment-{{ comment.id }}" class="border rounded-lg p-4">
+          <div class="flex justify-between text-sm">
+            <a href="{% url 'blog:public_profile' comment.user.username %}" class="font-semibold hover:underline">
+              {{ comment.user.username }}
+            </a>
+
+            {% if comment.user == request.user %}
+            <div class="flex gap-3">
+              <button onclick="editComment({{ comment.id }})">Edit</button>
+              <button onclick="deleteComment({{ comment.id }})">Delete</button>
+            </div>
+            {% endif %}
+          </div>
+          <div class="prose mt-2" id="content-{{ comment.id }}">
+            {{ comment.rendered_content|safe }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const csrftoken = "{{ csrf_token }}";
+
+  document.getElementById("commentSubmit")?.addEventListener("click", () => {
+    fetch("{% url 'blog:comment_add' post.slug %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken },
+      body: new URLSearchParams({
+        content: document.getElementById("commentInput").value
+      })
+    })
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("commentList").insertAdjacentHTML("afterbegin", `
+    <div id="comment-${d.id}" class="border rounded-lg p-4">
+      <div class="flex justify-between text-sm">
+        <strong>${d.user}</strong>
+        ${d.is_owner ? `
+          <div class="flex gap-3">
+            <button onclick="editComment(${d.id})">Edit</button>
+            <button onclick="deleteComment(${d.id})">Delete</button>
+          </div>
+        ` : ``}
+      </div>
+      <div class="prose mt-2" id="content-${d.id}">
+        ${d.content}
+      </div>
+    </div>
+  `);
+        document.getElementById("commentInput").value = "";
+      });
+
+  });
+
+  function deleteComment(id) {
+    fetch(`/blog/comment/delete/${id}/`, {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken }
+    }).then(() => document.getElementById(`comment-${id}`).remove());
+  }
+
+  function editComment(id) {
+    const el = document.getElementById(`content-${id}`);
+    const text = prompt("Edit comment:", el.innerText);
+    if (!text) return;
+
+    fetch(`/blog/comment/edit/${id}/`, {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken },
+      body: new URLSearchParams({ content: text })
+    })
+      .then(r => r.json())
+      .then(d => el.innerHTML = d.content);
+  }
+
+  document.getElementById("likeBtn")?.addEventListener("click", () => {
+    fetch("{% url 'blog:toggle_like' post.slug %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken }
+    })
+      .then(r => r.json())
+      .then(d => document.getElementById("likeCount").innerText = d.count);
+  });
+</script>
+{% endblock %}

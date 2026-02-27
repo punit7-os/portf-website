@@ -1,0 +1,63 @@
+{% extends "shop/base.html" %}
+{% block title %}Order #{{ order.id|stringformat:"08d" }} — Details{% endblock %}
+
+{% block content %}
+<style>
+  .order-detail {
+    max-width: 900px;
+    margin: 28px auto;
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(18,38,63,0.04);
+  }
+  .order-header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .order-header h2 { margin:0; }
+  .items-list { margin-top:14px; }
+  .item {
+    display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #f1f6fb;
+  }
+  .item img { width:64px; height:64px; object-fit:cover; border-radius:8px; }
+  .item a { color:#0b63d6; font-weight:700; text-decoration:none; }
+</style>
+
+<div class="order-detail">
+  <div class="order-header">
+    <h2>Order #{{ order.id|stringformat:"08d" }}</h2>
+    <div>Placed on: {{ order.created_at|date:"d M Y H:i" }}</div>
+  </div>
+
+  <div style="margin-top:12px; font-weight:700;">Total: ₹ {{ order.total_amount }}</div>
+
+  <div class="items-list">
+    <h3 style="margin-top:16px;">Items</h3>
+
+    <ul style="list-style:none; padding:0; margin:0;">
+      {% comment %}
+        Attempt to list related items. This assumes you have a related name like order.items or order.orderitem_set.
+        If your Order model doesn't store item rows, this will show a fallback message.
+      {% endcomment %}
+
+      {% if order.items.all %}
+        {% for item in order.items.all %}
+          <li class="item">
+            {% if item.product and item.product.image_url %}
+              <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+            {% endif %}
+            <div>
+              <a href="{% url 'shop:product_detail' item.product.slug %}">{{ item.product.name }}</a>
+              <div style="color:#64748b; font-weight:600;">₹ {{ item.price }} × {{ item.quantity }}</div>
+            </div>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li style="padding:14px 0; color:#6b7280;">No item-level details stored for this order.</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <div style="margin-top:18px;">
+    <a href="{% url 'shop:my_orders' %}" style="text-decoration:none; color:#0b63d6; font-weight:700;">← Back to My Orders</a>
+  </div>
+</div>
+{% endblock %}

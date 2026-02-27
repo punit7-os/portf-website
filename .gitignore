@@ -1,0 +1,42 @@
+
+.venv/
+
+# local env
+.env
+*.env
+data.json
+django-portfolio/gmail_token.pickle
+django-portfolio/credentials.json
+db.sqlite3
+*.sqlite3
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Database
+db.sqlite3
+*.sqlite3
+
+# Static & Media
+staticfiles/
+media/
+
+# OS
+.DS_Store
+Thumbs.db
+
+django-portfolio/venv/
+django-portfolio/.venv/
+django-portfolio/db.sqlite3
+django-portfolio/*.sqlite3
+django-portfolio/media/
+django-portfolio/staticfiles/
+django-portfolio/.env

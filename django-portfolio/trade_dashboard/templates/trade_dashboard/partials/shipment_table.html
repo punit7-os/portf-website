@@ -1,0 +1,105 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full text-sm text-left">
+        <thead class="bg-slate-800 text-slate-300">
+            <tr>
+
+                <!-- DATE -->
+                <th class="p-3">
+                    <a hx-get="{% url 'trade_dashboard:shipment_table' %}?sort=Date&order={% if current_sort == 'Date' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                        hx-target="#shipmentTable" hx-include="[name='route'],[name='mode']"
+                        class="flex items-center gap-1 hover:text-white cursor-pointer">
+
+                        Date
+
+                        {% if current_sort == "Date" %}
+                        {% if current_order == "asc" %}
+                        <span>▲</span>
+                        {% else %}
+                        <span>▼</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="opacity-40">⇅</span>
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th class="p-3">Route</th>
+                <th class="p-3">Mode</th>
+
+                <!-- COST -->
+                <th class="p-3">
+                    <a hx-get="{% url 'trade_dashboard:shipment_table' %}?sort=Cost&order={% if current_sort == 'Cost' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                        hx-target="#shipmentTable" hx-include="[name='route'],[name='mode']"
+                        class="flex items-center gap-1 hover:text-white cursor-pointer">
+
+                        Cost
+
+                        {% if current_sort == "Cost" %}
+                        {% if current_order == "asc" %}
+                        <span>▲</span>
+                        {% else %}
+                        <span>▼</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="opacity-40">⇅</span>
+                        {% endif %}
+                    </a>
+                </th>
+
+                <!-- DELAY -->
+                <th class="p-3">
+                    <a hx-get="{% url 'trade_dashboard:shipment_table' %}?sort=Delay&order={% if current_sort == 'Delay' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                        hx-target="#shipmentTable" hx-include="[name='route'],[name='mode']"
+                        class="flex items-center gap-1 hover:text-white cursor-pointer">
+
+                        Delay
+
+                        {% if current_sort == "Delay" %}
+                        {% if current_order == "asc" %}
+                        <span>▲</span>
+                        {% else %}
+                        <span>▼</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="opacity-40">⇅</span>
+                        {% endif %}
+                    </a>
+                </th>
+
+                <!-- RISK -->
+                <th class="p-3">
+                    <a hx-get="{% url 'trade_dashboard:shipment_table' %}?sort=Risk&order={% if current_sort == 'Risk' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                        hx-target="#shipmentTable" hx-include="[name='route'],[name='mode']"
+                        class="flex items-center gap-1 hover:text-white cursor-pointer">
+
+                        Risk
+
+                        {% if current_sort == "Risk" %}
+                        {% if current_order == "asc" %}
+                        <span>▲</span>
+                        {% else %}
+                        <span>▼</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="opacity-40">⇅</span>
+                        {% endif %}
+                    </a>
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr class="border-b border-slate-700 hover:bg-slate-800">
+                <td class="p-3">{{ row.Date|date:"Y-m-d" }}</td>
+                <td class="p-3">{{ row.Trade_Route }}</td>
+                <td class="p-3">{{ row.Shipping_Mode }}</td>
+                <td class="p-3">${{ row.Shipping_Cost }}</td>
+                <td class="p-3">{{ row.Delay_Days }}</td>
+                <td class="p-3">{{ row.Geopolitical_Risk_Index }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

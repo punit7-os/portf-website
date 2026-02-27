@@ -1,0 +1,111 @@
+<div class="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6"
+     id="weather-section">
+
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Mumbai Weather</h2>
+
+        <button onclick="refreshWeather()"
+            class="text-sm text-blue-600 hover:underline">
+            Refresh
+        </button>
+    </div>
+
+    <p class="text-xs text-gray-500 mb-4">
+        Data from Open-Meteo • Updates every minute
+    </p>
+
+    {% if error %}
+        <p class="text-red-500">{{ error }}</p>
+    {% else %}
+
+    <div class="grid grid-cols-2 gap-6">
+
+        <div>
+            <p class="text-4xl font-bold transition-all duration-500"
+               id="weather-temp">
+                {{ temperature }}°C
+            </p>
+        </div>
+
+        <div class="space-y-2 text-gray-600 dark:text-gray-300">
+
+            <p>
+                💧 Humidity:
+                <span id="weather-humidity"
+                      class="transition-all duration-500">
+                    {{ humidity }}%
+                </span>
+            </p>
+
+            <p>
+                🌬 Wind:
+                <span id="weather-wind"
+                      class="transition-all duration-500">
+                    {{ wind }} km/h
+                </span>
+            </p>
+
+            <p>
+                🌧 Rain:
+                <span id="weather-rain"
+                      class="transition-all duration-500">
+                    {{ rain }} mm
+                </span>
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+
+// Smooth update function (no blink)
+function updateWeatherSmooth(newData) {
+
+    const tempEl = document.getElementById("weather-temp");
+    const humidityEl = document.getElementById("weather-humidity");
+    const windEl = document.getElementById("weather-wind");
+    const rainEl = document.getElementById("weather-rain");
+
+    if (!tempEl) return;
+
+    tempEl.textContent = newData.temperature + "°C";
+    humidityEl.textContent = newData.humidity + "%";
+    windEl.textContent = newData.wind + " km/h";
+    rainEl.textContent = newData.rain + " mm";
+
+    // Subtle highlight animation
+    [tempEl, humidityEl, windEl, rainEl].forEach(el => {
+        el.classList.add("bg-yellow-100");
+        setTimeout(() => {
+            el.classList.remove("bg-yellow-100");
+        }, 500);
+    });
+}
+
+// Manual refresh
+function refreshWeather() {
+    fetch("{% url 'live_data_api:weather' %}")
+        .then(res => res.json())
+        .then(data => {
+            updateWeatherSmooth(data);
+        });
+}
+
+// Minute-aligned refresh (HH:MM:01)
+function scheduleWeatherRefresh() {
+    const now = new Date();
+    const delay = (60000 - now.getSeconds() * 1000 - now.getMilliseconds());
+
+    setTimeout(() => {
+        refreshWeather();
+        setInterval(refreshWeather, 60000);
+    }, delay);
+}
+
+scheduleWeatherRefresh();
+
+</script>

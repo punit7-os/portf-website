@@ -1,0 +1,359 @@
+{% extends "shop/base.html" %}
+{% load tz %}
+{% block title %}My Orders - My Shoppings{% endblock %}
+
+{% block content %}
+<style>
+  .orders-wrap {
+    max-width: 880px;
+    margin: 22.4px auto;
+    background: transparent;
+    padding: 4.8px;
+  }
+
+  h1.orders-title {
+    font-size: 22.4px;
+    margin-bottom: 14.4px;
+    color: #10203a;
+    font-weight: 700;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 6.4px;
+    overflow: hidden;
+    box-shadow: 0 4.8px 14.4px rgba(18, 38, 63, 0.04);
+  }
+
+  .orders-table thead tr {
+    background: #f6f9fc;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 11.2px 14.4px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef4fb;
+    font-size: 11.2px;
+    color: #1f2d3d;
+  }
+
+  .orders-table th {
+    font-weight: 700;
+    color: #334155;
+    font-size: 10.4px;
+    letter-spacing: 0.16px;
+  }
+
+  .orders-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .order-id {
+    font-weight: 700;
+    color: #0b3b66;
+  }
+
+  .price-cell {
+    font-weight: 700;
+    color: #0b4da0;
+    white-space: nowrap;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4.8px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 10.4px;
+  }
+
+  .status-active {
+    background: #e6f8f1;
+    color: #05683b;
+  }
+
+  .status-paid {
+    background: #eef6ff;
+    color: #0a57b7;
+  }
+
+  .status-cancelled {
+    background: #fff0f0;
+    color: #b71c1c;
+  }
+
+  .action-form {
+    display: inline-block;
+    margin: 0;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: #c53030;
+    border: 1px solid #f1dede;
+    padding: 6.4px 8px;
+    border-radius: 6.4px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 11.2px;
+  }
+
+  .btn-cancel:hover {
+    background: #fff5f5;
+  }
+
+  .btn-cancel[disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .product-link {
+    color: #0b63d6;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 11.2px;
+  }
+
+  .product-link:hover {
+    text-decoration: underline;
+  }
+
+  .product-list a {
+    margin-right: 6.4px;
+    display: inline-block;
+    margin-bottom: 4.8px;
+  }
+
+  /* ================= RESPONSIVE - TABLET (880px) ================= */
+  @media (max-width: 880px) {
+    .orders-table th,
+    .orders-table td {
+      padding: 8px 9.6px;
+      font-size: 10.4px;
+    }
+
+    .orders-wrap {
+      padding: 0 9.6px;
+    }
+
+    h1.orders-title {
+      font-size: 19.2px;
+      margin-bottom: 12.8px;
+    }
+  }
+
+  /* ================= RESPONSIVE - MOBILE (680px) ================= */
+  @media (max-width: 680px) {
+    .orders-table,
+    .orders-table thead,
+    .orders-table tbody,
+    .orders-table th,
+    .orders-table td,
+    .orders-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .orders-table thead {
+      display: none;
+    }
+
+    .orders-table tbody tr {
+      background: #fff;
+      margin-bottom: 11.2px;
+      border-radius: 8px;
+      box-shadow: 0 4.8px 12.8px rgba(18, 38, 63, 0.06);
+      padding: 9.6px;
+    }
+
+    .orders-table td {
+      border: none;
+      padding: 6.4px 4.8px;
+      font-size: 11.2px;
+      display: flex;
+      justify-content: space-between;
+      gap: 9.6px;
+    }
+
+    .orders-table td::before {
+      content: attr(data-label);
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+      font-size: 10.4px;
+    }
+
+    .product-list {
+      text-align: right;
+    }
+
+    .price-cell {
+      text-align: right;
+    }
+
+    .status-badge {
+      margin-left: auto;
+    }
+
+    .action-form {
+      margin-left: auto;
+    }
+
+    .orders-wrap {
+      margin: 16px auto;
+      padding: 0 12.8px;
+    }
+
+    h1.orders-title {
+      font-size: 17.6px;
+      margin-bottom: 11.2px;
+    }
+
+    .btn-cancel {
+      padding: 5.6px 6.4px;
+      font-size: 10.4px;
+    }
+  }
+
+  /* ================= RESPONSIVE - SMALL MOBILE (480px) ================= */
+  @media (max-width: 480px) {
+    .orders-wrap {
+      margin: 12.8px 9.6px;
+    }
+
+    h1.orders-title {
+      font-size: 16px;
+    }
+
+    .orders-table tbody tr {
+      padding: 8px;
+      margin-bottom: 9.6px;
+    }
+
+    .orders-table td {
+      padding: 5.6px 4px;
+      font-size: 10.4px;
+      gap: 8px;
+    }
+
+    .orders-table td::before {
+      font-size: 9.6px;
+    }
+
+    .status-badge {
+      padding: 4px 6.4px;
+      font-size: 9.6px;
+    }
+
+    .btn-cancel {
+      padding: 4.8px 6.4px;
+      font-size: 9.6px;
+    }
+
+    .product-link {
+      font-size: 10.4px;
+    }
+  }
+</style>
+
+<div class="orders-wrap">
+  <h1 class="orders-title">My Orders</h1>
+
+  <table class="orders-table" role="table" aria-label="My Orders">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Placed On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% if orders %}
+      {% for o in orders %}
+      {# create a padded id once and reuse it to avoid quotes/escape issues #}
+      {% with o.id|stringformat:"08d" as padded_id %}
+      <tr>
+        <!-- 8-digit order id -->
+        <td class="order-id" data-label="Order ID">#{{ padded_id }}</td>
+
+        <td class="product-list" data-label="Product">
+          <!-- Products column: try to list order items if available (default related name orderitem_set) -->
+          <!-- <div class="product-list"> -->
+          {% if o.items.exists %}
+          {% for item in o.items.all %}
+          {% if item.product %}
+          <a class="product-link" href="{% url 'shop:product_detail' item.product.slug %}">
+            {{ item.product.name }}
+          </a>
+          {% else %}
+          <span style="color:#6b7280;">Item</span>
+          {% endif %}
+
+          {% if not forloop.last %}
+          ,
+          {% endif %}
+          {% endfor %}
+          {% else %}
+          <a class="product-link" href="{% url 'shop:order_detail' o.id %}">
+            View Items
+          </a>
+          {% endif %}
+
+        </td>
+
+        <!-- Amount -->
+        <!-- <td class="price-cell">₹ {{ o.total_amount }}</td> -->
+        <td class="price-cell" data-label="Amount">₹ {{ o.total_amount }}</td>
+
+        <!-- Status mapping: show 'Active' for 'created' -->
+        <td data-label="Status">
+
+          {% if o.status == 'created' %}
+          <span class="status-badge status-active">Active</span>
+          {% elif o.status == 'paid' %}
+          <span class="status-badge status-paid">Paid</span>
+          {% elif o.status == 'cancelled' %}
+          <span class="status-badge status-cancelled">Cancelled</span>
+          {% else %}
+          <span class="status-badge">{{ o.get_status_display }}</span>
+          {% endif %}
+        </td>
+
+        <!-- Placed On -->
+        <!-- <td>{{ o.created_at|date:"d M Y H:i" }}</td> -->
+        <td data-label="Placed On">{{ o.created_at|localtime|date:"d M Y h:i A" }}</td>
+
+        <!-- Action: Cancel (only if not paid/cancelled) -->
+        <!-- <td> -->
+        <td data-label="Action">
+
+          {% if o.status != 'paid' and o.status != 'cancelled' %}
+          <form method="post" action="{% url 'shop:cancel_order' o.id %}" class="action-form"
+            onsubmit="return confirm('Cancel order #{{ padded_id }} ?');">
+            {% csrf_token %}
+            <button type="submit" class="btn-cancel">Cancel</button>
+          </form>
+          {% else %}
+          <span style="color:#6b7280;font-weight:600;">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+      {% else %}
+      <tr>
+        <td colspan="6" style="padding:22px; text-align:center; color:#6b7280;">No orders found.</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "shop/base.html" %}
+{% block title %}Your Shopping Cart{% endblock %}
+
+{% block content %}
+<style>
+  /* ================= CART RESPONSIVE ================= */
+
+  @media (max-width: 768px) {
+
+    #cartTable thead {
+      display: none;
+    }
+
+    #cartTable,
+    #cartTable tbody,
+    #cartTable tr,
+    #cartTable td {
+      display: block;
+      width: 100%;
+    }
+
+    #cartTable tr {
+      margin-bottom: 14px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      padding: 12px;
+    }
+
+    #cartTable td {
+      padding: 8px 6px;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #cartTable td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .qty-input {
+      width: 46px !important;
+    }
+
+    .qty-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .row-total {
+      font-weight: 700;
+    }
+  }
+</style>
+
+
+<div
+  style="max-width:900px; margin:20px auto; background:#fff; padding:25px; border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+  <h2 style="margin-top:0;">🛒 Your Shopping Cart</h2>
+
+  <p><a href="{% url 'shop:product_list' %}" style="text-decoration:none;">⬅️ Continue Shopping</a></p>
+
+  {% if items %}
+  <table id="cartTable" style="width:100%; border-collapse:collapse; margin-top:20px;">
+    <thead>
+      <tr style="background:#f3f6fa;">
+        <th style="padding:12px; text-align:left;">Item</th>
+        <th style="padding:12px;">Price</th>
+        <th style="padding:12px;">Qty</th>
+        <th style="padding:12px;">Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr data-product-id="{{ item.id }}" style="border-bottom:1px solid #eee;">
+        <td data-label="Item" style="padding:12px;">{{ item.name }}</td>
+
+        <td data-label="Price" style="padding:12px;">₹ {{ item.price }}</td>
+
+        <td data-label="Quantity" style="padding:12px;">
+
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="qty-btn dec" data-action="dec">−</button>
+            <input class="qty-input" type="number" min="0" value="{{ item.quantity }}"
+              style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px;text-align:center;">
+            <button class="qty-btn inc" data-action="inc">+</button>
+          </div>
+        </td>
+        <td data-label="Total" class="row-total" style="padding:12px; font-weight:600;">
+          ₹ {{ item.line_total }}</td>
+        <td data-label="Remove" style="padding:12px;">
+
+          <a href="{% url 'shop:cart_remove' item.id %}" style="color:#ff4b4b; font-weight:600;">❌ Remove</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 id="cartTotal" style="margin-top:20px;">Total: <strong>₹ {{ total }}</strong></h3>
+
+
+
+  {% else %}
+  <p style="font-size:18px; padding:20px;">Your cart is empty.</p>
+  {% endif %}
+
+</div>
+
+<script>
+  (function () {
+    // helper: get csrf cookie
+    function getCookie(name) {
+      const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return v ? v.pop() : '';
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // update row UI
+    function formatINR(n) {
+      // simple formatting (no locale dependency)
+      return n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    }
+
+    // update DOM badge
+    function setCartBadge(count) {
+      const badge = document.getElementById('cartCountBadge');
+      if (badge) badge.textContent = count;
+    }
+
+    // Bind events
+    document.querySelectorAll('#cartTable tbody tr').forEach(row => {
+      const productId = row.getAttribute('data-product-id');
+      const input = row.querySelector('.qty-input');
+      const dec = row.querySelector('.qty-btn.dec');
+      const inc = row.querySelector('.qty-btn.inc');
+
+      function updateQty(newQty) {
+        // send AJAX to cart_update
+        fetch("{% url 'shop:cart_update' 0 %}".replace('/0/', '/' + productId + '/'), {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: new URLSearchParams({ qty: newQty }).toString()
+        }).then(async resp => {
+          if (!resp.ok) throw new Error('Network error');
+          return resp.json();
+        }).then(data => {
+          if (!data.success) throw new Error('Failed');
+
+          // Update row total
+          const rowTotalEl = row.querySelector('.row-total');
+          if (rowTotalEl) rowTotalEl.textContent = '₹ ' + formatINR(data.row_total);
+
+          // Update cart total
+          const cartTotalEl = document.getElementById('cartTotal');
+          if (cartTotalEl) cartTotalEl.innerHTML = 'Total: <strong>₹ ' + formatINR(data.cart_total) + '</strong>';
+
+          // Update header badge using UNIQUE count from server
+          if (data.cart_count !== undefined) {
+            setCartBadge(data.cart_count);
+          } else if (data.total_qty !== undefined) {
+            // fallback: if server gave only total_qty, don't change because we want unique count
+            // (but this case shouldn't happen with current views)
+            setCartBadge(data.total_qty);
+          }
+        }).catch(err => {
+          console.error(err);
+          // Revert UI input (optional: re-fetch or reload)
+          // For now we won't change input (user may retry)
+        });
+      }
+
+      // dec button
+      if (dec) dec.addEventListener('click', (e) => {
+        e.preventDefault();
+        let v = parseInt(input.value || '0', 10);
+        v = isNaN(v) ? 0 : v;
+        v = Math.max(0, v - 1);
+        input.value = v;
+        updateQty(v);
+      });
+
+      // inc button
+      if (inc) inc.addEventListener('click', (e) => {
+        e.preventDefault();
+        let v = parseInt(input.value || '0', 10);
+        v = isNaN(v) ? 0 : v;
+        v = v + 1;
+        input.value = v;
+        updateQty(v);
+      });
+
+      // manual input change (debounced)
+      let timer = null;
+      input.addEventListener('input', (e) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          let v = parseInt(input.value || '0', 10);
+          v = isNaN(v) ? 0 : v;
+          if (v < 0) v = 0;
+          input.value = v;
+          updateQty(v);
+        }, 450);
+      });
+    });
+
+  })();
+
+
+
+</script>
+{% endblock %}

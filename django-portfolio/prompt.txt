@@ -1,0 +1,24 @@
+IMPORTANT: Do NOT skip any code. Do NOT use ellipsis (...) Return FULL, COMPLETE, READY-TO-PASTE code. If output is too long, STOP and wait for me to say "continue".and if you cant provide full file then give me the affected section directly that should i change in file and whichever section is not affected dont give me so it will be more clear for me and above section give small explaination of that why this section is affected and previouus content functionality should not be changed.
+2.If there are are multiple issues we will solve one if it has some errors will solve it and then will jump to next one like step by step.
+3.if any front end issue possible without backend changes then do it in first priority, if thats not works then we will do the changes in backend if it will issue for the security matter of the site is then backend changes will be the priority on 1st stage.
+4. if the new  code is too long so you can give me in which tag i can add that new code and give me that  where to change line number (e.g. line number 102)
+5.no need of existing change give me the block or tag or above line or below this line add change remove 
+6. whenever i give the full file of code to find bug problems and you findout then ask me about that bug section so i will paste specific section then give me full replaceable section (without losing breaking existing functionality) of that because when u directly give u skip the existing funnctionality
+7. if you need some file then ask me ill provide, but dont create full file with skipped content until i asked for it or just give me notifcation at top of reply that in between some content is skipped.
+8. Sometime i ask you multiple problems in one chat , so you give me the multiple answers in part but sometimes you mess up and sometime i mess up to apply those thing so save in your memory that give me output in only 1 issue or feature by notifying on top that we will solve step by step then we will jump to next one then end of output ask me that is this issue solve now should we jump to 2 and same for 3 issue and so on.
+9.I want first project to create all pages and links with responsiveness after that we will work on everypage in details 
+10. check that git is tracking local and on git directory correct or not  before starting a project or pushing the project first time . and in make sure in gitignore file must contains this so in production i dont get any issues: venv/__pycache__/*.pyc db.sqlite3 *.sqlite3 media/ staticfiles/ .env
+
+razorpay success number : 4386 2894 0766 0153
+
+INSTRUCTIONS BEFORE START PROJECT: 
+I want first project to create all pages and links with responsiveness after that we will work on everypage in details 
+
+
+chmod 400 djang-keys.pem
+
+cd /home/ubuntu/projects/portf-website/django-portfolio
+
+ source venv/bin/activate
+
+ ## Remember that when will push next app have to reset the social account and site ID - 3 feb chat

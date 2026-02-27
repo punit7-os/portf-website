@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark bg-slate-900">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Global Trade & Supply Chain Intelligence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon.png' %}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+    <style>
+        html,
+        body {
+            background-color: #0f172a;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            overscroll-behavior: none;
+        }
+
+        /* ===== TradeSphere Premium Metallic Branding ===== */
+
+        .tradesphere-brand {
+            background: linear-gradient(120deg,
+                    #10b981 0%,
+                    #22c55e 25%,
+                    #facc15 50%,
+                    #22c55e 75%,
+                    #10b981 100%);
+            background-size: 250% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: metallicShine 6s ease-in-out infinite;
+            letter-spacing: 1.5px;
+        }
+
+        .tradesphere-brand-glow {
+            text-shadow:
+                0 0 8px rgba(34, 197, 94, 0.4),
+                0 0 18px rgba(250, 204, 21, 0.25);
+        }
+
+        @keyframes metallicShine {
+            0% {
+                background-position: 0% center;
+            }
+
+            50% {
+                background-position: 100% center;
+            }
+
+            100% {
+                background-position: 0% center;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen overflow-x-hidden">
+
+    <div class="max-w-7xl mx-auto p-6">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide leading-tight">
+                🌍 <span class="tradesphere-brand tradesphere-brand-glow">
+                    TradeSphere
+                </span>
+                <span class="text-slate-300 font-medium">
+                    – Global Trade & Supply Chain Intelligence
+                </span>
+            </h1>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner"
+            class="hidden fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-emerald-400"></div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- DASHBOARD ANALYTICS (HTMX) -->
+        <!-- ============================= -->
+
+        <div id="dashboardContent" hx-get="{% url 'trade_dashboard:dashboard_data' %}" hx-trigger="load"
+            hx-target="#dashboardContent" hx-swap="innerHTML" hx-indicator="#loadingSpinner">
+        </div>
+
+        <!-- ============================= -->
+        <!-- FILTERS (STATIC) -->
+        <!-- ============================= -->
+
+        <div class="flex flex-col md:flex-row gap-4 mb-6 mt-6">
+
+            <!-- Route Filter -->
+            <select class="bg-slate-800 border border-slate-700 p-2 rounded-lg" name="route"
+                hx-get="{% url 'trade_dashboard:dashboard_data' %}" hx-target="#dashboardContent"
+                hx-include="[name='mode']" hx-trigger="change">
+
+                <option value="">All Routes</option>
+                <option value="Atlantic">Atlantic</option>
+                <option value="Commodity">Commodity</option>
+                <option value="Intra-Asia">Intra-Asia</option>
+                <option value="Pacific">Pacific</option>
+                <option value="Suez">Suez</option>
+            </select>
+
+            <!-- Mode Filter -->
+            <select class="bg-slate-800 border border-slate-700 p-2 rounded-lg" name="mode"
+                hx-get="{% url 'trade_dashboard:dashboard_data' %}" hx-target="#dashboardContent"
+                hx-include="[name='route']" hx-trigger="change">
+
+                <option value="">All Modes</option>
+                <option value="Sea">Sea</option>
+                <option value="Air">Air</option>
+            </select>
+
+        </div>
+
+        <!-- ============================= -->
+        <!-- SHIPMENT TABLE -->
+        <!-- ============================= -->
+
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+            <h3 class="text-lg font-semibold mb-4">Shipment Logs</h3>
+
+            <div id="shipmentTable" hx-get="{% url 'trade_dashboard:shipment_table' %}" hx-trigger="load">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================= -->
+    <!-- CHART RENDER SCRIPT -->
+    <!-- ============================= -->
+
+    <script>
+        let costChart = null;
+        let routeChart = null;
+
+        function renderCharts() {
+
+            if (!window.lineData || !window.barData) return;
+
+            const costCanvas = document.getElementById('costDelayChart');
+            const routeCanvas = document.getElementById('routeRiskChart');
+
+            if (!costCanvas || !routeCanvas) return;
+
+            if (costChart) costChart.destroy();
+            if (routeChart) routeChart.destroy();
+
+            costChart = new Chart(costCanvas, {
+                type: 'line',
+                data: {
+                    labels: window.lineData.labels,
+                    datasets: [
+                        {
+                            label: 'Shipping Cost',
+                            data: window.lineData.costs,
+                            borderColor: '#3b82f6',
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Delay Days',
+                            data: window.lineData.delays,
+                            borderColor: '#f97316',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'Brent Oil Price',
+                            data: window.lineData.oil,
+                            borderColor: '#22c55e',
+                            tension: 0.4,
+                            borderDash: [5, 5],
+                            yAxisID: 'y2'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Shipping Cost' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'Delay Days' }
+                        },
+                        y2: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { drawOnChartArea: false },
+                            suggestedMin: 60,
+                            suggestedMax: 120,
+                            title: { display: true, text: 'Brent Oil Price' },
+                            ticks: { color: '#22c55e' }
+                        }
+                    }
+                }
+            });
+
+            routeChart = new Chart(routeCanvas, {
+                type: 'bar',
+                data: {
+                    labels: window.barData.routes,
+                    datasets: [{
+                        label: 'Risk Score',
+                        data: window.barData.risks,
+                        backgroundColor: '#ef4444',
+                        maxBarThickness: 60,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.target.id === "dashboardContent") {
+                setTimeout(renderCharts, 50);
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(renderCharts, 100);
+        });
+
+        document.body.addEventListener("htmx:beforeRequest", function () {
+            document.getElementById("loadingSpinner").classList.remove("hidden");
+        });
+
+        document.body.addEventListener("htmx:afterSwap", function () {
+            document.getElementById("loadingSpinner").classList.add("hidden");
+        });
+    </script>
+
+</body>
+
+</html>

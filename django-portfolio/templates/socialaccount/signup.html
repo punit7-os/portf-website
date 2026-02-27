@@ -1,0 +1,49 @@
+{% extends "shop/base.html" %}
+{% load i18n %}
+
+{% block title %}Sign up - My Shoppings{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
+  <h2 style="margin-top:0;text-align:center;">Sign Up</h2>
+
+  <p style="color:#444;">
+    You are about to use your {{ sociallogin.account.get_provider_display|default:"social" }} account to login to {{ request.get_host }}.
+    As a final step, please complete the following form:
+  </p>
+
+  {% if form.errors %}
+    <div style="background:#fdecea;color:#b00020;padding:10px;border-radius:6px;margin-bottom:12px;">
+      {% for field in form %}
+        {% for err in field.errors %}
+          <div>{{ err }}</div>
+        {% endfor %}
+      {% endfor %}
+      {% for err in form.non_field_errors %}
+        <div>{{ err }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'socialaccount_signup' %}">
+    {% csrf_token %}
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Email:</label>
+      {{ form.email }}
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-weight:600;margin-bottom:6px;">Username:</label>
+      {{ form.username }}
+    </div>
+
+    <button type="submit" style="width:100%;padding:12px;border-radius:8px;border:none;background:#007BFF;color:white;font-weight:600;">
+      Sign Up
+    </button>
+  </form>
+
+  <p style="text-align:center;margin-top:12px;">
+    Already have an account? <a href="{% url 'account_login' %}">Sign In</a>
+  </p>
+</div>
+{% endblock %}

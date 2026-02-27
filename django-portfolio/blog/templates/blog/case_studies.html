@@ -1,0 +1,175 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Case Studies | SourCEO{% endblock %}
+
+{% block content %}
+
+<!-- ================= HEADER ================= -->
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-14">
+    <h1 class="text-3xl md:text-4xl font-bold text-dark">
+      Case Studies
+    </h1>
+    <p class="mt-4 max-w-3xl text-lg text-slate-600">
+      Real projects. Real problems. Practical solutions.
+    </p>
+  </div>
+</section>
+
+<!-- ================= CASE STUDIES ================= -->
+<section class="py-16">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-12">
+
+    <!-- ================= CASE STUDY 1 ================= -->
+    <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+        <div class="md:col-span-2">
+          <span class="text-xs font-semibold uppercase text-primary">
+            E-Commerce Platform
+          </span>
+
+          <h2 class="mt-2 text-2xl font-semibold text-dark">
+            Custom Django E-Commerce System
+          </h2>
+
+          <p class="mt-4 text-slate-700 leading-relaxed">
+            A fully functional e-commerce platform built to demonstrate
+            real-world checkout flows, user accounts, cart management,
+            and payment integration.
+          </p>
+
+          <div class="mt-6 space-y-3 text-slate-700">
+            <p><strong>Problem:</strong> Off-the-shelf tools felt rigid and didn’t
+              support custom business logic.</p>
+
+            <p><strong>Solution:</strong> Built a Django-based system with
+              custom cart logic, Razorpay integration, and admin controls.</p>
+
+            <p><strong>Outcome:</strong> A scalable demo platform reflecting
+              real client checkout and payment workflows.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h3 class="font-semibold text-dark mb-3">Key Highlights</h3>
+          <ul class="space-y-2 text-sm text-slate-700">
+            <li>✔ User authentication</li>
+            <li>✔ Cart & checkout flow</li>
+            <li>✔ Razorpay integration</li>
+            <li>✔ Admin order management</li>
+            <li>✔ Responsive UI</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= CASE STUDY 2 ================= -->
+    <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+        <div class="md:col-span-2">
+          <span class="text-xs font-semibold uppercase text-primary">
+            Portfolio Platform
+          </span>
+
+          <h2 class="mt-2 text-2xl font-semibold text-dark">
+            Developer Portfolio & Business Blog
+          </h2>
+
+          <p class="mt-4 text-slate-700 leading-relaxed">
+            A portfolio designed to go beyond visuals and explain
+            architecture decisions, problem-solving approach,
+            and business value.
+          </p>
+
+          <div class="mt-6 space-y-3 text-slate-700">
+            <p><strong>Problem:</strong> Traditional portfolios show projects
+              but not thinking or business understanding.</p>
+
+            <p><strong>Solution:</strong> Built a Django-based site combining
+              portfolio, blog, and case studies.</p>
+
+            <p><strong>Outcome:</strong> A clear narrative of technical skills
+              aligned with business goals.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h3 class="font-semibold text-dark mb-3">Key Highlights</h3>
+          <ul class="space-y-2 text-sm text-slate-700">
+            <li>✔ Tailwind UI</li>
+            <li>✔ SEO-friendly structure</li>
+            <li>✔ Scalable Django setup</li>
+            <li>✔ Clean content separation</li>
+            <li>✔ Business-first presentation</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= CASE STUDY 3 (NEW) ================= -->
+    <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+        <div class="md:col-span-2">
+          <span class="text-xs font-semibold uppercase text-primary">
+            Content & Growth Platform
+          </span>
+
+          <h2 class="mt-2 text-2xl font-semibold text-dark">
+            Business-Focused Blog Platform (SourCEO)
+          </h2>
+
+          <p class="mt-4 text-slate-700 leading-relaxed">
+            A custom blog platform created to explain technology,
+            automation, and growth concepts in simple, business-friendly language.
+          </p>
+
+          <div class="mt-6 space-y-3 text-slate-700">
+            <p><strong>Problem:</strong> Most tech blogs are written for developers,
+              not founders or decision-makers.</p>
+
+            <p><strong>Solution:</strong> Designed a category-driven blog structure
+              focused on business problems, automation use cases, and case studies.</p>
+
+            <p><strong>Outcome:</strong> A content platform that builds authority,
+              trust, and positions the developer as a business-aware tech partner.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h3 class="font-semibold text-dark mb-3">Key Highlights</h3>
+          <ul class="space-y-2 text-sm text-slate-700">
+            <li>✔ Business-first content strategy</li>
+            <li>✔ Clean Tailwind UI</li>
+            <li>✔ SEO-ready architecture</li>
+            <li>✔ Scalable category system</li>
+            <li>✔ Clear user navigation</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= CTA ================= -->
+    <div class="bg-slate-100 rounded-xl p-10 text-center">
+      <h3 class="text-2xl font-semibold text-dark">
+        Have a Similar Problem?
+      </h3>
+      <p class="mt-3 text-slate-600 max-w-2xl mx-auto">
+        If you’re looking to build something practical, scalable,
+        and business-focused — let’s talk.
+      </p>
+      <a href="{% url 'blog:contact' %}"
+         class="inline-block mt-6 px-8 py-3 bg-primary text-white font-medium rounded-lg hover:bg-blue-700 transition">
+        Contact Me
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

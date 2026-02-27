@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Live Data{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon.png' %}">
+    <!-- Tailwind Config MUST come before CDN -->
+    <script>
+        window.tailwind = {
+            config: {
+                darkMode: 'class'
+            }
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .price-up {
+            color: #16a34a;
+        }
+
+        .price-down {
+            color: #dc2626;
+        }
+
+        body {
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* PulseIQ Branding */
+        .pulse-brand {
+            background: linear-gradient(90deg, #00f5ff, #6366f1, #a855f7);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseGradient 4s linear infinite;
+            letter-spacing: 1px;
+        }
+
+        .dark .pulse-brand {
+            text-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+        }
+
+        @keyframes pulseGradient {
+            0% {
+                background-position: 0% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col">
+
+    <nav
+        class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-6 py-4 flex justify-between items-center shadow">
+        <div class="text-xl font-bold">
+            📊 <span class="pulse-brand">PulseIQ</span>
+        </div>
+
+        <div class="flex items-center space-x-4 text-sm">
+            <a href="{% url 'live_data_pages:dashboard' %}" class="hover:text-gray-300">
+                Dashboard
+            </a>
+
+
+        </div>
+    </nav>
+
+    <main class="flex-1 p-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer
+        class="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-center py-4 text-sm border-t dark:border-gray-700">
+        © {{ now|date:"Y" }} Live Data App
+    </footer>
+
+    <!-- Dark Mode Script - MUST BE AT BOTTOM -->
+    <!-- Dark Mode Script - MUST BE AT BOTTOM -->
+    <script>
+        const html = document.documentElement;
+
+        // Initialize theme on page load
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+
+            // Default to DARK if no preference saved
+            if (!savedTheme) {
+                localStorage.setItem('theme', 'dark');
+                html.classList.add('dark');
+            } else if (savedTheme === 'dark') {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        }
+
+        // Initialize immediately
+        initTheme();
+
+        // Maintain theme after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', initTheme);
+    </script>
+
+</body>
+
+</html>

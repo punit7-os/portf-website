@@ -1,0 +1,92 @@
+{% extends "blog/base.html" %}
+{% load socialaccount %}
+{% load static %}
+
+{% block title %}Login | SourCEO{% endblock %}
+
+{% block content %}
+
+<section class="py-20">
+    <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+
+        <h1 class="text-2xl font-bold text-dark text-center mb-6">
+            Login to
+            <a href="{% url 'blog:home' %}" class="font-bold">
+                Sour<span class="text-primary">CEO</span>
+            </a>
+        </h1>
+
+
+        <!-- Google Login -->
+       <a href="{% provider_login_url 'google' process='login' next=request.GET.next|default:'/blog/profile/' %}"
+   class="flex items-center justify-center gap-3 border border-slate-300 rounded-lg py-2 mb-6 font-medium hover:bg-slate-50">
+    <img src="{% static 'images/google-logo.png' %}" class="w-5 h-5">
+    Continue with Google
+</a>
+
+
+        <div class="text-center text-slate-500 text-sm mb-6">
+            or login with username/email
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <p class="text-red-600 text-sm mb-4 text-center">
+                Invalid credentials. Please try again.
+            </p>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Username or Email</label>
+                <input type="text" name="username" required
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-1">Password</label>
+                <div class="relative">
+                    <input type="password" name="password" id="loginPassword" required
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-primary">
+                    <button type="button" onclick="toggleLoginPassword()"
+                        class="absolute right-3 top-2.5 text-xs font-semibold text-primary">
+                        SHOW
+                    </button>
+                </div>
+            </div>
+
+
+            <input type="hidden" name="next" value="{{ next|default:'/blog/profile/' }}">
+
+
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-blue-700">
+                Login
+            </button>
+
+            <div class="mt-6 text-center text-sm text-slate-600">
+                Don’t have an account?
+                <a href="{% url 'blog:signup' %}" class="text-primary font-medium">
+                    Sign up here
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</section>
+
+<script>
+    function toggleLoginPassword() {
+        const field = document.getElementById("loginPassword");
+        const btn = event.target;
+        if (field.type === "password") {
+            field.type = "text";
+            btn.textContent = "HIDE";
+        } else {
+            field.type = "password";
+            btn.textContent = "SHOW";
+        }
+    }
+</script>
+
+{% endblock %}

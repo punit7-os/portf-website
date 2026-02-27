@@ -1,0 +1,1402 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Shoppings{% endblock %}</title>
+  <!-- ================= FAVICON ================= -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon.png' %}">
+  <meta name="theme-color" content="#007BFF">
+
+  <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+
+  <style>
+    /* ================= RESET & BASE ================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f6f8fb;
+      color: #333;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ================= HEADER (DESKTOP) ================= */
+    header {
+      background: linear-gradient(90deg, #007BFF 0%, #0b8fff 100%);
+      color: #fff;
+      padding: 16px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      top: 0;
+      position: sticky;
+      z-index: 2;
+      box-shadow: 0 2.4px 8px rgba(6, 40, 84, 0.06);
+    }
+
+    header .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #ffd43b;
+    }
+
+    .brand .logo {
+      width: 27.2px;
+      height: 27.2px;
+      border-radius: 6.4px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      padding: 2.4px;
+    }
+
+    .brand .logo svg {
+      width: 16px;
+      height: 16px;
+      fill: #0077d9;
+    }
+
+    .brand .title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    header a {
+      color: #ffd43b;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 8px;
+      font-size: 14.4px;
+    }
+
+    header a:hover {
+      text-decoration: underline;
+    }
+
+    header>div {
+      display: flex;
+      align-items: center;
+      gap: 9.6px;
+    }
+
+    /* ================= ACCOUNT DROPDOWN ================= */
+    .account {
+      position: relative;
+      display: inline-block;
+    }
+
+    .account .account-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4.8px 8px;
+      border-radius: 6.4px;
+    }
+
+    .account .account-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 35.2px;
+      background: #fff;
+      color: #222;
+      border-radius: 6.4px;
+      box-shadow: 0 4.8px 14.4px rgba(0, 0, 0, 0.12);
+      min-width: 128px;
+      overflow: hidden;
+      z-index: 2000;
+    }
+
+    .account .account-menu a {
+      display: block;
+      padding: 8px 9.6px;
+      color: #222;
+      text-decoration: none;
+      font-size: 11.2px;
+    }
+
+    .account .account-menu a:hover {
+      background: #f1f5fb;
+    }
+
+    /* ================= CART BADGE ================= */
+    .cart-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6.4px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4.8px 8px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 14.4px;
+    }
+
+    .cart-count {
+      background: #ffd43b;
+      color: #07263a;
+      font-weight: 800;
+      padding: 1.6px 6.4px;
+      border-radius: 999px;
+      font-size: 12px;
+      min-width: 17.6px;
+      text-align: center;
+      display: inline-block;
+      box-shadow: 0 1.6px 4.8px rgba(8, 30, 60, 0.06);
+    }
+
+    /* ================= FLOATING SEARCH (DESKTOP) ================= */
+    .floating-search {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 24px;
+      box-shadow: 0 6.4px 24px rgba(6, 40, 84, 0.06);
+      padding: 6.4px 12.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 86%;
+      max-width: 460px;
+      border: 1px solid rgba(10, 40, 100, 0.05);
+      transition: all 0.25s ease;
+    }
+
+    .floating-search input[type="text"] {
+      flex: 1;
+      padding: 8px 11.2px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      color: #333;
+    }
+
+    .floating-search button {
+      background: linear-gradient(90deg, #007BFF, #00C6FF);
+      border: none;
+      color: white;
+      padding: 6.4px 9.6px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 12.8px;
+    }
+
+    /* ================= MAIN CONTAINER ================= */
+    main {
+      flex: 1;
+      max-width: 1080px;
+      margin: 88px auto 19.2px auto;
+      padding: 0 12.8px;
+      width: 100%;
+    }
+
+    /* ================= GRID & CARDS ================= */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      justify-items: center;
+      align-items: start;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      /* tighter */
+      box-shadow: 0 2px 7px rgba(0, 0, 0, 0.07);
+      /* lighter */
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 100%;
+      transition: all 0.25s ease;
+      transform: translateY(6px);
+      cursor: pointer;
+    }
+
+    .card.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-4.8px);
+      box-shadow: 0 9.6px 24px rgba(6, 40, 84, 0.06);
+    }
+
+    .card img {
+      width: 100%;
+      height: 135px;
+      /* reduced from 160px */
+      object-fit: contain;
+      background: #f9f9f9;
+      display: block;
+    }
+
+
+    .p {
+      padding: 7px;
+      /* reduced */
+      text-align: center;
+    }
+
+
+    .p h3 {
+      margin: 4px 0 5px 0;
+      font-size: 11px;
+      /* reduced */
+      color: #0b2540;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .price {
+      font-weight: 700;
+      color: #0b76d6;
+      margin-bottom: 5px;
+      font-size: 13px;
+      /* reduced */
+    }
+
+
+    .card .card-body {
+      padding: 8px 9.6px 4.8px 9.6px;
+    }
+
+    /* ================= BUTTONS ================= */
+    .cart-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      /* reduced */
+      padding: 6px 7px 9px 7px;
+      /* reduced */
+    }
+
+
+    .cart-btn form {
+      flex: 1;
+      margin: 0;
+      max-width: none;
+    }
+
+    .cart-btn button {
+      width: 100%;
+      padding: 6px;
+      /* reduced */
+      border: none;
+      border-radius: 7px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      font-size: 10px;
+      /* reduced */
+      transition: all 0.3s ease;
+      height: 28px;
+      /* reduced */
+    }
+
+    .add {
+      background: linear-gradient(135deg, #007BFF, #00C6FF);
+      box-shadow: 0 3.2px 8px rgba(0, 123, 255, 0.2);
+    }
+
+    .add:hover {
+      transform: translateY(-1.6px) scale(1.02);
+    }
+
+    .add.added {
+      background: linear-gradient(135deg, #28a745, #6ddf72);
+      box-shadow: 0 3.2px 8px rgba(40, 167, 69, 0.2);
+    }
+
+    .buy {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      box-shadow: 0 3.2px 8px rgba(255, 126, 95, 0.2);
+    }
+
+    .buy:hover {
+      transform: translateY(-1.6px) scale(1.02);
+    }
+
+    /* ================= WISHLIST HEART ================= */
+    .wishlist-heart {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30.4px;
+      height: 30.4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      font-size: 16px;
+      color: #9ca3af;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 4.8px 11.2px rgba(0, 0, 0, 0.18);
+      transition: all 0.25s ease;
+    }
+
+    .wishlist-heart.active {
+      color: #e11d48;
+      background: #ffffff;
+      box-shadow: 0 4.8px 12.8px rgba(225, 29, 72, 0.35);
+    }
+
+    .wishlist-heart:hover {
+      transform: scale(1.12);
+    }
+
+    .wishlist-heart:active {
+      transform: scale(0.95);
+    }
+
+    /* ================= FOOTER ================= */
+    footer {
+      background: linear-gradient(135deg, #007BFF, #4dabff);
+      color: #fff;
+      padding: 24px 8px;
+      font-size: 11.2px;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      max-width: 880px;
+      margin: auto;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .footer-column {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .footer-column h4 {
+      margin-bottom: 6.4px;
+      font-size: 12.8px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .footer-column a {
+      color: #fffa;
+      text-decoration: none;
+      display: block;
+      margin: 3.2px 0;
+      font-size: 11.2px;
+    }
+
+    .footer-column a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      margin-top: 14.4px;
+      font-size: 10.4px;
+      opacity: 0.85;
+    }
+
+    /* ================= SEARCH INFO BAR ================= */
+    .search-info-bar {
+      background: #eaf3ff;
+      color: #0b63d6;
+      padding: 12.8px 16px;
+      min-height: 41.6px;
+      border-radius: 9.6px;
+      margin: 0 auto 14.4px auto;
+      max-width: 880px;
+      font-size: 12.8px;
+      font-weight: 700;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-info-bar strong {
+      font-weight: 800;
+      color: #084298;
+    }
+
+    /* ================= SEARCH HIGHLIGHT ================= */
+    .highlight,
+    .product-name mark {
+      background: #ffeb3b;
+      color: #000;
+      padding: 0 1.6px;
+      border-radius: 3.2px;
+    }
+
+    /* ================= WISHLIST POPOVER ================= */
+    .wishlist-popover {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(15, 23, 42, 0.95);
+      color: #fff;
+      border-radius: 11.2px;
+      padding: 11.2px 12.8px;
+      z-index: 5000;
+      min-width: 208px;
+      max-width: calc(100% - 25.6px);
+      box-shadow: 0 9.6px 24px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+
+    .wishlist-popover.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .wishlist-popover-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .wishlist-popover-content p {
+      margin: 0;
+      font-size: 11.2px;
+      font-weight: 600;
+    }
+
+    .wishlist-login-btn {
+      background: linear-gradient(90deg, #007BFF, #00C6FF);
+      color: #fff;
+      padding: 6.4px 11.2px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 11.2px;
+    }
+
+    /* ================= MOBILE TOP BAR ================= */
+    .mobile-top-bar {
+      display: none;
+    }
+
+    /* ================= MOBILE BOTTOM NAV ================= */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    /* ================= MOBILE MENU ================= */
+    .mobile-menu {
+      position: fixed;
+      bottom: 48px;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      box-shadow: 0 -6.4px 19.2px rgba(0, 0, 0, 0.12);
+      border-radius: 11.2px 11.2px 0 0;
+      padding: 14.4px;
+      display: none;
+      z-index: 3001;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 11.2px;
+      text-decoration: none;
+      color: #111;
+      font-weight: 600;
+      border-bottom: 1px solid #f1f1f1;
+      font-size: 13.6px;
+    }
+
+    .mobile-menu.open {
+      display: block;
+    }
+
+    /* ================= MOBILE SEARCH INLINE ================= */
+    .mobile-search-inline {
+      display: flex;
+      align-items: center;
+      gap: 4.8px;
+    }
+
+    .mobile-search-inline input {
+      width: 0;
+      opacity: 0;
+      border: none;
+      outline: none;
+      padding: 0;
+      font-size: 11.2px;
+      border-radius: 16px;
+      transition: width 0.25s ease, opacity 0.2s ease;
+    }
+
+    .mobile-search-inline.active input {
+      width: 144px;
+      opacity: 1;
+      padding: 4.8px 8px;
+      background: #ffffff;
+    }
+
+    .mobile-search-inline button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #fff;
+      font-size: 14.4px;
+      width: 27.2px;
+      height: 27.2px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* ================= RESPONSIVE - LARGE TABLET ================= */
+    @media (max-width: 992px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .card img {
+        height: 150px;
+      }
+    }
+
+    /* ================= RESPONSIVE - TABLET ================= */
+    @media (max-width: 768px) {
+
+      /* Hide desktop header */
+      header {
+        display: none;
+      }
+
+      /* Hide desktop floating search */
+      .floating-search {
+        display: none !important;
+      }
+
+      /* Show mobile top bar */
+      .mobile-top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 41.6px;
+        background: linear-gradient(90deg, #007BFF, #0b8fff);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 11.2px;
+        z-index: 3500;
+        box-shadow: 0 1.6px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .mobile-brand {
+        color: #fff;
+        font-weight: 700;
+        font-size: 12.8px;
+        text-decoration: none;
+      }
+
+      /* Show mobile bottom nav */
+      .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 48px;
+        background: #ffffff;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 3000;
+      }
+
+      .mobile-bottom-nav a,
+      .mobile-bottom-nav button {
+        background: none;
+        border: none;
+        color: #0b63d6;
+        font-size: 14.4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.6px;
+        cursor: pointer;
+      }
+
+      .mobile-bottom-nav span {
+        font-size: 8.8px;
+        font-weight: 600;
+      }
+
+      /* Adjust body padding */
+      body {
+        padding-bottom: 56px;
+      }
+
+      /* Adjust main spacing */
+      main {
+        margin-top: 64px;
+      }
+
+      /* Grid: 3 columns on tablet */
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .card img {
+        height: 140px;
+      }
+
+      /* Wishlist heart size */
+      .wishlist-heart {
+        width: 28.8px;
+        height: 28.8px;
+        font-size: 14.4px;
+        top: 6.4px;
+        right: 6.4px;
+      }
+
+      /* Wishlist popover on desktop */
+      .wishlist-popover {
+        bottom: auto;
+        top: 64px;
+      }
+    }
+
+    /* ================= RESPONSIVE - MOBILE ================= */
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12.8px;
+      }
+
+      .card {
+        max-width: 100%;
+      }
+
+      .card img {
+        height: 128px;
+      }
+
+      .p {
+        padding: 8px;
+      }
+
+      .p h3 {
+        font-size: 11.2px;
+      }
+
+      .price {
+        font-size: 12.8px;
+      }
+
+      .cart-btn {
+        flex-direction: column;
+        gap: 6.4px;
+        padding: 6.4px 8px 9.6px 8px;
+      }
+
+      .cart-btn form {
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .cart-btn button {
+        width: 100%;
+        font-size: 11.2px;
+        padding: 8px;
+        height: 32px;
+      }
+
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      main {
+        margin-top: 56px;
+        padding: 0 9.6px;
+      }
+    }
+
+    /* ================= RESPONSIVE - VERY SMALL ================= */
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 9.6px;
+      }
+
+      .card img {
+        height: 112px;
+      }
+
+      .p {
+        padding: 6.4px;
+      }
+
+      .p h3 {
+        font-size: 9.6px;
+      }
+
+      .price {
+        font-size: 11.2px;
+      }
+
+      .cart-btn button {
+        font-size: 9.6px;
+        height: 28px;
+        padding: 6.4px;
+      }
+
+      .wishlist-heart {
+        width: 24px;
+        height: 24px;
+        font-size: 12.8px;
+        top: 6.4px;
+        right: 6.4px;
+      }
+    }
+  </style>
+</head>
+
+<body data-initial-cart-count="{{ cart_unique_items|default:0 }}" style="overflow-x:hidden;">
+  <!-- ================= MOBILE TOP BAR ================= -->
+  <div class="mobile-top-bar">
+    <a href="{% url 'shop:product_list' %}" class="mobile-brand">
+      My Shoppings
+    </a>
+
+    <div class="mobile-search-inline">
+      <input type="text" id="mobileSearchInput" placeholder="Search products..." autocomplete="off">
+      <button id="mobileTopSearchBtn" aria-label="Search">
+        🔍
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Floating Search Bar -->
+  <!-- <form class="floating-search" method="get" action="{% url 'shop:product_list' %}"> -->
+  <form class="floating-search mobile-search-hidden" method="get" action="{% url 'shop:product_list' %}">
+
+    <input type="text" name="q" value="{{ query }}" placeholder="Search for products...">
+    <button type="submit" aria-label="Search">
+      🔍
+    </button>
+  </form>
+
+  <header>
+    <!-- Brand (clickable) -->
+    <a class="brand" href="{% url 'shop:product_list' %}">
+      <span class="logo" aria-hidden="true">
+        <!-- small bag icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M7 7V6a4 4 0 0 1 8 0v1h3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7h3zM9 7h6" fill="#ffd43b" />
+        </svg>
+      </span>
+      <div>
+        <div class="title">My Shoppings</div>
+      </div>
+    </a>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <!-- Cart link with badge -->
+      <a href="{% url 'shop:cart_detail' %}" class="cart-badge" id="cartLink" aria-label="Cart">
+        <!-- cart icon -->
+        <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 6h15l-1.5 9h-12z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <circle cx="9" cy="20" r="1" fill="#fff" />
+          <circle cx="18" cy="20" r="1" fill="#fff" />
+        </svg>
+        <span style="font-weight:700;color:#fff;margin-left:6px;">Cart</span>
+        <span id="cartCountBadge" class="cart-count" aria-live="polite" aria-atomic="true">
+          {{ cart_unique_items|default:0 }}
+        </span>
+      </a>
+
+      <!-- My Orders -->
+      <a href="{% url 'shop:my_orders' %}" style="color:#ffd43b; font-weight:600;">My Orders</a>
+
+      <!-- Account -->
+      <div class="account">
+        {% if request.user.is_authenticated %}
+        <button class="account-btn" id="accountBtn">{{ request.user.get_username }} ▾</button>
+        <div class="account-menu" id="accountMenu" aria-hidden="true">
+          <a href="{% url 'shop:profile' %}">Profile</a>
+          <a href="{% url 'shop:logout' %}">Logout</a>
+        </div>
+        {% else %}
+        <a href="{% url 'shop:login' %}" style="color:#ffd43b; font-weight:600;">Login</a>
+        <a href="{% url 'shop:signup' %}" style="color:#ffd43b; font-weight:600; margin-left:6px;">Signup</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="searchInfoBar" class="search-info-bar" style="display:none;">
+      Showing results for: <strong id="searchKeyword"></strong>
+    </div>
+    {% block content %}
+    <!-- ================= SEARCH INFO BAR ================= -->
+
+    <!-- sample card for layout/testing: in product_list.html use your loop and set data-href -->
+    <div class="grid" style="max-width:1100px; margin:40px auto 0;">
+      <div class="card" data-href="#">
+        <img src="{% static 'images/sample.jpg' %}" alt="Sample Product">
+        <div class="card-body">
+          <div class="p">
+            <h3>Sample Product</h3>
+            <div class="price">₹499</div>
+          </div>
+        </div>
+        <div class="cart-btn">
+          <form action="{% url 'shop:cart_add' 1 %}" method="post">{% csrf_token %}
+            <button type="button" class="add">Add to Cart</button>
+          </form>
+          <form action="{% url 'shop:buy_now' p.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy">
+              ⚡ Buy Now
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+  </main>
+
+  <footer>
+    <div class="footer-container">
+
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <a href="mailto:punitp0170@gmail.com" target="_blank">📧 Email</a>
+        <a href="https://wa.me/917048856947" target="_blank">💬 WhatsApp</a>
+      </div>
+
+      <div class="footer-column">
+        <h4>My Shoppings</h4>
+        <p>© {% now "Y" %} All Rights Reserved</p>
+      </div>
+
+      <div class="footer-column">
+        <h4>Developer</h4>
+        <p>Designed & Developed by <strong>Punit Patel</strong></p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      Made with ❤️ for learning & portfolio purpose
+    </div>
+  </footer>
+  <script>
+    /* ================= CSRF ================= */
+    function getCookie(name) {
+      const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return v ? v.pop() : '';
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    /* ================= ACCOUNT DROPDOWN (FIXED) ================= */
+    document.addEventListener("DOMContentLoaded", function () {
+      const accountBtn = document.getElementById("accountBtn");
+      const accountMenu = document.getElementById("accountMenu");
+
+      if (!accountBtn || !accountMenu) return;
+
+      // Toggle menu on button click
+      accountBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation(); // 🔥 VERY IMPORTANT
+        const isOpen = accountMenu.style.display === "block";
+        accountMenu.style.display = isOpen ? "none" : "block";
+        accountMenu.setAttribute("aria-hidden", isOpen ? "true" : "false");
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener("click", function (e) {
+        if (!accountMenu.contains(e.target) && !accountBtn.contains(e.target)) {
+          accountMenu.style.display = "none";
+          accountMenu.setAttribute("aria-hidden", "true");
+        }
+      });
+    });
+
+
+    /* ================= ADD TO CART (AJAX) – LOGIN SAFE ================= */
+    document.addEventListener('click', async function (e) {
+      const addBtn = e.target.closest('button.add');
+      if (!addBtn) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const form = addBtn.closest('form');
+      if (!form) return;
+
+      addBtn.disabled = true;
+
+      try {
+        const resp = await fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: new URLSearchParams({ qty: 1 })
+        });
+
+        /* 🔐 LOGIN REQUIRED */
+        if (resp.status === 401) {
+          const data = await resp.json();
+          if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+            return;
+          }
+        }
+
+        const data = await resp.json();
+
+        if (data.cart_count !== undefined) {
+          document.getElementById('cartCountBadge').textContent = data.cart_count;
+        }
+
+      } catch (err) {
+        console.error(err);
+      } finally {
+        addBtn.disabled = false;
+      }
+    });
+
+
+
+
+    /* ================= BUY NOW (LOGIN SAFE) ================= */
+    document.addEventListener('click', async function (e) {
+      const buyBtn = e.target.closest('button.buy');
+      if (!buyBtn) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const form = buyBtn.closest('form');
+      if (!form) return;
+
+      buyBtn.disabled = true;
+
+      try {
+        const resp = await fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: new URLSearchParams({ qty: 1 })
+        });
+
+        /* 🔐 LOGIN REQUIRED */
+        if (resp.status === 401) {
+          const data = await resp.json();
+          if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+            return;
+          }
+        }
+
+        /* ✅ Logged-in user → proceed to checkout */
+        window.location.href = "/shop/checkout/";
+
+      } catch (err) {
+        console.error("Buy Now failed", err);
+        buyBtn.disabled = false;
+      }
+    });
+
+
+    /* ================= PAGE VISIBILITY REFRESH ================= */
+    (function () {
+      let wasHidden = false;
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") wasHidden = true;
+        if (document.visibilityState === "visible" && wasHidden) {
+          window.location.reload();
+        }
+      });
+    })();
+
+
+    /* =====================================================
+       FRONTEND-ONLY LOGIN GUARD (NO BACKEND TOUCH)
+       ===================================================== */
+
+    /* Django auth state injected safely */
+    const IS_AUTHENTICATED = "{{ request.user.is_authenticated|yesno:'1,0' }}" === "1";
+
+    /* 1️⃣ BUY NOW ANCHOR PROTECTION */
+    document.addEventListener("click", function (e) {
+      const buyLink = e.target.closest("a.buy-link");
+      if (!buyLink) return;
+
+      if (!IS_AUTHENTICATED) {
+        e.preventDefault();
+        const nextUrl = buyLink.getAttribute("href");
+        window.location.href =
+          "{% url 'shop:login' %}?next=" + encodeURIComponent(nextUrl);
+      }
+    });
+
+    /* 2️⃣ DIRECT CHECKOUT URL PROTECTION */
+    (function () {
+      const path = window.location.pathname;
+      const isCheckout = path === "/shop/checkout/";
+
+      if (isCheckout && !IS_AUTHENTICATED) {
+        const nextUrl = window.location.pathname + window.location.search;
+        window.location.replace(
+          "{% url 'shop:login' %}?next=" + encodeURIComponent(nextUrl)
+        );
+      }
+    })();
+
+
+    /* ================= WISHLIST WITH LOGIN POPOVER ================= */
+
+    document.addEventListener("click", function (e) {
+      const heart = e.target.closest(".wishlist-heart");
+      if (!heart) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!IS_AUTHENTICATED) {
+        showWishlistPopover();
+        return;
+      }
+
+      const productId = heart.dataset.product;
+
+      fetch(`/shop/wishlist/toggle/${productId}/`, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (!data) return;
+          heart.classList.toggle("active", data.status === "added");
+        })
+        .catch(err => console.error("Wishlist error:", err));
+    });
+
+    /* ================= POPOVER CONTROL ================= */
+
+    let wishlistPopoverTimer = null;
+
+    function showWishlistPopover() {
+      const pop = document.getElementById("wishlistPopover");
+      if (!pop) return;
+
+      pop.classList.add("show");
+      pop.setAttribute("aria-hidden", "false");
+
+      clearTimeout(wishlistPopoverTimer);
+      wishlistPopoverTimer = setTimeout(() => {
+        pop.classList.remove("show");
+        pop.setAttribute("aria-hidden", "true");
+      }, 3000);
+    }
+
+
+    (function () {
+      const searchInput = document.querySelector('.floating-search input[name="q"]');
+      const mainContent = document.querySelector('main');
+
+      if (!searchInput || !mainContent) return;
+
+      let controller = null;
+
+
+      async function performSearch(query) {
+        if (controller) controller.abort();
+        controller = new AbortController();
+
+        if (!query.trim()) {
+          window.location.href = "{% url 'shop:product_list' %}";
+          return;
+        }
+
+        try {
+          const resp = await fetch(
+            `{% url 'shop:search_products' %}?q=${encodeURIComponent(query)}`,
+            {
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+              signal: controller.signal
+            }
+          );
+
+          if (!resp.ok) return;
+
+          const html = await resp.text();
+          mainContent.innerHTML = html;
+
+          /* ✨ Highlight matches */
+          highlightText(mainContent, query);
+
+
+
+        } catch (err) {
+          if (err.name !== "AbortError") console.error(err);
+        }
+      }
+
+      let debounceTimer;
+      searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const q = this.value;
+        debounceTimer = setTimeout(() => performSearch(q), 250);
+      });
+    })();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const wrapper = document.querySelector('.mobile-search-inline');
+      const input = document.getElementById('mobileSearchInput');
+      const btn = document.getElementById('mobileTopSearchBtn');
+
+      if (!wrapper || !input || !btn) return;
+
+      btn.addEventListener('click', function () {
+        if (wrapper.classList.contains("active") && input.value.trim()) {
+          document.querySelector('.floating-search').submit();
+          return;
+        }
+
+        wrapper.classList.add('active');
+        setTimeout(() => {
+          input.focus();
+          input.click();
+        }, 200);
+      });
+
+      // ✅ FIXED LINE
+      input.addEventListener("blur", function () {
+        setTimeout(() => {
+          wrapper.classList.remove("active");
+        }, 300);
+      });
+    });
+
+
+    /* ================= MOBILE TOP SEARCH TOGGLE ================= */
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchForm = document.querySelector('.floating-search');
+      const topSearchBtn = document.getElementById('mobileTopSearchBtn');
+
+      if (!searchForm || !topSearchBtn) return;
+
+      topSearchBtn.addEventListener('click', function () {
+        searchForm.classList.toggle('mobile-active');
+      });
+    });
+    /* =====================================================
+       MOBILE SEARCH → CONNECT TO EXISTING SEARCH SYSTEM
+       ===================================================== */
+    document.addEventListener("DOMContentLoaded", function () {
+      const mobileInput = document.getElementById("mobileSearchInput");
+      const desktopInput = document.querySelector('.floating-search input[name="q"]');
+      const desktopForm = document.querySelector('.floating-search');
+
+      if (!mobileInput || !desktopInput || !desktopForm) return;
+
+      /* 🔁 LIVE SYNC (typing on mobile triggers existing live search) */
+      mobileInput.addEventListener("input", function () {
+        desktopInput.value = this.value;
+
+        // trigger the same input event used by live search
+        desktopInput.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+
+      /* 🔍 ENTER KEY → SUBMIT SEARCH */
+      mobileInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          desktopForm.submit();
+        }
+      });
+    });
+    /* ================= SEARCH INFO BAR LOGIC ================= */
+    document.addEventListener("DOMContentLoaded", function () {
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get("q");
+
+      const bar = document.getElementById("searchInfoBar");
+      const text = document.getElementById("searchKeyword");
+
+      if (!bar || !text) return;
+
+      if (query && query.trim()) {
+        text.textContent = query;
+        bar.style.display = "block";
+      } else {
+        bar.style.display = "none";
+      }
+    });
+
+    /* ================= SAFE WORD HIGHLIGHT (NO SPACING BUG) ================= */
+    function highlightText(container, keyword) {
+      if (!keyword) return;
+
+      const regex = new RegExp(`(${keyword})`, "gi");
+
+      container.querySelectorAll(".product-name").forEach(el => {
+        const original = el.innerHTML;
+
+        // avoid double-highlighting
+        if (original.includes("<mark>")) return;
+
+        el.innerHTML = original.replace(regex, "<mark>$1</mark>");
+      });
+    }
+
+
+    /* ================= MOBILE MENU TOGGLE (ANDROID FIXED) ================= */
+    document.addEventListener("DOMContentLoaded", function () {
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      if (!hamburgerBtn || !mobileMenu) return;
+
+      // Toggle menu
+      hamburgerBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation(); // 🔥 CRITICAL FIX
+
+        const isOpen = mobileMenu.classList.contains("open");
+        mobileMenu.classList.toggle("open", !isOpen);
+      });
+
+      // Close when clicking outside
+      document.addEventListener("click", function (e) {
+        if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+          mobileMenu.classList.remove("open");
+        }
+      });
+
+      // Close when clicking a menu link
+      mobileMenu.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+        });
+      });
+    });
+
+
+
+  </script>
+
+
+  <!-- ================= MOBILE BOTTOM NAV ================= -->
+  <nav class="mobile-bottom-nav">
+    <a href="{% url 'shop:product_list' %}">
+      🏠
+      <span>Home</span>
+    </a>
+
+
+
+    <a href="{% url 'shop:cart_detail' %}">
+      🛒
+      <span>Cart</span>
+    </a>
+
+    <a href="{% url 'shop:my_orders' %}">
+      📦
+      <span>Orders</span>
+    </a>
+
+    <button id="hamburgerBtn" aria-label="Menu">
+      ☰
+      <span>Menu</span>
+    </button>
+  </nav>
+  <!-- ================= MOBILE MENU DRAWER ================= -->
+  <div class="mobile-menu" id="mobileMenu">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'shop:profile' %}">👤 Profile</a>
+    <!-- <a href="{% url 'shop:my_orders' %}">📦 My Orders</a> -->
+    <a href="{% url 'shop:wishlist' %}">❤️ Wishlist </a>
+    <a href="{% url 'shop:logout' %}">🚪 Logout</a>
+    {% else %}
+    <a href="{% url 'shop:login' %}">🔐 Login</a>
+    <a href="{% url 'shop:signup' %}">📝 Signup</a>
+    {% endif %}
+  </div>
+
+  <!-- ================= WISHLIST LOGIN POPOVER ================= -->
+  <div id="wishlistPopover" class="wishlist-popover" aria-hidden="true">
+    <div class="wishlist-popover-content">
+      <p>🔐 Please login to add product to wishlist</p>
+      <a href="{% url 'shop:login' %}" class="wishlist-login-btn">
+        Login
+      </a>
+    </div>
+  </div>
+
+
+</body>
+
+</html>

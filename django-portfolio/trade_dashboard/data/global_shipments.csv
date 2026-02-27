@@ -1,0 +1,4 @@
+Date,Trade_Route,Shipping_Mode,Shipping_Cost,Delay_Days,Geopolitical_Risk_Index,Trade_Volume
+2024-01-01,Suez Canal,Sea,12000,5,72,200
+2024-01-02,Pacific Route,Sea,9000,2,45,180
+2024-01-03,Suez Canal,Air,20000,1,70,90

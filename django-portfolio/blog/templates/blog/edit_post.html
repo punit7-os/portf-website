@@ -1,0 +1,100 @@
+{% extends "blog/base.html" %}
+{% block title %}Edit Post | SourCEO{% endblock %}
+
+{% block content %}
+
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-2xl font-bold text-dark">Edit Post</h1>
+    <p class="text-slate-600 mt-1">Update your post content</p>
+  </div>
+</section>
+
+<section class="py-12">
+  <div class="max-w-3xl mx-auto px-4">
+
+    <div class="bg-white border rounded-xl p-6 shadow-sm">
+
+      {% if form.errors %}
+      <div class="mb-4 p-4 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
+        <strong>Please fix the errors below:</strong>
+        <ul class="list-disc ml-5 mt-2">
+          {% for field in form %}
+          {% for error in field.errors %}
+          <li>{{ field.label }}: {{ error }}</li>
+          {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+
+       <!-- TITLE -->
+<div>
+  <label class="block text-sm font-medium mb-1">Title</label>
+  {{ form.title }}
+</div>
+
+<!-- DESCRIPTION -->
+<div>
+  <label class="block text-sm font-medium mb-1">Content</label>
+  {{ form.description }}
+</div>
+
+
+        <!-- IMAGE -->
+        <div>
+          <label class="block text-sm font-medium mb-1">📷 Image (Max 2 MB)</label>
+
+          {% if post.image %}
+          <img src="{{ post.image.url }}" class="rounded-lg max-h-64 mb-2">
+
+          <button type="submit" name="remove_image" value="1" class="text-sm text-red-600 underline">
+            Remove image
+          </button>
+          {% else %}
+          {{ form.image }}
+          {% endif %}
+        </div>
+
+        <!-- VIDEO -->
+        <div>
+          <label class="block text-sm font-medium mb-1">🎥 Video (Max 10 MB)</label>
+
+          {% if post.video %}
+          <video controls class="rounded-lg max-h-64 mb-2">
+            <source src="{{ post.video.url }}">
+          </video>
+
+          <button type="submit" name="remove_video" value="1" class="text-sm text-red-600 underline">
+            Remove video
+          </button>
+          {% else %}
+          {{ form.video }}
+          {% endif %}
+        </div>
+
+        <div class="flex gap-4">
+          <button type="submit" name="save" value="1"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+            Save Changes
+          </button>
+
+          <a href="{% url 'blog:profile' %}" class="px-6 py-2 border rounded-lg text-slate-600 hover:bg-slate-100">
+            Cancel
+          </a>
+        </div>
+
+
+      </form>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

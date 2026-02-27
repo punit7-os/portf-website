@@ -1,0 +1,175 @@
+{% extends "live_data/base.html" %}
+
+{% block title %}Live Dashboard{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-2 text-center">
+     Real-Time Financial Intelligence
+</h1>
+
+<p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">
+     ⏱ Data may be delayed by up to 1 minute.
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+
+     <!-- Weather -->
+     <div id="weather-container"
+          hx-get="{% url 'live_data_api:weather' %}"
+          hx-trigger="load, refresh"
+          hx-swap="innerHTML">
+
+          <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6 animate-pulse">
+               <div class="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
+               <div class="h-10 bg-gray-300 rounded mb-2"></div>
+               <div class="h-4 bg-gray-300 rounded w-2/3"></div>
+          </div>
+
+     </div>
+
+     <!-- Crypto -->
+     <div id="crypto-container" class="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
+
+          <div id="crypto-content"
+               hx-get="{% url 'live_data_api:crypto' %}"
+               hx-trigger="load, refresh"
+               hx-swap="innerHTML">
+
+               <div class="animate-pulse">
+                    <div class="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
+                    <div class="h-10 bg-gray-300 rounded mb-2"></div>
+                    <div class="h-20 bg-gray-300 rounded"></div>
+               </div>
+
+          </div>
+
+     </div>
+
+ <!-- Stocks -->
+<div class="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
+
+     <div id="stocks-content"
+          hx-get="{% url 'live_data_api:stocks' %}"
+          hx-trigger="load, refresh"
+          hx-swap="innerHTML">
+
+          <div class="animate-pulse">
+               <div class="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
+               <div class="h-10 bg-gray-300 rounded mb-2"></div>
+               <div class="h-20 bg-gray-300 rounded"></div>
+          </div>
+
+     </div>
+
+</div>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+     /* ============================
+        RENDER ENGINE (AT :01)
+     ============================ */
+
+     function refreshAllSections() {
+          console.log("Render refresh at:", new Date().toLocaleTimeString());
+
+          htmx.trigger("#weather-container", "refresh");
+          htmx.trigger("#crypto-content", "refresh");
+          htmx.trigger("#stocks-content", "refresh");
+     }
+
+     /* ============================
+        PREFETCH ENGINE (AT :50)
+     ============================ */
+
+     function prefetchCrypto() {
+          console.log("Prefetch crypto at:", new Date().toLocaleTimeString());
+
+          fetch("{% url 'live_data_api:crypto' %}", {
+               headers: { "HX-Request": "true" }
+          });
+     }
+
+     /* ============================
+        MASTER CLOCK ALIGNMENT
+     ============================ */
+
+     function startAlignedEngine() {
+
+          const now = new Date();
+          const seconds = now.getSeconds();
+          const milliseconds = now.getMilliseconds();
+
+          // 🔹 Prefetch at :50
+          const delayTo50 = ((50 - seconds + 60) % 60) * 1000 - milliseconds;
+
+          setTimeout(() => {
+               prefetchCrypto();
+               setInterval(prefetchCrypto, 60000);
+          }, delayTo50);
+
+          // 🔹 Render at :01
+          const delayTo01 = ((60 - seconds) % 60) * 1000 - milliseconds + 1000;
+
+          setTimeout(() => {
+               refreshAllSections();
+               setInterval(refreshAllSections, 60000);
+          }, delayTo01);
+     }
+
+     document.addEventListener("DOMContentLoaded", function () {
+          startAlignedEngine();
+     });
+
+     /* ============================
+        CHART INITIALIZATION
+     ============================ */
+
+     function initCryptoCharts() {
+
+          document.querySelectorAll(".crypto-chart").forEach(canvas => {
+
+               const existing = Chart.getChart(canvas);
+               if (existing) existing.destroy();
+
+               const prices = JSON.parse(canvas.dataset.prices);
+
+               new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                         labels: prices.map((_, i) => i),
+                         datasets: [{
+                              data: prices,
+                              borderColor: "#3b82f6",
+                              borderWidth: 2,
+                              tension: 0.3,
+                              fill: false,
+                              pointRadius: 0
+                         }]
+                    },
+                    options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: { legend: { display: false } },
+                         scales: { x: { display: false }, y: { display: false } },
+                         elements: { point: { radius: 0 } }
+                    }
+               });
+
+          });
+     }
+
+     document.body.addEventListener("htmx:afterSwap", function (event) {
+          if (event.target.id === "crypto-content") {
+               initCryptoCharts();
+          }
+     });
+
+</script>
+
+{% endblock %}

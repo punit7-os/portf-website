@@ -1,0 +1,133 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Blog | Business, Automation & Tech{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12">
+
+    <div class="max-w-3xl">
+      <h1 class="text-3xl md:text-4xl font-bold text-dark leading-tight">
+        Business Growth & Automation
+        <span class="text-primary">Explained Simply</span>
+      </h1>
+
+      <p class="mt-4 text-slate-600 text-lg">
+        Insights for founders, agencies, and decision-makers —
+        how technology actually helps businesses grow.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= BLOG LIST SECTION ================= -->
+<section class="py-12">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+
+    <h2 class="text-2xl font-semibold text-dark mb-8">
+      Latest Articles
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- ================= ADMIN POSTS (UNCHANGED) ================= -->
+      {% for post in admin_posts %}
+      <article class="bg-white rounded-xl border border-slate-200 hover:shadow-lg transition">
+        <div class="p-6">
+
+          {% if post.category %}
+          <span class="text-xs font-semibold text-primary uppercase">
+            {{ post.category.name }}
+          </span>
+          {% endif %}
+
+          <h3 class="mt-2 text-lg font-semibold text-dark leading-snug">
+            {{ post.title }}
+          </h3>
+
+          <p class="mt-3 text-sm text-slate-600">
+            {{ post.excerpt|truncatewords:25 }}
+          </p>
+
+          <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+            <a href="{% url 'blog:detail' post.slug %}" class="text-primary font-medium">
+              Read more →
+            </a>
+
+
+          </div>
+
+        </div>
+      </article>
+      {% endfor %}
+
+      <!-- ================= USER POSTS (STEP-4 ADDED SAFELY) ================= -->
+      {% for post in user_posts %}
+      <article class="bg-white rounded-xl border border-slate-200 hover:shadow-lg transition overflow-hidden">
+
+        <!-- IMAGE CLICKABLE -->
+        {% if post.image %}
+        <a href="{% url 'blog:user_post_detail' post.id %}">
+          <img src="{{ post.image.url }}" class="h-40 w-full object-cover hover:opacity-90 transition" alt="Post image">
+        </a>
+        {% endif %}
+
+        <div class="p-6 space-y-2">
+
+          <!-- TITLE CLICKABLE -->
+          <h3 class="text-lg font-semibold text-dark">
+            <a href="{% url 'blog:user_post_detail' post.id %}" class="hover:text-primary transition">
+              {{ post.title }}
+            </a>
+          </h3>
+          <span class="text-xs text-slate-500">
+            {{ post.reading_time }} min read
+          </span>
+
+          <p class="text-sm text-slate-600">
+            {{ post.description|truncatewords:20 }}
+          </p>
+
+          <p class="text-xs text-slate-500">
+            by
+            {% if user.is_authenticated %}
+            <a href="{% url 'blog:public_profile' post.user.username %}"
+              class="text-primary hover:underline font-medium">
+              {{ post.user.username }}
+            </a>
+            {% else %}
+            <span class="text-slate-400 font-medium cursor-not-allowed">
+              {{ post.user.username }}
+            </span>
+            {% endif %}
+          </p>
+
+
+
+          <div class="flex items-center justify-between text-sm pt-2">
+            <!-- READ MORE -->
+            <a href="{% url 'blog:user_post_detail' post.id %}" class="text-primary font-medium">
+              Read more →
+            </a>
+
+
+          </div>
+
+        </div>
+      </article>
+
+      {% empty %}
+      <p class="text-slate-500 col-span-full">
+        No community posts yet.
+      </p>
+      {% endfor %}
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

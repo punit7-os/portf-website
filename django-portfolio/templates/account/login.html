@@ -1,0 +1,153 @@
+{% extends "shop/base.html" %}
+{% load i18n static %}
+{% load form_tags %}
+{% load socialaccount %}
+
+
+{% block title %}Login - My Shoppings{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper"
+  style="max-width:430px;margin:40px auto;padding:22px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.06);">
+
+  <!-- WELCOME (AUTO HIDE AFTER 20s) -->
+  <div id="welcomeBlock" style="text-align:center;margin-bottom:12px;">
+    <h2 style="margin:0;font-size:22px;color:#0b2545;">Welcome back</h2>
+    <p style="margin:6px 0 0;color:#6b7280;font-size:14px;">
+      Sign in to continue to My Shoppings
+    </p>
+  </div>
+
+  <!-- SUCCESS / INFO MESSAGES (AUTO HIDE AFTER 12s) -->
+  <div id="messageBlock">
+    {% include "account/messages.html" %}
+  </div>
+
+  <form method="post" action="{% url 'shop:login' %}" style="margin-top:16px;">
+    {% csrf_token %}
+
+    <!-- USERNAME / EMAIL -->
+    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">
+      Username or Email
+    </label>
+    <div style="margin-bottom:16px;">
+      {% if form.login %}
+      {{ form.login|add_class:"input-full" }}
+      {% elif form.username %}
+      {{ form.username|add_class:"input-full" }}
+      {% endif %}
+
+      {% if form.login.errors %}
+      <div style="color:#b00020;margin-top:6px;">
+        {{ form.login.errors|join:", " }}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- PASSWORD WITH SHOW / HIDE -->
+    <label style="display:block;font-weight:600;margin-bottom:6px;color:#333;">
+      Password
+    </label>
+    <div style="
+      display:flex;
+      align-items:center;
+      border:1px solid #e6edf8;
+      border-radius:8px;
+      margin-bottom:18px;
+    ">
+      <input type="password" name="{{ form.password.html_name }}" id="passwordField" class="input-full"
+        style="border:none;flex:1;" required>
+
+      <button type="button" id="togglePassword" style="
+                background:none;
+                border:none;
+                padding:0 12px;
+                color:#007BFF;
+                font-weight:700;
+                font-size:13px;
+                cursor:pointer;
+              ">
+        SHOW
+      </button>
+    </div>
+
+    {% if form.password.errors %}
+    <div style="color:#b00020;margin-top:-10px;margin-bottom:10px;">
+      {{ form.password.errors|join:", " }}
+    </div>
+    {% endif %}
+
+    <!-- LOGIN BUTTON -->
+    <button type="submit" style="
+              width:100%;
+              padding:12px;
+              border-radius:10px;
+              border:none;
+              background:#007BFF;
+              color:white;
+              font-weight:700;
+              cursor:pointer;
+            ">
+      {% trans "Login" %}
+    </button>
+
+    <!-- ✅ SAFE HIDDEN FIELDS RENDER (NO []) -->
+    {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+    {% endfor %}
+
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+</div>
+
+<!-- INPUT STYLE -->
+<style>
+  .input-full {
+    width: 100%;
+    padding: 11px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #e6edf8;
+    outline: none;
+  }
+
+  @media (max-width:480px) {
+    .auth-wrapper {
+      margin: 20px 12px;
+      padding: 18px;
+    }
+  }
+</style>
+
+<!-- PASSWORD TOGGLE + AUTO HIDE -->
+<script>
+  const toggleBtn = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("passwordField");
+
+  toggleBtn.addEventListener("click", () => {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleBtn.textContent = "HIDE";
+    } else {
+      passwordInput.type = "password";
+      toggleBtn.textContent = "SHOW";
+    }
+  });
+
+  // Auto-hide messages after 12 seconds
+  const messageBlock = document.getElementById("messageBlock");
+  if (messageBlock) {
+    setTimeout(() => {
+      messageBlock.style.display = "none";
+    }, 12000);
+  }
+
+  // Auto-hide welcome after 20 seconds
+  const welcomeBlock = document.getElementById("welcomeBlock");
+  if (welcomeBlock) {
+    setTimeout(() => {
+      welcomeBlock.style.display = "none";
+    }, 20000);
+  }
+</script>
+{% endblock %}

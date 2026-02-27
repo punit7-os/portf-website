@@ -1,0 +1,402 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Shop - My Shoppings{% endblock %}
+{% block content %}
+<style>
+  /* ================= GRID & CARD ================= */
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: #f8f9fb;
+    padding: 8px;
+  }
+
+  /* ================= PRODUCT INFO ================= */
+
+  .p {
+    padding: 16px;
+    text-align: center;
+  }
+
+  .p a {
+    text-decoration: none;
+    color: #222;
+  }
+
+  .product-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.3;
+    min-height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .price {
+    color: #007BFF;
+    font-weight: 600;
+    margin: 3px 0 5px;
+    font-size: 1.0em;
+  }
+
+  /* ================= ACTION BUTTONS ================= */
+
+  .cart-btn {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 0px;
+  }
+
+  /* remove base.html form width restriction */
+  .cart-btn form {
+    max-width: none !important;
+  }
+
+  /* COMMON BUTTON SIZE — MATCHING SCREENSHOT */
+  .cart-btn .add,
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    width: 150px;
+    /* ✅ EXACT WIDTH LIKE SCREENSHOT */
+    height: 44px;
+    /* ✅ SAME HEIGHT */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    border-radius: 12px;
+    text-decoration: none !important;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+  }
+
+  /* ================= ADD TO CART ================= */
+
+  .cart-btn .add {
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: #fff;
+    border: none;
+
+    /* allow two-line text like screenshot */
+    white-space: normal;
+    text-align: center;
+    padding: 6px 10px;
+  }
+
+  .cart-btn .add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+  }
+
+  .cart-btn .add.added {
+    background: #28a745 !important;
+  }
+
+  /* ================= BUY NOW ================= */
+
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    background: linear-gradient(135deg, #ff7a18, #ffb347);
+    color: #fff !important;
+    border: none;
+
+    white-space: nowrap;
+    /* stays single-line */
+    padding: 0 16px;
+    box-shadow: 0 4px 14px rgba(255, 140, 0, 0.35);
+  }
+
+  .cart-btn .buy:hover,
+  .cart-btn .buy-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 140, 0, 0.45);
+  }
+
+  .cart-btn .buy:active,
+  .cart-btn .buy-link:active {
+    transform: scale(0.97);
+  }
+
+  /* ================= MOBILE ================= */
+
+  @media (max-width: 480px) {
+    .cart-btn {
+      flex-direction: column;
+    }
+
+    .cart-btn .add,
+    .cart-btn .buy,
+    .cart-btn .buy-link {
+      width: 100%;
+    }
+  }
+
+  /* =====================================================
+   MOBILE GRID FIX – FORCE 2 & 3 COLUMNS
+   ===================================================== */
+
+/* 📱 Small phones → 2 columns */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px;
+  }
+}
+
+/* 📱 Large phones / small tablets → 3 columns */
+@media (min-width: 601px) and (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 18px;
+  }
+}
+/* =====================================================
+   MOBILE CARD HEIGHT REDUCTION
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+  /* ⬇ reduce image height */
+  .card img {
+    height: 140px;
+    padding: 6px;
+  }
+
+  /* ⬇ tighter content padding */
+  .p {
+    padding: 10px;
+  }
+
+  /* ⬇ title spacing */
+  .product-title {
+    font-size: 14px;
+    min-height: 34px;
+  }
+
+  /* ⬇ price spacing */
+  .price {
+    margin: 3px 0 5px;
+    font-size: 1em;
+  }
+
+  /* ⬇ tighter buttons area */
+  .cart-btn {
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+
+  /* ⬇ buttons slightly shorter */
+  .cart-btn .add,
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    height: 40px;
+    font-size: 13px;
+  }
+}
+
+/* =====================================================
+   DESKTOP ONLY — REDUCE BUTTON SIZE (HOME PAGE)
+   ===================================================== */
+
+/* Desktop & large screens */
+@media (min-width: 901px) {
+
+  .cart-btn {
+    gap: 5px; /* slightly tighter */
+  }
+
+  .cart-btn .add,
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    width: 130px;        /* ⬇ reduced from 150px */
+    height: 38px;        /* ⬇ reduced from 44px */
+    font-size: 13px;     /* ⬇ slightly smaller text */
+    border-radius: 10px;
+  }
+
+  /* Add to Cart padding */
+  .cart-btn .add {
+    padding: 4px 8px;
+  }
+
+  /* Buy Now stays single-line */
+  .cart-btn .buy,
+  .cart-btn .buy-link {
+    padding: 0 7px;
+  }
+}
+
+
+</style>
+
+
+
+<div class="grid">
+  {% for p in products %}
+<div class="card" data-href="{% url 'shop:product_detail' p.slug %}">
+  <div style="position:relative;">
+    <img src="{{ p.image_url|default:'https://via.placeholder.com/400x250' }}" alt="{{ p.name }}">
+
+    <!-- ❤️ WISHLIST HEART -->
+    <span
+      class="wishlist-heart {% if p.id in wishlist_ids %}active{% endif %}"
+      data-product="{{ p.id }}"
+      title="Add to wishlist"
+    >♥</span>
+  </div>
+
+  <div class="p">
+    <div class="product-title" title="{{ p.name }}">
+      {{ p.name }}
+    </div>
+
+    <div class="price">₹ {{ p.price }}</div>
+
+    <div class="cart-btn">
+      <form action="{% url 'shop:cart_add' p.id %}" method="post">
+        {% csrf_token %}
+        <button type="button" class="add">🛒 Add to Cart</button>
+      </form>
+
+      <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="buy buy-link">
+        ⚡ Buy Now
+      </a>
+    </div>
+  </div>
+</div>
+
+  {% empty %}
+  <p>No products found.</p>
+  {% endfor %}
+</div>
+
+<script>
+  /* =========================================
+     HOME PAGE – ADD TO CART (SAME AS DETAIL)
+     ========================================= */
+
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
+
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('button.add');
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const form = btn.closest('form');
+    if (!form) return;
+
+    const url = form.action;
+    const originalText = btn.textContent;
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+
+      const resp = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ qty: 1 })
+      });
+
+      /* 🔐 NOT LOGGED IN → REDIRECT */
+      if (resp.status === 401) {
+        const data = await resp.json();
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+          return;
+        }
+      }
+
+      if (!resp.ok) throw new Error('Add failed');
+
+      const data = await resp.json();
+
+      if (data.success) {
+        btn.classList.add('added');
+        btn.textContent = '✅ Added';
+
+        const badge = document.getElementById('cartCountBadge');
+        if (badge && data.cart_count !== undefined) {
+          badge.textContent = data.cart_count;
+        }
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('added');
+          btn.disabled = false;
+        }, 1200);
+      } else {
+        throw new Error('Add failed');
+      }
+
+    } catch (err) {
+      console.error(err);
+      btn.textContent = 'Try again';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 1200);
+    }
+  });
+
+  document.addEventListener("click", function (e) {
+
+  /* ❌ Ignore cart buttons */
+  if (e.target.closest(".cart-btn")) return;
+
+  /* ❌ Ignore wishlist heart */
+  if (e.target.closest(".wishlist-heart")) return;
+
+  const card = e.target.closest(".card");
+  if (!card) return;
+
+  const url = card.getAttribute("data-href");
+  if (url) {
+    window.location.href = url;
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+<div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Global Stocks</h2>
+
+    <button 
+        hx-get="{% url 'live_data_api:stocks' %}"
+        hx-target="#stocks-content"
+        hx-swap="innerHTML"
+        class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+        Refresh
+    </button>
+</div>
+
+<p class="text-xs text-gray-500 mb-4">
+    ⚠ Data from Yahoo Finance (delayed). 
+    Intraday during market hours, 5-day history when closed.
+</p>
+
+{% if stocks.error %}
+    <p class="text-red-500">{{ stocks.error }}</p>
+{% else %}
+
+    {% for stock, data in stocks.items %}
+
+    <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6 stock-card"
+         data-price="{{ data.price }}">
+
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="font-semibold text-lg">
+                    {{ stock }}
+                    <span class="text-xs text-gray-400">
+                        ({{ data.market }})
+                    </span>
+                </p>
+            </div>
+
+            <p class="text-xl font-bold price-value">
+                {{ data.price }}
+            </p>
+        </div>
+
+        {% if data.change < 0 %}
+            <p class="text-red-500 font-medium">
+                {{ data.change }}% ↓
+            </p>
+        {% else %}
+            <p class="text-green-600 font-medium">
+                {{ data.change }}% ↑
+            </p>
+        {% endif %}
+
+        <div class="grid grid-cols-3 gap-4 text-sm mt-4 text-gray-600 dark:text-gray-300">
+            <div>
+                <p class="font-medium">High</p>
+                <p>{{ data.high }}</p>
+            </div>
+            <div>
+                <p class="font-medium">Low</p>
+                <p>{{ data.low }}</p>
+            </div>
+            <div>
+                <p class="font-medium">Volume</p>
+                <p>{{ data.volume }}</p>
+            </div>
+        </div>
+
+        <div class="mt-4 relative h-16">
+            <canvas class="absolute inset-0 w-full h-full stock-chart"
+                    data-prices='{{ data.sparkline|safe }}'>
+            </canvas>
+        </div>
+
+    </div>
+
+    {% endfor %}
+{% endif %}
+
+<script>
+document.querySelectorAll(".stock-chart").forEach(canvas => {
+
+    const existing = Chart.getChart(canvas);
+    if (existing) existing.destroy();
+
+    const prices = JSON.parse(canvas.dataset.prices);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: prices.map((_, i) => i),
+            datasets: [{
+                data: prices,
+                borderColor: "#3b82f6",
+                borderWidth: 2,
+                tension: 0.3,
+                fill: false,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } },
+            elements: { point: { radius: 0 } }
+        }
+    });
+});
+</script>

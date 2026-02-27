@@ -1,0 +1,24 @@
+Category,Name,Slug,Description,Price,Image_URLs,Active
+electronics-a,Wireless Bluetooth Earphones,wireless-bluetooth-earphones,Neckband wireless earphones with deep bass,1299,https://picsum.photos/seed/earphones1/600/600,Yes
+electronics-b,Android Smartphone Budget,android-smartphone-budget,Affordable Android smartphone,6999,https://picsum.photos/seed/phone1/600/600,Yes
+electronics-c,Laptop 15 Inch,laptop-15-inch,15.6 inch laptop for office use,42990,https://picsum.photos/seed/laptop1/600/600,Yes
+electronics-d,Smart Fitness Watch,smart-fitness-watch,Smartwatch with health tracking,1999,https://picsum.photos/seed/watch1/600/600,Yes
+electronics-e,LED Smart TV 32 Inch,led-smart-tv-32-inch,HD ready smart TV,13499,https://picsum.photos/seed/tv1/600/600,Yes
+
+home-kitchen-a,Mixer Grinder 750W,mixer-grinder-750w,High power mixer grinder,3299,https://picsum.photos/seed/mixer1/600/600,Yes
+home-kitchen-b,Electric Kettle 1.5L,electric-kettle-1-5l,Steel electric kettle,699,https://picsum.photos/seed/kettle1/600/600,Yes
+home-kitchen-c,Steel Water Bottle 1L,steel-water-bottle-1l,Insulated water bottle,899,https://picsum.photos/seed/bottle1/600/600,Yes
+home-kitchen-d,Air Fryer,air-fryer,Healthy oil-free air fryer,7999,https://picsum.photos/seed/airfryer1/600/600,Yes
+home-kitchen-e,Room Heater,room-heater,Compact room heater,2199,https://picsum.photos/seed/heater1/600/600,Yes
+
+fashion-a,Men Slim Fit Jeans,men-slim-fit-jeans,Stylish slim fit jeans,2299,https://picsum.photos/seed/jeans1/600/600,Yes
+fashion-b,Men Casual Shirt,men-casual-shirt,Cotton casual shirt,1799,https://picsum.photos/seed/shirt1/600/600,Yes
+fashion-c,Running Shoes,running-shoes,Lightweight sports shoes,3499,https://picsum.photos/seed/shoes1/600/600,Yes
+fashion-d,Women Ethnic Kurta,women-ethnic-kurta,Traditional kurta,2599,https://picsum.photos/seed/kurta1/600/600,Yes
+fashion-e,Analog Wrist Watch,analog-wrist-watch,Classic wrist watch,1499,https://picsum.photos/seed/watch2/600/600,Yes
+
+books-a,Atomic Habits Book,atomic-habits-book,Self improvement book,499,https://picsum.photos/seed/book1/600/600,Yes
+books-b,Rich Dad Poor Dad Book,rich-dad-poor-dad-book,Finance book,399,https://picsum.photos/seed/book2/600/600,Yes
+books-c,The Psychology of Money Book,psychology-of-money-book,Money mindset book,349,https://picsum.photos/seed/book3/600/600,Yes
+books-d,Think and Grow Rich Book,think-and-grow-rich-book,Success principles book,299,https://picsum.photos/seed/book4/600/600,Yes
+books-e,Ikigai Book,ikigai-book,Life purpose book,389,https://picsum.photos/seed/book5/600/600,Yes

@@ -1,0 +1,60 @@
+<div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Crypto (Binance Spot Live)</h2>
+
+    <button 
+        hx-get="{% url 'live_data_api:crypto' %}"
+        hx-target="#crypto-content"
+        hx-swap="innerHTML"
+        class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+        Refresh
+    </button>
+</div>
+
+{% if crypto.error %}
+<p class="text-red-500">{{ crypto.error }}</p>
+{% else %}
+
+{% for coin, data in crypto.items %}
+
+<div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6">
+
+    <div class="flex justify-between items-center">
+        <p class="font-semibold text-lg capitalize">
+            {{ coin }}
+        </p>
+
+        <p class="text-xl font-bold">
+            $ {{ data.price }}
+        </p>
+    </div>
+
+    <p class="{% if data.change_24h < 0 %}text-red-500{% else %}text-green-600{% endif %}">
+        {{ data.change_24h|floatformat:2 }}%
+    </p>
+
+    <div class="grid grid-cols-3 gap-4 text-sm mt-4 text-gray-600 dark:text-gray-300">
+        <div>
+            <p class="font-medium">24h High</p>
+            <p>$ {{ data.high_24h }}</p>
+        </div>
+        <div>
+            <p class="font-medium">24h Low</p>
+            <p>$ {{ data.low_24h }}</p>
+        </div>
+        <div>
+            <p class="font-medium">Volume</p>
+            <p>{{ data.volume|floatformat:0 }}</p>
+        </div>
+    </div>
+
+    <div class="mt-4 relative h-16">
+        <canvas class="absolute inset-0 w-full h-full crypto-chart"
+                data-prices='{{ data.sparkline|safe }}'>
+        </canvas>
+    </div>
+
+</div>
+
+{% endfor %}
+
+{% endif %}

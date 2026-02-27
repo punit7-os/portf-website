@@ -1,0 +1,146 @@
+{% extends "blog/base.html" %}
+{% block title %}My Profile | SourCEO{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 py-14">
+    <h1 class="text-3xl font-bold text-dark">My Profile</h1>
+    <p class="mt-2 font-bold text-dark text-slate-600">Your activity on Sour<span class="text-primary">CEO</span> </p>
+  </div>
+</section>
+
+<section class="py-12">
+  <div class="max-w-5xl mx-auto px-4 space-y-12">
+
+    <!-- USER INFO -->
+    <div class="bg-white border rounded-xl p-6">
+      <h3 class="text-lg font-semibold mb-4">Account Information</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm text-slate-500">Username</label>
+          <p class="mt-1 font-semibold text-dark">{{ request.user.username }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm text-slate-500">Email</label>
+          <p class="mt-1 text-dark">{{ request.user.email|default:"Not provided" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <!-- STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+      <div class="bg-white p-4 md:p-6 rounded-lg border">
+        <p class="text-2xl font-bold">{{ user_posts.count }}</p>
+        <p class="text-sm text-slate-500">Posts</p>
+      </div>
+
+      <div class="bg-white p-4 md:p-6 rounded-lg border">
+        <p class="text-2xl font-bold">{{ total_views }}</p>
+        <p class="text-sm text-slate-500">Views</p>
+      </div>
+
+      <div class="bg-white p-4 md:p-6 rounded-lg border">
+        <p class="text-2xl font-bold">{{ total_comments }}</p>
+        <p class="text-sm text-slate-500">Comments</p>
+      </div>
+
+      <div class="bg-white p-4 md:p-6 rounded-lg border">
+        <p class="text-2xl font-bold">{{ total_likes }}</p>
+        <p class="text-sm text-slate-500">Likes</p>
+      </div>
+    </div>
+
+    <!-- CREATE POST -->
+    <div class="bg-white border rounded-xl p-6">
+      <h3 class="text-lg font-semibold mb-4">Create Post</h3>
+
+      <form method="post" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+        {{ post_form.non_field_errors }}
+
+        <div>
+          <label class="block text-sm font-medium">Title</label>
+          {{ post_form.title }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Category</label>
+          {{ post_form.category }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Description</label>
+          {{ post_form.description }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">📷 Image</label>
+          {{ post_form.image }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">🎥 Video</label>
+          {{ post_form.video }}
+        </div>
+
+        <button class="px-6 py-2 bg-primary text-white rounded-lg">
+          Publish
+        </button>
+      </form>
+    </div>
+
+    <!-- USER POSTS -->
+    <div class="space-y-6">
+      <h3 class="text-xl font-semibold">Your Posts</h3>
+
+      {% for post in user_posts %}
+      <div class="bg-white border rounded-lg p-5 space-y-3">
+
+        <h3 class="text-lg font-semibold">{{ post.title }}</h3>
+
+        <p class="text-sm text-slate-500">
+          {{ post.category.name }} • {{ post.created_at|date:"M d, Y" }}
+        </p>
+
+        <p>{{ post.description }}</p>
+
+        <!-- POST STATS -->
+        <div class="flex gap-4 text-sm text-slate-500">
+          <span>👁️ {{ post.views }}</span>
+          <span>💬 {{ post.total_comments }}</span>
+          <span>👍 {{ post.total_likes }}</span>
+        </div>
+
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="rounded-lg max-h-96 mx-auto">
+        {% endif %}
+
+        {% if post.video %}
+        <video controls class="rounded-lg max-h-96 mx-auto">
+          <source src="{{ post.video.url }}">
+        </video>
+        {% endif %}
+
+        <div class="flex gap-4 text-sm">
+          <a href="{% url 'blog:edit_user_post' post.id %}" class="text-primary hover:underline">Edit</a>
+          <form method="post" action="{% url 'blog:delete_user_post' post.id %}">
+            {% csrf_token %}
+            <button class="text-red-600 hover:underline">Delete</button>
+          </form>
+        </div>
+
+      </div>
+      {% empty %}
+      <p class="text-slate-500">No posts yet.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

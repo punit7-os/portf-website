@@ -1,0 +1,616 @@
+{% extends "shop/base.html" %}
+{% block title %}Checkout - My Shoppings{% endblock %}
+
+{% block content %}
+<style>
+  /* ================= CHECKOUT SUGGESTIONS ================= */
+
+.checkout-suggest-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.checkout-suggest-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  background: #f8f9fb;
+}
+
+.cs-body {
+  padding: 8px;
+  text-align: center;
+}
+
+.cs-title {
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 30px;
+  line-height: 1.25;
+}
+
+.cs-price {
+  color: #007bff;
+  font-weight: 700;
+  margin: 3px 0 6px;
+  font-size: 13px;
+}
+
+.cs-actions {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.cs-actions form {
+  margin: 0;
+}
+
+.cs-add,
+.cs-buy {
+  height: 32px;
+  min-width: 85px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cs-add {
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: #fff;
+  border: none;
+}
+
+.cs-buy {
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ================= CHECKOUT "YOU MAY ALSO LIKE" HOVER EFFECT ================= */
+
+.checkout-suggest-card {
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .checkout-suggest-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(18, 38, 63, 0.14);
+  }
+
+  .checkout-suggest-card:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.checkout-suggest-card img {
+  transition: transform 0.28s ease;
+}
+
+.checkout-suggest-card {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* =========================================================
+   ✅ CHECKOUT – "YOU MAY ALSO LIKE" GRID (RESPONSIVE)
+   ========================================================= */
+
+.checkout-suggest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* 📱 MOBILE → EXACTLY 2 COLUMNS */
+@media (max-width: 768px) {
+  .checkout-suggest-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  /* Stack buttons vertically on mobile */
+  .checkout-suggest-card .cs-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .checkout-suggest-card .cs-add,
+  .checkout-suggest-card .cs-buy {
+    width: 100%;
+    min-width: 100%;
+    height: 34px;
+    font-size: 11px;
+  }
+}
+
+/* 📱 VERY SMALL PHONES */
+@media (max-width: 420px) {
+  .checkout-suggest-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* ================= MAIN CHECKOUT CONTAINER ================= */
+.checkout-container {
+  max-width: 840px;
+  margin: 10px auto;
+  padding: 16px;
+}
+
+.checkout-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.checkout-box h1 {
+  font-size: 24px;
+  margin: 0 0 14px 0;
+  font-weight: 700;
+}
+
+.checkout-box h2 {
+  font-size: 18px;
+  margin: 14px 0 10px 0;
+  font-weight: 600;
+}
+
+.checkout-box h3 {
+  font-size: 16px;
+  margin: 12px 0;
+}
+
+/* Cart Items */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.cart-item-details {
+  font-size: 13px;
+  color: #666;
+}
+
+.cart-item-total {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Total */
+.total-section {
+  text-align: right;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Form Styling */
+.checkout-form {
+  max-width: 560px;
+  margin-top: 14px;
+}
+
+.checkout-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.email-display {
+  padding: 9px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 7px;
+  background: #fbfcff;
+  font-size: 14px;
+}
+
+.email-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.pay-button {
+  margin-top: 12px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pay-button:hover {
+  background: #0056b3;
+}
+
+.redirect-note {
+  margin-top: 10px;
+  color: #666;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Error Message */
+.error-message {
+  background: #fdecea;
+  color: #b00020;
+  padding: 9px 12px;
+  border-radius: 7px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+/* Empty Cart */
+.empty-cart {
+  font-size: 14px;
+}
+
+/* Suggestions Section */
+.suggestions-section {
+  margin-top: 18px;
+}
+
+.suggestions-section h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* HR Separator */
+hr {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 14px 0;
+}
+                                        
+</style>
+
+<!-- ===================== TEST MODE TOAST ===================== -->
+<div id="test-toast" style="
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  max-width: 340px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 14px 16px;
+  z-index: 9999;
+  display: none;
+  font-size: 13px;
+">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <strong style="font-size: 14px;">🧪 Test Payment Instructions</strong>
+    <button onclick="closeToast()" style="background:none;border:none;font-size:18px;cursor:pointer;">×</button>
+  </div>
+
+  <ul style="margin:10px 0 8px 16px;padding:0;font-size:12px;line-height:1.5;">
+    <li>
+      <strong>Card Number:</strong>
+      <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
+        <code id="cardNumber" style="background:#f1f5f9;padding:3px 5px;border-radius:5px;font-size:11px;">
+          4386 2894 0766 0153
+        </code>
+        <button onclick="copyCard()" style="
+          border:none;
+          background:#007bff;
+          color:#fff;
+          font-size:11px;
+          padding:3px 7px;
+          border-radius:5px;
+          cursor:pointer;
+        ">Copy</button>
+      </div>
+    </li>
+    <li><strong>Expiry:</strong> Any future MM/YY</li>
+    <li><strong>CVV:</strong> Any 3 digits</li>
+    <li><strong>OTP:</strong> Any 4–6 digits</li>
+  </ul>
+
+  <div style="font-size:11px;color:#666;">
+    ⚠️ Razorpay test mode — no real money deducted.
+  </div>
+</div>
+
+<script>
+  function copyCard() {
+    const text = "4386 2894 0766 0153";
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Card number copied ✔");
+      }).catch(() => {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    tempInput.style.position = "fixed";
+    tempInput.style.opacity = "0";
+    document.body.appendChild(tempInput);
+    tempInput.focus();
+    tempInput.select();
+
+    try {
+      document.execCommand("copy");
+      alert("Card number copied ✔");
+    } catch (err) {
+      alert("Tap and hold to copy the card number");
+    }
+
+    document.body.removeChild(tempInput);
+  }
+
+  function closeToast() {
+    document.getElementById("test-toast").style.display = "none";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      const toast = document.getElementById("test-toast");
+      if (toast) toast.style.display = "block";
+
+      const cardEl = document.getElementById("cardNumber");
+      if (cardEl) {
+        cardEl.style.cursor = "pointer";
+        cardEl.addEventListener("click", copyCard);
+      }
+    }, 600);
+  });
+
+  /* ================= CHECKOUT SUGGESTIONS – ADD TO CART ================= */
+
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('.cs-add');
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const form = btn.closest('form');
+    if (!form) return;
+
+    const url = form.action;
+    const original = btn.textContent;
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+
+      const resp = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ qty: 1 })
+      });
+
+      if (resp.status === 401) {
+        const data = await resp.json();
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+          return;
+        }
+      }
+
+      if (!resp.ok) throw new Error();
+
+      const data = await resp.json();
+      if (data.success) {
+        btn.textContent = '✅ Added';
+        const badge = document.getElementById('cartCountBadge');
+        if (badge && data.cart_count !== undefined) {
+          badge.textContent = data.cart_count;
+        }
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.disabled = false;
+        }, 1200);
+      }
+    } catch {
+      btn.textContent = 'Try';
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 1200);
+    }
+  });
+
+  /* Card click → product page */
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.cs-actions')) return;
+    const card = e.target.closest('.checkout-suggest-card');
+    if (!card) return;
+    const url = card.dataset.href;
+    if (url) window.location.href = url;
+  });
+</script>
+
+<!-- =================== END TEST MODE TOAST =================== -->
+
+<div class="checkout-container">
+  <div class="checkout-box">
+    <h1>Checkout</h1>
+
+    {% if error %}
+    <div class="error-message">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    {% if cart|length %}
+    <h2>Your Cart</h2>
+
+    {% for item in cart %}
+    <div class="cart-item">
+      <div>
+        <div class="cart-item-name">{{ item.product.name }}</div>
+        <div class="cart-item-details">₹ {{ item.price }} × {{ item.quantity }}</div>
+      </div>
+      <div class="cart-item-total">₹ {{ item.total_price }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="total-section">
+      Total: ₹ {{ total }}
+    </div>
+
+    <hr>
+
+    <form id="checkout-form" method="post" class="checkout-form">
+      {% csrf_token %}
+
+      {% if request.user.is_authenticated and request.user.email %}
+      <label>Email for receipt</label>
+      <div class="email-display">
+        {{ request.user.email }}
+      </div>
+      <input type="hidden" id="email-field" value="{{ request.user.email }}">
+      {% else %}
+      <label>Email for receipt</label>
+      <input id="email-field" type="email" required placeholder="you@example.com" class="email-input">
+      {% endif %}
+
+      <button id="pay-button" type="button" class="pay-button">
+        Pay Now
+      </button>
+    </form>
+    {% else %}
+    <p class="empty-cart">Your cart is empty. <a href="{% url 'shop:product_list' %}">Start shopping</a></p>
+    {% endif %}
+
+    <p class="redirect-note">
+      <em>You will be redirected to Razorpay secure popup.</em>
+    </p>
+  </div>
+
+  {% if suggestions %}
+  <div class="suggestions-section">
+    <h2>You may also like</h2>
+    
+    <div class="checkout-suggest-grid">
+      {% for p in suggestions %}
+      <div class="checkout-suggest-card" data-href="{% url 'shop:product_detail' p.slug %}">
+        <img src="{{ p.image_url|default:'https://via.placeholder.com/150x120' }}" alt="{{ p.name }}">
+
+        <div class="cs-body">
+          <div class="cs-title">{{ p.name }}</div>
+          <div class="cs-price">₹ {{ p.price }}</div>
+
+          <div class="cs-actions">
+            <!-- ADD TO CART -->
+            <form action="{% url 'shop:cart_add' p.id %}" method="post">
+              {% csrf_token %}
+              <button type="button" class="cs-add">🛒 Add to Cart</button>
+            </form>
+
+            <!-- BUY NOW -->
+            <a href="{% url 'shop:checkout' %}?buy={{ p.id }}&qty=1" class="cs-buy">⚡ Buy Now</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+  document.getElementById("pay-button").addEventListener("click", async () => {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const email = document.getElementById("email-field").value.trim();
+
+    if (!email) {
+      alert("Please provide an email.");
+      return;
+    }
+
+    const resp = await fetch("{% url 'shop:payment_initiate' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({ email }).toString()
+    });
+
+    if (!resp.ok) {
+      alert("Payment initiation failed");
+      return;
+    }
+
+    const data = await resp.json();
+
+    const options = {
+      key: data.razorpay_key_id,
+      amount: data.amount,
+      currency: "INR",
+      name: "My Shoppings",
+      description: "Order #" + data.order_id,
+      order_id: data.razorpay_order_id,
+      prefill: { email },
+      handler: async function (response) {
+        const verify = await fetch("{% url 'shop:payment_handler' %}", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            order_id: data.order_id
+          }).toString()
+        });
+
+        if (verify.ok) {
+          window.location.href = "{% url 'shop:checkout_success' %}";
+        } else {
+          alert("Payment verification failed");
+        }
+      },
+      theme: { color: "#007bff" }
+    };
+
+    new Razorpay(options).open();
+  });
+</script>
+
+{% endblock %}

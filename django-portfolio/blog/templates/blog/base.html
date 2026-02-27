@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Blog | Punit Patel{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon.png' %}">
+  <meta name="theme-color" content="#007BFF">
+  <!-- Tailwind CDN (good for portfolio + learning) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',   // blue-600
+            dark: '#0f172a',      // slate-900
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo / Brand -->
+        <a href="{% url 'blog:home' %}" class="text-xl font-bold text-dark">
+          Sour<span class="text-primary">CEO</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-6 font-medium">
+          <a href="{% url 'blog:home' %}" class="hover:text-primary">Blog</a>
+          <a href="{% url 'blog:case_studies' %}" class="hover:text-primary">Case Studies</a>
+          <a href="{% url 'blog:about' %}" class="hover:text-primary">About</a>
+          <a href="{% url 'blog:contact' %}" class="hover:text-primary">Contact</a>
+
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'blog:profile' %}">Profile</a>
+          <form method="post" action="{% url 'blog:logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-red-600 hover:underline">
+              Logout
+            </button>
+          </form>
+
+          {% else %}
+          <a href="{% url 'blog:login' %}">Login</a>
+          {% endif %}
+
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button id="menuBtn" class="md:hidden text-2xl focus:outline-none">
+          ☰
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-slate-200">
+      <div class="px-4 py-4 space-y-3 font-medium">
+        <a href="{% url 'blog:home' %}" class="block">Blog</a>
+        <a href="{% url 'blog:case_studies' %}" class="block">Case Studies</a>
+        <a href="{% url 'blog:about' %}" class="block">About</a>
+        <a href="{% url 'blog:contact' %}" class="block">Contact</a>
+
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'blog:profile' %}" class="block text-primary">Profile</a>
+        <form method="post" action="{% url 'blog:logout' %}" class="block">
+          {% csrf_token %}
+          <button type="submit" class="text-red-600 hover:underline">
+            Logout
+          </button>
+        </form>
+        {% else %}
+        <a href="{% url 'blog:login' %}" class="block text-primary">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-dark text-slate-300 mt-16">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- About -->
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-3">About</h3>
+          <p class="text-sm leading-relaxed">
+            Insights on business growth, automation, and technology —
+            written for founders, agencies, and decision makers.
+          </p>
+        </div>
+
+        <!-- Links -->
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-3">Quick Links</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="{% url 'blog:home' %}" class="hover:text-white">Blog</a></li>
+            <li><a href="{% url 'blog:case_studies' %}" class="hover:text-white">Case Studies</a></li>
+            <li><a href="{% url 'blog:about' %}" class="hover:text-white">About</a></li>
+            <li><a href="{% url 'blog:contact' %}" class="hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Branding -->
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-3">Developer</h3>
+          <p class="text-sm">
+            Built by
+            <a href="https://punitpatel.dev" target="_blank" rel="noopener noreferrer"
+              class="font-semibold text-white hover:underline">
+              Punit Patel
+            </a><br>
+
+            Django • Tailwind • Business-focused solutions
+          </p>
+        </div>
+
+      </div>
+
+     <div class="text-center text-xs text-slate-400 mt-10">
+  © {% now "Y" %} Punit Patel. All rights reserved.
+</div>
+
+    </div>
+  </footer>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    // Toggle menu
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+
+    // Close when clicking any link inside menu
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
+
+    // Close on resize to desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+
+
+    // Show Gmail web link only on desktop
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const gmailLink = document.getElementById('gmailWebLink');
+
+    if (!isMobile && gmailLink) {
+      gmailLink.classList.remove('hidden');
+    }
+
+    // Function to open Gmail compose with pre-filled details
+
+    function openGmailCompose() {
+      const name = document.querySelector('input[name="Name"]')?.value || '';
+      const email = document.querySelector('input[name="Email"]')?.value || '';
+      const message = document.querySelector('textarea[name="Message"]')?.value || '';
+
+      if (!name || !email || !message) {
+        alert("Please fill in all fields before sending.");
+        return;
+      }
+
+      const subject = encodeURIComponent("Inquiry from SourCEO Blog");
+      const body = encodeURIComponent(
+        `Hey Punit,\n\n` +
+        `My name is ${name}\n` +
+        `Email: ${email}\n\n` +
+        `${message}\n\n`
+      );
+
+      const gmailUrl =
+        `https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=${subject}&body=${body}`;
+
+      window.open(gmailUrl, "_blank");
+    }
+
+
+
+  </script>
+
+
+</body>
+
+</html>

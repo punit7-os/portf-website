@@ -1,0 +1,587 @@
+{% extends "shop/base.html" %}
+{% load socialaccount static i18n %}
+
+{% block title %}Signup - My Shoppings{% endblock %}
+
+{% block content %}
+<div class="signup-card">
+  <h2>Create an account</h2>
+
+  <!-- INLINE OTP ERROR -->
+  <div id="otpError" class="error-box" style="display:none;"></div>
+
+  {% if form.non_field_errors %}
+  <div class="error-box">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <!-- GOOGLE -->
+  <a href="{% provider_login_url 'google' process='signup' %}" class="google-btn">
+    <img src="{% static 'images/google-logo.png' %}" alt="Google">
+    Sign up with Google
+  </a>
+
+  <div class="or-text">Or</div>
+
+  <form method="post" id="signupForm" novalidate>
+    {% csrf_token %}
+
+    {% if show_otp or request.GET.otp %}
+
+    <!-- READ-ONLY DETAILS -->
+    <div class="readonly-block">
+      <div><strong>Username:</strong> {{ otp_data.username }}</div>
+      <div><strong>Email:</strong> {{ otp_data.email }}</div>
+      <div><strong>Mobile:</strong> {{ otp_data.phone }}</div>
+
+    </div>
+
+    <!-- OTP -->
+    <div class="otp-box">
+      <p>
+        An OTP has been sent to
+        <strong>{{ otp_data.email }}</strong>
+      </p>
+
+      <div id="otpToast" class="toast">OTP resent successfully</div>
+
+      <label>OTP</label>
+      <input type="text" id="otpInput" name="otp" maxlength="6" class="otp-input" inputmode="numeric"
+        autocomplete="one-time-code" autofocus>
+
+      <input type="hidden" name="otp_verify" value="1">
+      <input type="hidden" name="resend_otp" id="resendFlag" value="0">
+
+      <button type="submit" class="primary-btn">
+        Verify OTP & Signup
+      </button>
+
+      <button type="button" id="resendBtn" class="resend-btn" disabled>
+        Resend OTP (02:00)
+      </button>
+    </div>
+
+    {% else %}
+    <!-- NORMAL SIGNUP -->
+    <label>Username</label>
+    {{ form.username }}
+
+    <label>Email</label>
+    {{ form.email }}
+
+    <label>Mobile / Phone</label>
+    {{ form.phone }}
+
+    <!-- PASSWORD -->
+    <label>Password</label>
+    <div class="password-wrap">
+      {{ form.password1 }}
+      <button type="button" class="toggle-pass">SHOW</button>
+    </div>
+
+    <!-- PASSWORD HINTS -->
+    <ul class="pass-hints">
+      <li id="len">✖ At least 8 characters</li>
+      <li id="case">✖ Upper & lowercase letters</li>
+      <li id="num">✖ At least one number</li>
+      <li id="spec">✖ At least one special character</li>
+    </ul>
+
+    <label>Confirm Password</label>
+    <div class="password-wrap">
+      {{ form.password2 }}
+      <button type="button" class="toggle-pass">SHOW</button>
+    </div>
+
+    <button type="submit" class="primary-btn">
+      Signup (Send OTP)
+    </button>
+    {% endif %}
+  </form>
+
+  <p class="login-link">
+    Already have an account? <a href="{% url 'shop:login' %}">Login</a>
+  </p>
+</div>
+
+<!-- TOAST -->
+<div id="otpToast" class="toast">OTP resent successfully</div>
+
+<style>
+  .signup-card {
+    max-width: 448px;
+    margin: 38.4px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 9.6px;
+    box-shadow: 0 8px 24px rgba(3, 35, 70, 0.06);
+  }
+
+  .signup-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+
+  .signup-card label {
+    display: block;
+    margin-bottom: 4.8px;
+    margin-top: 9.6px;
+    font-weight: 600;
+    font-size: 12.8px;
+  }
+
+  .signup-card input {
+    width: 100%;
+    height: 35.2px;
+    padding: 0 9.6px;
+    border: 1px solid #e6edf8;
+    border-radius: 6.4px;
+    font-size: 12px;
+  }
+
+  .signup-card input:focus {
+    outline: 2px solid #0b63d6;
+    border-color: transparent;
+  }
+
+  .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9.6px;
+    border-radius: 8px;
+    border: 1px solid #e6edf8;
+    font-weight: 700;
+    text-decoration: none;
+    color: #333;
+    font-size: 13.6px;
+    transition: all 0.2s;
+  }
+
+  .google-btn:hover {
+    background: #f8fbff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .google-btn img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
+  .or-text {
+    text-align: center;
+    color: #6b7280;
+    margin: 12.8px 0;
+    font-size: 12.8px;
+  }
+
+  .password-wrap {
+    display: flex;
+    align-items: center;
+    height: 35.2px;
+    border: 1px solid #e6edf8;
+    border-radius: 6.4px;
+  }
+
+  .password-wrap input {
+    border: none;
+    flex: 1;
+    height: 100%;
+  }
+
+  .password-wrap input:focus {
+    outline: none;
+  }
+
+  .password-wrap:focus-within {
+    outline: 2px solid #0b63d6;
+    border-color: transparent;
+  }
+
+  .toggle-pass {
+    border: none;
+    background: none;
+    padding: 0 9.6px;
+    font-weight: 700;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 10.4px;
+  }
+
+  .pass-hints {
+    font-size: 10.4px;
+    color: #6b7280;
+    margin: 6.4px 0;
+    padding-left: 14.4px;
+  }
+
+  .pass-hints li {
+    margin: 3.2px 0;
+  }
+
+  .pass-hints li.ok {
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  .readonly-block {
+    background: #f8fbff;
+    border: 1px solid #e6edf8;
+    border-radius: 6.4px;
+    padding: 11.2px;
+    font-size: 12.8px;
+    line-height: 1.6;
+  }
+
+  .readonly-block div {
+    margin: 3.2px 0;
+  }
+
+  .otp-box {
+    margin-top: 12.8px;
+    padding: 12.8px;
+    background: #f8fbff;
+    border: 1px solid #e6edf8;
+    border-radius: 8px;
+  }
+
+  .otp-box p {
+    font-size: 12.8px;
+    margin-bottom: 9.6px;
+  }
+
+  .otp-input {
+    height: 32px;
+    font-size: 12.8px;
+    letter-spacing: 2.4px;
+    text-align: center;
+  }
+
+  .primary-btn {
+    width: 100%;
+    height: 36.8px;
+    margin-top: 9.6px;
+    border: none;
+    border-radius: 8px;
+    background: #0b63d6;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13.6px;
+    transition: all 0.2s;
+  }
+
+  .primary-btn:hover {
+    box-shadow: 0 6.4px 16px rgba(11, 99, 214, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .primary-btn:active {
+    transform: translateY(0);
+  }
+
+  .resend-btn {
+    width: 100%;
+    height: 35.2px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+    background: #cbd5e1;
+    color: #475569;
+    font-weight: 700;
+    font-size: 12.8px;
+    cursor: not-allowed;
+  }
+
+  .resend-btn.active {
+    background: #e5efff;
+    color: #2563eb;
+    cursor: pointer;
+  }
+
+  .resend-btn.active:hover {
+    background: #dbeafe;
+  }
+
+  .error-box {
+    background: #fff1f0;
+    color: #9b1c18;
+    padding: 8px;
+    border-radius: 6.4px;
+    margin-bottom: 9.6px;
+    font-size: 12.8px;
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12.8px;
+  }
+
+  .login-link a {
+    color: #0b63d6;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+
+  .toast {
+    position: fixed;
+    top: 72px;
+    right: -256px;
+    z-index: 9999;
+    background: #16a34a;
+    color: white;
+    padding: 11.2px 14.4px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.4s;
+    font-size: 12.8px;
+    box-shadow: 0 6.4px 19.2px rgba(0, 0, 0, 0.2);
+  }
+
+  .toast.show {
+    right: 16px;
+  }
+
+  /* ================= RESPONSIVE - MOBILE ================= */
+  @media (max-width: 768px) {
+    .signup-card {
+      max-width: 100%;
+      margin: 16px;
+      padding: 19.2px;
+    }
+
+    .signup-card h2 {
+      font-size: 1.4rem;
+    }
+
+    .signup-card input {
+      height: 32px;
+      font-size: 11.2px;
+    }
+
+    .password-wrap {
+      height: 32px;
+    }
+
+    .google-btn {
+      font-size: 12.8px;
+      padding: 8px;
+    }
+
+    .primary-btn {
+      height: 33.6px;
+      font-size: 12.8px;
+    }
+
+    .resend-btn {
+      height: 32px;
+      font-size: 11.2px;
+    }
+
+    .toast {
+      top: 56px;
+      right: -240px;
+      font-size: 11.2px;
+      padding: 9.6px 12.8px;
+    }
+
+    .toast.show {
+      right: 12.8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .signup-card {
+      margin: 12.8px;
+      padding: 16px;
+    }
+
+    .signup-card h2 {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const signupForm = document.getElementById("signupForm");
+    const otpInput = document.getElementById("otpInput");
+    const otpError = document.getElementById("otpError");
+    const resendBtn = document.getElementById("resendBtn");
+    const resendFlag = document.getElementById("resendFlag");
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+    if (!signupForm || !csrfToken) return;
+
+    /* =========================
+       PASSWORD TOGGLE (ALWAYS WORKS)
+    ========================= */
+    document.querySelectorAll(".toggle-pass").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        if (!input) return;
+
+        input.type = input.type === "password" ? "text" : "password";
+        this.textContent = input.type === "password" ? "SHOW" : "HIDE";
+      });
+    });
+
+    /* =========================
+     PASSWORD STRENGTH HINTS
+  ========================= */
+    const passwordInput = document.querySelector('input[name="password1"]');
+
+    function updateHint(id, condition) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle("ok", condition);
+      el.textContent = (condition ? "✔ " : "✖ ") + el.textContent.slice(2);
+    }
+
+    if (passwordInput) {
+      passwordInput.addEventListener("input", function () {
+        const v = this.value;
+
+        updateHint("len", v.length >= 8);
+        updateHint("case", /[a-z]/.test(v) && /[A-Z]/.test(v));
+        updateHint("num", /\d/.test(v));
+        updateHint("spec", /[^A-Za-z0-9]/.test(v));
+      });
+    }
+
+    /* =====================================================
+       OTP PAGE LOGIC
+    ===================================================== */
+    if (otpInput) {
+
+      /* =========================
+         RESEND OTP TIMER (FIXED)
+      ========================= */
+      if (resendBtn && resendFlag) {
+        let seconds = 120;
+        let interval = null;
+
+        const startTimer = () => {
+          resendBtn.disabled = true;
+          seconds = 120;
+
+          if (interval) clearInterval(interval);
+
+          interval = setInterval(() => {
+            seconds--;
+
+            const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+            const s = String(seconds % 60).padStart(2, "0");
+            resendBtn.textContent = `Resend OTP (${m}:${s})`;
+
+            if (seconds <= 0) {
+              clearInterval(interval);
+              resendBtn.disabled = false;
+              resendBtn.textContent = "Resend OTP";
+            }
+          }, 1000);
+        };
+
+        // 🔥 START TIMER AS SOON AS OTP PAGE LOADS
+        startTimer();
+
+        resendBtn.addEventListener("click", function () {
+          resendFlag.value = "1";
+
+          fetch("", {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: new FormData(signupForm)
+          }).then(() => {
+            const toast = document.getElementById("otpToast");
+            if (toast) {
+              toast.classList.add("show");
+              setTimeout(() => toast.classList.remove("show"), 3000);
+            }
+            startTimer();
+          });
+        });
+      }
+
+      /* =========================
+         VERIFY OTP (UNCHANGED)
+      ========================= */
+      signupForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        resendFlag.value = "0";   // 🔥 CRITICAL FIX
+
+
+        fetch("", {
+          method: "POST",
+          headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
+          body: new FormData(signupForm)
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (!data.success) {
+              otpError.textContent = data.error || "Invalid OTP";
+              otpError.style.display = "block";
+            } else {
+              window.location.href = data.redirect_url;
+            }
+          });
+      });
+
+      return; // ⛔ SAFE TO STOP HERE
+    }
+
+    /* =====================================================
+       INITIAL SIGNUP (SEND OTP)
+    ===================================================== */
+    signupForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      fetch("", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: new FormData(signupForm)
+      })
+        .then(async res => {
+          let data;
+          try {
+            data = await res.json();
+          } catch (e) {
+            throw new Error("Invalid server response");
+          }
+
+          if (!res.ok || !data.success) {
+            throw data;
+          }
+
+          return data;
+        })
+        .then(data => {
+          // ✅ Redirect to OTP page
+          window.location.href = window.location.pathname + "?otp=1";
+        })
+        .catch(err => {
+          otpError.textContent =
+            err?.error ||
+            "This email or username is already registered. Please login.";
+          otpError.style.display = "block";
+        });
+    });
+
+
+  });
+</script>
+
+
+
+{% endblock %}

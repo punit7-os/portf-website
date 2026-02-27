@@ -1,0 +1,110 @@
+<script>
+    window.lineData = {{ line_chart_data | safe }};
+    window.barData = {{ bar_chart_data | safe }};
+</script>
+<!-- Metric Cards -->
+<div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-10">
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <p class="text-slate-400 text-sm">Avg Delay (Days)</p>
+
+        <div class="flex items-center justify-between mt-2">
+            <h2 class="text-2xl font-bold">{{ avg_delay }}</h2>
+
+            {% if trend_direction != "flat" %}
+            <div class="flex items-center gap-1 text-sm font-semibold {{ trend_color }}">
+                {% if trend_direction == "up" %}
+                ▲
+                {% elif trend_direction == "down" %}
+                ▼
+                {% endif %}
+                {{ trend_percent }}%
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <p class="text-slate-400 text-sm">Total Trade Volume</p>
+        <h2 class="text-2xl font-bold mt-2">{{ total_volume }}</h2>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <p class="text-slate-400 text-sm">Avg Risk Score</p>
+
+        <div class="flex items-center justify-between mt-2">
+            <h2 class="text-2xl font-bold">{{ avg_risk }}</h2>
+
+            <span class="
+        px-3 py-1 rounded-full text-xs font-semibold
+        {% if risk_color == 'green' %}
+            bg-green-500/20 text-green-400
+        {% elif risk_color == 'yellow' %}
+            bg-yellow-500/20 text-yellow-400
+        {% else %}
+            bg-red-500/20 text-red-400
+        {% endif %}
+    ">
+                {{ risk_level }} Risk
+            </span>
+        </div>
+
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <p class="text-slate-400 text-sm">Correlation (Cost vs Risk)</p>
+        <h2 class="text-2xl font-bold mt-2">{{ correlation }}</h2>
+    </div>
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <p class="text-slate-400 text-sm">Oil Impact Correlation</p>
+        <h2 class="text-2xl font-bold mt-2 text-emerald-400">
+            {{ oil_correlation }}
+        </h2>
+    </div>
+</div>
+
+<div class="flex justify-end mt-2">
+    <span class="text-xs text-slate-400">
+        Records Loaded: <span class="font-semibold text-white">{{ snapshot_size }}</span>
+    </span>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <h3 class="text-lg font-semibold mb-4">Shipping Cost vs Delay Trends</h3>
+        <div class="relative h-80">
+            <canvas id="costDelayChart"></canvas>
+        </div>
+
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-white/10">
+        <h3 class="text-lg font-semibold mb-4">Risk Score by Trade Route</h3>
+        <div class="relative h-80">
+            <canvas id="routeRiskChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Professional Data Source Footer -->
+<div class="flex justify-end mt-4 text-xs text-slate-500">
+
+    <div class="text-right leading-relaxed">
+        <span class="block text-slate-400 font-medium mb-1">Source:</span>
+
+        <a href="https://www.kaggle.com/datasets/bertnardomariouskono/global-supply-chain-disruption-and-resilience"
+            target="_blank" class="hover:text-white transition-colors">
+            Global Supply Chain Disruption & Resilience
+        </a>
+        <span class="mx-1">|</span>
+        <a href="https://www.kaggle.com/datasets/rockyt07/major-commodities-all-time" target="_blank"
+            class="hover:text-white transition-colors">
+            Major Commodities (1997–2025)
+        </a>
+    </div>
+
+</div>

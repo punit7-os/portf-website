@@ -1,0 +1,123 @@
+{% extends "blog/base.html" %}
+
+{% block title %}About | Punit Patel Blog{% endblock %}
+
+{% block content %}
+
+<!-- ================= PAGE HEADER ================= -->
+<section class="bg-white border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-4xl font-bold text-dark leading-tight">
+      This Blog Isn’t About Tech.
+      <br class="hidden sm:block">
+      <span class="text-primary">It’s About What Tech Does for Business.</span>
+    </h1>
+
+    <p class="mt-6 max-w-3xl text-lg text-slate-600">
+      If you’re a founder, business owner, or decision-maker trying to figure out
+      <strong>what to build, why to build it, and when</strong> — you’re in the right place.
+    </p>
+  </div>
+</section>
+
+<!-- ================= CONTENT ================= -->
+<section class="py-16">
+  <div class="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
+
+    <div class="space-y-16">
+
+      <!-- WHY THIS BLOG -->
+      <div>
+        <h2 class="text-2xl font-semibold text-dark mb-5">
+          Why This Blog Exists
+        </h2>
+
+        <p class="text-slate-700 leading-relaxed text-lg">
+          Most content online falls into one of two extremes.
+        </p>
+
+        <ul class="mt-6 space-y-3 text-slate-700">
+          <li>• Highly technical blogs that lose business readers in the first paragraph</li>
+          <li>• Vague “digital transformation” articles that say everything — and nothing</li>
+        </ul>
+
+        <p class="mt-6 text-slate-700 leading-relaxed">
+          This blog exists to sit right in the middle.
+          To explain <strong>how technology decisions impact revenue, time, scalability, and control</strong> —
+          without forcing you to learn code.
+        </p>
+      </div>
+
+      <!-- WHO IT IS FOR -->
+      <div>
+        <h2 class="text-2xl font-semibold text-dark mb-5">
+          Who This Blog Is For
+        </h2>
+
+        <p class="text-slate-700 leading-relaxed mb-6">
+          You’ll get the most value here if you are:
+        </p>
+
+        <ul class="list-disc pl-6 space-y-3 text-slate-700">
+          <li>A business owner tired of manual processes and spreadsheets</li>
+          <li>A founder planning a product but unsure what features actually matter</li>
+          <li>An agency or consultant exploring automation for clients</li>
+          <li>A decision-maker who wants clarity before hiring a developer</li>
+        </ul>
+      </div>
+
+      <!-- WHO AM I -->
+      <div>
+        <h2 class="text-2xl font-semibold text-dark mb-5">
+          Who I Am
+        </h2>
+
+        <p class="text-slate-700 leading-relaxed">
+          I’m <strong>Punit Patel</strong>, a developer who doesn’t start with tools —
+          I start with problems.
+        </p>
+
+        <p class="mt-5 text-slate-700 leading-relaxed">
+          I build systems using Django, automation, and modern frontend tools,
+          but more importantly, I focus on
+          <strong>why a feature exists</strong> and
+          <strong>how it helps the business long-term</strong>.
+        </p>
+
+        <p class="mt-5 text-slate-700 leading-relaxed">
+          This blog complements my portfolio by showing not just
+          <em>what I build</em>, but
+          <em>how I think when designing real-world solutions</em>.
+        </p>
+      </div>
+
+      <!-- CTA -->
+      <div class="bg-slate-100 rounded-2xl p-8 md:p-10">
+        <h3 class="text-xl md:text-2xl font-semibold text-dark">
+          Want to see real examples?
+        </h3>
+
+        <p class="mt-3 text-slate-600 max-w-2xl">
+          Explore detailed case studies or reach out if you want to discuss
+          a project, idea, or automation opportunity.
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-4">
+          <a href="{% url 'blog:case_studies' %}"
+             class="inline-block px-7 py-3 rounded-xl bg-primary text-white font-medium hover:bg-blue-700 transition">
+            View Case Studies
+          </a>
+
+          <a href="{% url 'blog:contact' %}"
+             class="inline-block px-7 py-3 rounded-xl border border-slate-300 text-dark font-medium hover:bg-white transition">
+            Contact Me
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

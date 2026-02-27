@@ -1,0 +1,30 @@
+Category,Name,Slug,Description,Price,Image_URLs,Active
+Electronics,Wireless Bluetooth Earphones,wireless-bluetooth-earphones,Neckband wireless earphones with deep bass and fast charging,1299,https://images.unsplash.com/photo-1585386959984-a41552231693,Yes
+Electronics,Android Smartphone Budget,android-smartphone-budget,Affordable Android smartphone with large display and long battery life,6999,https://images.unsplash.com/photo-1511707171634-5f897ff02aa9,Yes
+Electronics,Laptop 15 Inch,laptop-15-inch,15.6 inch laptop suitable for office and study use,42990,https://images.unsplash.com/photo-1517336714731-489689fd1ca8,Yes
+Electronics,Smart Fitness Watch,smart-fitness-watch,Smartwatch with heart rate and SpO2 monitoring,1999,https://images.unsplash.com/photo-1523275335684-37898b6baf30,Yes
+Electronics,LED Smart TV 32 Inch,led-smart-tv-32-inch,HD ready smart LED television with streaming apps,13499,https://images.unsplash.com/photo-1593359677879-a4bb92f829d1,Yes
+
+Home & Kitchen,Mixer Grinder 750W,mixer-grinder-750w,High power mixer grinder with stainless steel jars,3299,https://images.unsplash.com/photo-1586201375761-83865001e17b,Yes
+Home & Kitchen,Electric Kettle 1.5L,electric-kettle-1-5l,Stainless steel electric kettle with auto shut off,699,https://images.unsplash.com/photo-1544551763-46a013bb70d5,Yes
+Home & Kitchen,Steel Water Bottle 1L,steel-water-bottle-1l,Insulated stainless steel water bottle for hot and cold drinks,899,https://images.unsplash.com/photo-1602143407151-7111542de6e8,Yes
+Home & Kitchen,Air Fryer,air-fryer,Oil free air fryer for healthy cooking,7999,https://images.unsplash.com/photo-1625944526367-4c6b67e94c63,Yes
+Home & Kitchen,Room Heater,room-heater,Compact electric room heater with thermostat control,2199,https://images.unsplash.com/photo-1618220179428-22790b461013,Yes
+
+Fashion,Men Slim Fit Jeans,men-slim-fit-jeans,Stylish slim fit denim jeans for men,2299,https://images.unsplash.com/photo-1541099649105-f69ad21f3246,Yes
+Fashion,Men Casual Shirt,men-casual-shirt,Cotton casual shirt suitable for daily wear,1799,https://images.unsplash.com/photo-1521334884684-d80222895322,Yes
+Fashion,Running Shoes,running-shoes,Lightweight sports shoes for running and gym,3499,https://images.unsplash.com/photo-1542291026-7eec264c27ff,Yes
+Fashion,Women Ethnic Kurta,women-ethnic-kurta,Traditional printed kurta for women,2599,https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03,Yes
+Fashion,Analog Wrist Watch,analog-wrist-watch,Classic analog watch with leather strap,1499,https://images.unsplash.com/photo-1524805444758-089113d48a6d,Yes
+
+Beauty & Personal Care,Matte Foundation,matte-foundation,Matte finish foundation suitable for all skin types,549,https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9,Yes
+Beauty & Personal Care,Men Face Wash,men-face-wash,Oil control refreshing face wash for men,299,https://images.unsplash.com/photo-1585238342028-4bbc81d7b8c5,Yes
+Beauty & Personal Care,Hair Dryer,hair-dryer,Compact hair dryer with heat control,1099,https://images.unsplash.com/photo-1616594039964-ae9021a400a0,Yes
+Beauty & Personal Care,Beard Oil,beard-oil,Natural beard oil for grooming and growth,499,https://images.unsplash.com/photo-1621607511914-9b6c83f6c6ab,Yes
+Beauty & Personal Care,Matte Lipstick,matte-lipstick,Long lasting matte finish lipstick,450,https://images.unsplash.com/photo-1580910051074-7f5f0a2f6d9c,Yes
+
+Books,Atomic Habits Book,atomic-habits-book,Self improvement book on habit building,499,https://images.unsplash.com/photo-1512820790803-83ca734da794,Yes
+Books,Rich Dad Poor Dad Book,rich-dad-poor-dad-book,Personal finance and investing book,399,https://images.unsplash.com/photo-1524995997946-a1c2e315a42f,Yes
+Books,The Psychology of Money Book,psychology-of-money-book,Book about financial behavior and mindset,349,https://images.unsplash.com/photo-1528207776546-365bb710ee93,Yes
+Books,Think and Grow Rich Book,think-and-grow-rich-book,Classic success and motivation book,299,https://images.unsplash.com/photo-1519682337058-a94d519337bc,Yes
+Books,Ikigai Book,ikigai-book,Book about purpose and happiness in life,389,https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c,Yes
