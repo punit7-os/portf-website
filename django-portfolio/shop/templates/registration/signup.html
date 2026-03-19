@@ -571,11 +571,16 @@
           window.location.href = window.location.pathname + "?otp=1";
         })
         .catch(err => {
-          otpError.textContent =
-            err?.error ||
-            "This email or username is already registered. Please login.";
-          otpError.style.display = "block";
-        });
+       console.log("FULL ERROR:", err);
+
+     if (typeof err === "object" && err.error) {
+    otpError.textContent = err.error;
+       } else {
+         otpError.textContent = "Something went wrong. Please try again.";
+        }
+
+      otpError.style.display = "block";
+      });
     });
 
 

@@ -40,3 +40,6 @@ django-portfolio/*.sqlite3
 django-portfolio/media/
 django-portfolio/staticfiles/
 django-portfolio/.env
+
+gmail_token.pickle
+credentials.json

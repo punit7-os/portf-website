@@ -651,30 +651,20 @@ def signup(request):
         form = CustomUserCreationForm(request.POST)
 
         if not form.is_valid():
-            if "email" in form.errors:
-                return JsonResponse({
-                    "success": False,
-                    "error": "This email is already registered. Please login."
-                }, status=400)
-
-            if "username" in form.errors:
-                return JsonResponse({
-                    "success": False,
-                    "error": "This username is already taken."
-                }, status=400)
+            print("FORM ERRORS:", form.errors)
 
             return JsonResponse({
                 "success": False,
-                "error": "Invalid signup details. Please check the form."
+                "error": form.errors.as_text()
             }, status=400)
 
         otp = random.randint(100000, 999999)
 
         otp_data = {
-            "username": form.cleaned_data["username"],
-            "email": form.cleaned_data["email"],
-            "password": form.cleaned_data["password1"],
-            "phone": form.cleaned_data["phone"],
+            "username": form.cleaned_data.get("username"),
+            "email": form.cleaned_data.get("email"),
+            "password": form.cleaned_data.get("password1"),
+            "phone": form.cleaned_data.get("phone"),
             "otp": str(otp),
             "expires_at": time.time() + 300
         }
