@@ -2,559 +2,532 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Punit Patel | Portfolio</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon.png' %}">
-<link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon.png' %}">
-<meta name="theme-color" content="#007BFF">
-<style>
-    /* Reset */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  <title>Punit Patel | Full-Stack Developer</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+  <link rel="icon" href="{% static 'images/favicon/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
 
-    body { background: #f4f6f9; color: #333; }
-
-    /* Header */
-    header {
-      background: linear-gradient(135deg, #007BFF, #0056b3);
-      color: white;
-      padding: 40px 16px;
-      text-align: center;
-    }
-    header h1 { font-size: 2.4rem; margin-bottom: 8px; }
-    header p { font-size: 0.96rem; opacity: 0.9; }
-
-    /* Navigation */
-    nav {
-      display: flex; justify-content: center; background: white; box-shadow: 0 1.6px 4px rgba(0,0,0,0.1);
-    }
-    nav a {
-      padding: 12px 16px; text-decoration: none; color: #007BFF; font-weight: 600;
-      transition: 0.3s;
-    }
-    nav a:hover { background: #007BFF; color: white; border-radius: 4px; }
-
-    /* Sections */
-    section { padding: 48px 16px; text-align: center; }
-    section h2 { font-size: 1.76rem; margin-bottom: 16px; color: #0056b3; }
-
-    /* About */
-    #about { background: #ffffff; }
-    #about p { max-width: 560px; margin: auto; font-size: 0.88rem; line-height: 1.7; }
-
-    /* Skills */
-    #skills { background: #e9f5ff; }
-    .skill { display: inline-block; background: white; margin: 8px; padding: 12px 20px;
-      border-radius: 6.4px; box-shadow: 0 1.6px 4.8px rgba(0,0,0,0.1); font-weight: bold; font-size: 0.88rem; }
-
-    /* Projects */
-    #projects { background: #ffffff; }
-    .project {
-      display: inline-block; width: 224px; margin: 12px; background: #f9f9f9; border-radius: 8px;
-      box-shadow: 0 1.6px 8px rgba(0,0,0,0.1); overflow: hidden; transition: 0.3s;
-    }
-    .project:hover { transform: scale(1.05); }
-    .project img { width: 100%; height: 144px; object-fit: cover; }
-    .project h3 { margin: 12px; font-size: 0.96rem; color: #007BFF; }
-    .project p { margin: 0 12px 16px; font-size: 0.76rem; }
-
-    /* Contact */
-    #contact { background: #f1f8f6; }
-    #contact h2 { font-size: 1.76rem; margin-bottom: 12px; }
-    #contact p { font-size: 0.88rem; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto; }
-    #contact a {
-      display: inline-block; margin: 8px; padding: 9.6px 19.2px;
-      border-radius: 6.4px; text-decoration: none; font-weight: bold; transition: 0.3s;
-      font-size: 0.88rem;
-    }
-    .btn-hire { background: #007BFF; color: white; }
-    .btn-hire:hover { background: #0056b3; }
-    .btn-work { background: #28a745; color: white; }
-    .btn-work:hover { background: #1e7e34; }
-
-    /* Footer */
-    footer {
-      background: #007BFF; color: white; padding: 16px; text-align: center;
-      margin-top: 24px;
-      font-size: 0.88rem;
-    }
-    .projects-section {
-  padding: 48px 16px;
-  background: #f8f9fb;
-  text-align: center;
-}
-
-.section-title {
-  font-size: 2rem;
-  margin-bottom: 8px;
-  color: #222;
-}
-
-.section-subtitle {
-  font-size: 0.96rem;
-  color: #666;
-  margin-bottom: 32px;
-}
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  max-width: 880px;
-  margin: auto;
-}
-
-
-.project-card {
-  background: #fff;
-  border-radius: 9.6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.project-card:hover {
-  transform: translateY(-6.4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.project-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.project-content {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.project-content h3 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.project-content p {
-  font-size: 0.8rem;
-  color: #555;
-  margin-bottom: 12px;
-  line-height: 1.5;
-  flex-grow: 1;
-  min-height: 48px;
-}
-
-.project-link {
-  display: inline-block;
-  padding: 8px 12px;
-  background: #007bff;
-  color: white;
-  border-radius: 6.4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background 0.3s;
-  font-size: 0.85rem;
-  align-self: center;
-  margin-top: auto;
-}
-
-.project-link:hover {
-  background: #0056b3;
-}
-.project-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-
-.project-card:hover .project-img {
-  transform: scale(1.04) translateY(-3.2px);
-  box-shadow: 0 11.2px 24px rgba(2,6,23,0.12);
-}
-
-/* small responsive tweak */
-@media (max-width:600px){
-  .project-img { height: 128px; }
-  header h1 { font-size: 2rem; }
-  header p { font-size: 0.85rem; }
-  section h2 { font-size: 1.5rem; }
-  .section-title { font-size: 1.7rem; }
-  .projects-grid {
-    grid-template-columns: 1fr;
-    max-width: 320px;
-  }
-}
-
-/* ===== Work In Progress Modal ===== */
-.wip-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(3.2px);
-  z-index: 2000;
-  align-items: center;
-  justify-content: center;
-}
-
-.wip-modal-content {
-  background: #fff;
-  padding: 24px 20px;
-  max-width: 336px;
-  width: 90%;
-  border-radius: 11.2px;
-  text-align: center;
-  box-shadow: 0 16px 32px rgba(0,0,0,0.2);
-  animation: fadeUp 0.35s ease;
-}
-
-.wip-modal-content h2 {
-  margin-bottom: 9.6px;
-  color: #007BFF;
-  font-size: 1.6rem;
-}
-
-.wip-modal-content p {
-  font-size: 0.8rem;
-  color: #444;
-  line-height: 1.6;
-}
-
-.wip-modal-content button {
-  margin-top: 16px;
-  padding: 8px 14.4px;
-  border: none;
-  border-radius: 6.4px;
-  background: #007BFF;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.88rem;
-}
-
-.wip-modal-content button:hover {
-  background: #0056b3;
-}
-
-.wip-close {
-  position: absolute;
-  right: 14.4px;
-  top: 11.2px;
-  font-size: 17.6px;
-  cursor: pointer;
-  color: #666;
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* WhatsApp CTA */
-.btn-whatsapp {
-  background: #25D366;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6.4px;
-  padding: 9.6px 19.2px;
-  border-radius: 6.4px;
-  font-weight: bold;
-  text-decoration: none;
-  margin-top: 9.6px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  font-size: 0.88rem;
-}
-
-.btn-whatsapp:hover {
-  background: #1ebe5d;
-  transform: translateY(-1.6px);
-  box-shadow: 0 4.8px 14.4px rgba(37, 211, 102, 0.35);
-}
-
-/* Mobile optimization */
-@media (max-width: 600px) {
-  .btn-whatsapp {
-    width: 100%;
-    max-width: 256px;
-    font-size: 0.85rem;
-  }
-  #contact a {
-    font-size: 0.8rem;
-    padding: 8px 16px;
-  }
-}
-
-  </style>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <meta name="theme-color" content="#050508">
 </head>
+
 <body>
 
-  <!-- Header -->
-  <header>
-    <h1>👋 Hi, I'm Punit Patel</h1>
-    <p>Web Developer | Python | Django | AWS | Freelancer</p>
-  </header>
+  <div id="cursor-glow"></div>
+  <div id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring-1"></div>
+  <div class="cursor-ring" id="cursor-ring-2"></div>
+  <div class="cursor-ring" id="cursor-ring-3"></div>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
+  <img src="{% static 'images/animations/element.svg' %}" class="fsv fsv-1" alt="" loading="lazy">
+  <img src="{% static 'images/animations/element.svg' %}" class="fsv fsv-2" alt="" loading="lazy">
+  <img src="{% static 'images/animations/element.svg' %}" class="fsv fsv-3" alt="" loading="lazy">
+  <img src="{% static 'images/animations/element.svg' %}" class="fsv fsv-4" alt="" loading="lazy">
+  <img src="{% static 'images/animations/element.svg' %}" class="fsv fsv-5" alt="" loading="lazy">
+
+  <nav class="nav" id="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <img src="{% static 'images/projects/logo.png' %}" alt="Punit Patel Logo">
+        <span class="logo-ring" aria-hidden="true"></span>
+        <span class="logo-ring-2" aria-hidden="true"></span>
+        <span class="logo-pulse" aria-hidden="true"></span>
+        <span class="logo-pulse-2" aria-hidden="true"></span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
-  <!-- About -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <button class="mobile-menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    <ul class="mobile-menu-links">
+      <li><a href="#home" class="menu-link">Home</a></li>
+      <li><a href="#about" class="menu-link">About</a></li>
+      <li><a href="#skills" class="menu-link">Skills</a></li>
+      <li><a href="#projects" class="menu-link">Projects</a></li>
+      <li><a href="#contact" class="menu-link">Contact</a></li>
+    </ul>
+    <span class="mobile-menu-accent">Punit Patel · Full-Stack Dev</span>
+  </div>
+
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-identity">
+        <p class="hero-eyebrow">Building Scalable Web Experiences</p>
+        <h1 class="hero-name" id="heroName" aria-label="Punit Patel">
+          <span class="hero-name-inner">
+            <span id="typing-name"></span><span class="hero-cursor"></span>
+          </span>
+        </h1>
+        <p class="hero-role"><span id="typing-role"></span><span class="hero-role-cursor" id="roleCursor"></span></p>
+      </div>
+      <div class="cta-tagline">
+        <a href="#projects" class="hero-cta">View My Work</a>
+        <p class="hero-tagline">"Helping Startups &amp; Businesses Scale With Custom Digital Solutions Tailored To Their
+          Business Needs."</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
   <section id="about">
-    <h2>About Me</h2>
-    <p>
-      I am a passionate Web Developer and Freelancer with expertise in building
-      modern, scalable, and user-friendly applications using Django, Python, and AWS.
-      I help businesses and entrepreneurs bring their ideas to life with clean code and
-      attractive design.
-    </p>
+    <div class="section">
+      <p class="section-label reveal">Who I am</p>
+      <h2 class="section-title reveal">
+        <span class="section-title-typed" data-title="About Me">
+          <span class="title-text"></span><span class="title-cursor"></span>
+        </span>
+      </h2>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>I'm a passionate Full-Stack Django Developer and Freelancer specializing in building scalable web
+            applications and business-driven digital solutions.</p>
+          <p>I design and develop modern, secure, and high-performance systems using Django, Python, and AWS — from
+            e-commerce platforms and content management systems to real-time data applications and automation tools.</p>
+          <p>I help startups, businesses, and entrepreneurs transform ideas into reliable, production-ready web
+            solutions with clean architecture, optimized performance, and intuitive user experience.</p>
+          <div class="about-stats">
+            <div class="about-stat">
+              <span class="about-stat-num stat-animate-up" id="stat-years">
+                <span class="stat-slot">
+                  <span>0+</span><span>1+</span><span>2+</span><span>3+</span><span>4+</span>
+                </span>
+              </span>
+              <span class="about-stat-label">Years Coding</span>
+            </div>
+            <div class="about-stat">
+              <span class="about-stat-num stat-animate-down" id="stat-projects">
+                <span class="stat-slot">
+                  <span>8+</span><span>7+</span><span>6+</span><span>5+</span><span>4+</span><span>3+</span><span>2+</span><span>1+</span><span>0+</span>
+                </span>
+              </span>
+              <span class="about-stat-label">Projects Built</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABOUT VISUAL -->
+        <div class="about-visual reveal">
+          <div class="orbit-scene" id="orbitScene">
+
+            <svg class="orbit-svg" id="orbitSvg" viewBox="0 0 460 460">
+              <defs>
+                <filter id="ob-glow" x="-200%" y="-200%" width="500%" height="500%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="a" />
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b" />
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="c" />
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="d" />
+                  <feMerge>
+                    <feMergeNode in="d" />
+                    <feMergeNode in="c" />
+                    <feMergeNode in="b" />
+                    <feMergeNode in="a" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="ob-pg" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="3" />
+                </filter>
+                <radialGradient id="ob-bg" cx="35%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+                  <stop offset="45%" stop-color="#c7d2fe" stop-opacity=".9" />
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity=".75" />
+                </radialGradient>
+              </defs>
+
+              <path fill="none" stroke="rgba(255,255,255,.03)" stroke-width="20" filter="url(#ob-pg)" d="M 118,368 C 95,340 55,285 48,220 C 42,158 62,100 100,72 C 138,44 185,38 230,42
+                   C 268,46 300,68 310,80 C 328,100 345,138 330,155 C 315,172 285,168 265,155
+                   C 245,142 228,125 210,128 C 192,131 182,148 195,163 C 210,180 245,182 275,170
+                   C 318,152 365,110 395,85 C 415,70 438,72 448,95 C 458,118 450,165 432,200
+                   C 415,235 390,260 360,290 C 345,305 342,340 342,368" />
+
+              <path fill="none" stroke="rgba(255,255,255,.07)" stroke-width="3" d="M 118,368 C 95,340 55,285 48,220 C 42,158 62,100 100,72 C 138,44 185,38 230,42
+                   C 268,46 300,68 310,80 C 328,100 345,138 330,155 C 315,172 285,168 265,155
+                   C 245,142 228,125 210,128 C 192,131 182,148 195,163 C 210,180 245,182 275,170
+                   C 318,152 365,110 395,85 C 415,70 438,72 448,95 C 458,118 450,165 432,200
+                   C 415,235 390,260 360,290 C 345,305 342,340 342,368" />
+
+              <path id="ob-path" fill="none" stroke="rgba(255,255,255,.48)" stroke-width="1.3" stroke-dasharray="4 7"
+                stroke-linecap="round" d="M 118,368 C 95,340 55,285 48,220 C 42,158 62,100 100,72 C 138,44 185,38 230,42
+                   C 268,46 300,68 310,80 C 328,100 345,138 330,155 C 315,172 285,168 265,155
+                   C 245,142 228,125 210,128 C 192,131 182,148 195,163 C 210,180 245,182 275,170
+                   C 318,152 365,110 395,85 C 415,70 438,72 448,95 C 458,118 450,165 432,200
+                   C 415,235 390,260 360,290 C 345,305 342,340 342,368" />
+
+              <g fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1">
+                <circle cx="48" cy="220" r="4" />
+                <circle cx="100" cy="72" r="4" />
+                <circle cx="230" cy="42" r="4" />
+                <circle cx="395" cy="85" r="4" />
+                <circle cx="432" cy="200" r="4" />
+                <circle cx="360" cy="290" r="4" />
+              </g>
+
+              <circle cx="118" cy="368" r="4" fill="rgba(255,255,255,.3)" stroke="rgba(255,255,255,.45)"
+                stroke-width="1" />
+              <circle cx="342" cy="368" r="4" fill="rgba(255,255,255,.3)" stroke="rgba(255,255,255,.45)"
+                stroke-width="1" />
+
+              <!-- Trail dots ball 1 -->
+              <circle id="ob-t4" r="1.5" fill="rgba(99,102,241,.15)" />
+              <circle id="ob-t3" r="2.2" fill="rgba(129,140,248,.28)" />
+              <circle id="ob-t2" r="3.2" fill="rgba(180,190,255,.42)" />
+              <circle id="ob-t1" r="4.5" fill="rgba(215,220,255,.58)" />
+
+              <!-- BALL 1 -->
+              <g id="ob-ball" filter="url(#ob-glow)">
+                <circle id="ob-aura" r="16" fill="rgba(99,102,241,.1)" />
+                <circle id="ob-halo" r="9" fill="rgba(165,180,252,.22)" />
+                <circle r="5" fill="url(#ob-bg)" />
+                <circle r="1.6" cx="-1.6" cy="-1.6" fill="rgba(255,255,255,.92)" />
+              </g>
+
+              <!-- BALL 2 — starts from opposite end (offset half cycle in JS) -->
+              <g id="ob-ball2" filter="url(#ob-glow)">
+                <circle id="ob-aura2" r="16" fill="rgba(99,102,241,.1)" />
+                <circle id="ob-halo2" r="9" fill="rgba(165,180,252,.22)" />
+                <circle r="5" fill="url(#ob-bg)" />
+                <circle r="1.6" cx="-1.6" cy="-1.6" fill="rgba(255,255,255,.92)" />
+              </g>
+            </svg>
+
+            <!-- BOY IMAGE -->
+            <div class="orbit-boy">
+              <img src="{% static 'images/animations/aboutmee.svg' %}" alt="Developer" id="orbitBoyImg">
+            </div>
+
+            <!--
+              SKILL BUBBLES
+              Positions are expressed as percentages of the orbit-scene box (460×460 viewBox mapped 1:1).
+              AWS moved to left:74%, top:72% so it sits cleanly below and to the right of the boy's knee
+              — no longer overlapping the figure at any common desktop width.
+            -->
+            <div class="ob" data-i="0" style="left:10.4%;top:47.8%">
+              <span class="oi">🔧</span><span class="ol">Django</span>
+            </div>
+            <div class="ob" data-i="1" style="left:21.7%;top:15.7%">
+              <span class="oi">🐍</span><span class="ol">Python</span>
+            </div>
+            <div class="ob" data-i="2" style="left:50%;top:9.1%">
+              <span class="oi">🌐</span><span class="ol">HTML</span>
+            </div>
+            <div class="ob" data-i="3" style="left:85.9%;top:18.5%">
+              <span class="oi">🎨</span><span class="ol">CSS</span>
+            </div>
+            <div class="ob" data-i="4" style="left:93.9%;top:43.5%">
+              <span class="oi">🔗</span><span class="ol">REST API</span>
+            </div>
+            <!-- AWS: shifted left a touch and raised slightly so it clears the boy -->
+            <div class="ob" data-i="5" style="left:84%;top:62%">
+              <span class="oi">☁️</span><span class="ol">AWS</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
   </section>
 
-  <!-- Skills -->
-  <section id="skills">
-    <h2>My Skills</h2>
-    <div class="skill">Python</div>
-    <div class="skill">Django</div>
-    <div class="skill">HTML & CSS</div>
-    <div class="skill">JavaScript</div>
-    <div class="skill">AWS</div>
-    <div class="skill">SQL</div>
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills" class="skills-section">
+    <div class="skills-header">
+      <p class="section-label reveal">What I work with</p>
+      <h2 class="section-title reveal" style="margin-bottom:0">
+        <span class="section-title-typed" data-title="Skills">
+          <span class="title-text"></span><span class="title-cursor"></span>
+        </span>
+      </h2>
+    </div>
+    <div class="skills-track-wrap">
+      <div class="skills-row skills-row-1" aria-hidden="true">
+        <span class="skill-tag">Python</span><span class="skill-tag">Django</span>
+        <span class="skill-tag">REST API</span><span class="skill-tag">django-allauth</span>
+        <span class="skill-tag">Sessions</span><span class="skill-tag">Payment API</span>
+        <span class="skill-tag">SQLite</span><span class="skill-tag">HTML</span>
+        <span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Tailwind</span><span class="skill-tag">Alpine.js</span>
+        <span class="skill-tag">Python</span><span class="skill-tag">Django</span>
+        <span class="skill-tag">REST API</span><span class="skill-tag">django-allauth</span>
+        <span class="skill-tag">Sessions</span><span class="skill-tag">Payment API</span>
+        <span class="skill-tag">SQLite</span><span class="skill-tag">HTML</span>
+        <span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Tailwind</span><span class="skill-tag">Alpine.js</span>
+      </div>
+      <div class="skills-row skills-row-2" aria-hidden="true">
+        <span class="skill-tag">Google OAuth</span><span class="skill-tag">Linux</span>
+        <span class="skill-tag">AWS EC2</span><span class="skill-tag">WhiteNoise</span>
+        <span class="skill-tag">HTMX</span><span class="skill-tag">SQL</span>
+        <span class="skill-tag">PostgreSQL</span><span class="skill-tag">Responsive Web Design</span>
+        <span class="skill-tag">Chart.js</span><span class="skill-tag">Cloudflare</span>
+        <span class="skill-tag">Gunicorn</span>
+        <span class="skill-tag">Google OAuth</span><span class="skill-tag">Linux</span>
+        <span class="skill-tag">AWS EC2</span><span class="skill-tag">WhiteNoise</span>
+        <span class="skill-tag">HTMX</span><span class="skill-tag">SQL</span>
+        <span class="skill-tag">PostgreSQL</span><span class="skill-tag">Responsive Web Design</span>
+        <span class="skill-tag">Chart.js</span><span class="skill-tag">Cloudflare</span>
+        <span class="skill-tag">Gunicorn</span>
+      </div>
+    </div>
   </section>
 
-  <!-- Projects -->
-  <!-- Projects Section -->
-<section id="projects" class="projects-section">
-  <h2 class="section-title">🚀 My Projects</h2>
-  <p class="section-subtitle">Showcasing work that blends creativity with functionality</p>
+  <div class="divider"></div>
 
-  <div class="projects-grid">
-    <!-- Project 1: Portfolio Website -->
-
-    <div class="project-card">
-  <img src="{% static 'images/projects/portfolio.png' %}" alt="Portfolio Website Screenshot" class="project-img">
-  <div class="project-content">
-    <h3>Portfolio Website</h3>
-    <p>A professional portfolio built with Django, HTML/CSS/JS and deployed on AWS — optimised for conversions and clarity.</p>
-    <a href="#" target="_blank" class="project-link">🔗 View Project</a>
-  </div>
-</div>
-
-
-    <!-- Project 2 Placeholder -->
-    <div class="project-card">
-      <img src="{% static 'images/projects/Ecom.png' %}" alt="E-commerce Store">
-      <div class="project-content">
-        <h3>E-commerce Store</h3>
-        <p>A fully functional e-commerce website with product management, cart, and payment gateway integration.</p>
-        <a href="{% url 'shop:product_list' %}" target="_blank" class="project-link">🔗 View Project</a>
-      </div>
-    </div>
-    
-    <!-- Project 3 Placeholder -->
-    <div class="project-card">
-      <img src="{% static 'images/projects/blog2.png' %}" alt="Blog System">
-      <div class="project-content">
-        <h3>Blog System</h3>
-        <p>A blog/CMS platform with categories, comments, and SEO-friendly design.</p>
-        <!-- <a href="#" target="_blank" class="project-link">🔗 View Project</a> -->
-        <a href="{% url 'blog:home' %}" target="_blank" class="project-link">🔗 View Project</a>
-
-      </div>
-    </div>
-
-    <!-- Project 4 Placeholder -->
-    <div class="project-card">
-      <img src="{% static 'images/projects/pulseiq.png' %}" alt="API Integration">
-      <div class="project-content">
-        <h3>API Integration</h3>
-        <p>Project using REST APIs to fetch and display live weather, stock market, or crypto data.</p>
-        <a href="{% url 'live_data_pages:dashboard' %}" target="_blank" class="project-link" >🔗 View Project</a>
-      </div>
-    </div>
-
-    <!-- Project 5 Placeholder -->
-    <div class="project-card">
-      <img src="{% static 'images/projects/tradesphere.png' %}" alt="Data Dashboard">
-      <div class="project-content">
-        <h3>Data Dashboard</h3>
-        <p>An interactive analytics dashboard with charts, filters, and insights.</p>
-        <a href="{% url 'trade_dashboard:dashboard' %}" target="_blank" class="project-link" >🔗 View Project</a>
-      </div>
-    </div>
-
-    <!-- Project 6 Placeholder -->
-    <div class="project-card">
-      <img src="{% static 'images/projects/locked.png' %}" alt="Automation Project">
-      <div class="project-content">
-        <h3>Automation Bot</h3>
-        <p>Automation scripts Email Senders </p>
-        <a href="#" class="project-link" onclick="openWipModal(event)">🔗 View Project</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-  <!-- Contact -->
-<!-- Contact -->
-<section id="contact">
-  <h2>📬 Contact Me</h2>
-  <p>
-    Let's build something amazing together! Reach out to me via email or collaboration.
-  </p>
-
-  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Project%20Enquiry&body=Hi%20Punit,%0A%0AI%20would%20like%20to%20discuss%20a%20new%20project%20with%20you."
-     target="_blank" class="btn-hire">
-    📩 Hire Me
-  </a>
-
-  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Work%20Together&body=Hi%20Punit,%0A%0AI%20have%20a%20collaboration%20idea%20and%20would%20love%20to%20work%20with%20you."
-     target="_blank" class="btn-work">
-    🤝 Work Together
-  </a>
-
-  <a href="https://wa.me/917048856947?text=Hey%20I%20saw%20your%20portfolio.%20Can%20we%20discuss%3F"
-   target="_blank"
-   class="btn-whatsapp">
-  💬 Chat on WhatsApp
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section">
+      <p class="section-label reveal">What I've built</p>
+      <h2 class="section-title reveal">
+        <span class="section-title-typed" data-title="Projects">
+          <span class="title-text"></span><span class="title-cursor"></span>
+        </span>
+      </h2>
+      <div class="projects-list">
+        <div class="project-item reveal">
+          <div class="project-info">
+            <p class="project-index">01 — E-Commerce Platform</p>
+            <h3 class="project-title">My Shoppings</h3>
+            <p class="project-desc">A full-featured Django e-commerce platform with secure authentication, Google Login,
+              OTP verification, and personalized accounts. Featuring wishlist, cart system, live product search, order
+              tracking, and Razorpay checkout — built to real-world production standards.</p>
+            <div class="project-tags">
+              <span class="project-tag">Django</span><span class="project-tag">Python</span>
+              <span class="project-tag">Razorpay</span><span class="project-tag">PostgreSQL</span>
+            </div>
+            <a href="{% url 'shop:product_list' %}" target="_blank" class="project-btn">
+    <span class="project-btn-text">View Demo</span>
 </a>
+          </div>
+          <div class="project-visual">
+            <div class="laptop-wrap tilt-right">
+              <div class="laptop">
+                <div class="laptop-body">
+                  <div class="laptop-screen"><img src="{% static 'images/projects/Ecommerce.png' %}"
+                      alt="E-Commerce Platform" loading="lazy"></div>
+                </div>
+                <div class="laptop-base"></div>
+              </div>
+              <div class="laptop-glow"></div>
+            </div>
+          </div>
+        </div>
+        <div class="project-item reverse reveal">
+          <div class="project-info">
+            <p class="project-index">02 — Content Management Platform</p>
+            <h3 class="project-title">SourCEO</h3>
+            <p class="project-desc">A business-focused content and case study platform designed to build authority and
+              drive engagement. Structured categories, multimedia publishing, public profiles, interactive comments, and
+              SEO-ready architecture deliver scalable growth-oriented content.</p>
+            <div class="project-tags">
+              <span class="project-tag">Django</span><span class="project-tag">SEO</span>
+              <span class="project-tag">AWS</span><span class="project-tag">Tailwind</span>
+            </div>
+           <a href="{% url 'blog:home' %}" target="_blank" class="project-btn">
+    <span class="project-btn-text">View Demo</span>
+</a>
+          </div>
+          <div class="project-visual">
+            <div class="laptop-wrap tilt-left">
+              <div class="laptop">
+                <div class="laptop-body">
+                  <div class="laptop-screen"><img src="{% static 'images/projects/Blog.png' %}"
+                      alt="SourCEO Content System" loading="lazy"></div>
+                </div>
+                <div class="laptop-base"></div>
+              </div>
+              <div class="laptop-glow"></div>
+            </div>
+          </div>
+        </div>
+        <div class="project-item reveal">
+          <div class="project-info">
+            <p class="project-index">03 — Real-Time Data Dashboard</p>
+            <h3 class="project-title">PulseIQ</h3>
+            <p class="project-desc">A real-time financial intelligence dashboard combining equity market insights,
+              weather intelligence, and crypto data in one interface. Built with cache-first service layer and partial
+              DOM updates for high-performance live data monitoring.</p>
+            <div class="project-tags">
+              <span class="project-tag">Django</span><span class="project-tag">Chart.js</span>
+              <span class="project-tag">REST API</span><span class="project-tag">HTMX</span>
+            </div>
+            <a href="{% url 'live_data_pages:dashboard' %}" target="_blank" class="project-btn">
+    <span class="project-btn-text">View Demo</span>
+</a>
+          </div>
+          <div class="project-visual">
+            <div class="laptop-wrap tilt-right-sm">
+              <div class="laptop">
+                <div class="laptop-body">
+                  <div class="laptop-screen"><img src="{% static 'images/projects/Pulseiq.png' %}"
+                      alt="PulseIQ Dashboard" loading="lazy"></div>
+                </div>
+                <div class="laptop-base"></div>
+              </div>
+              <div class="laptop-glow"></div>
+            </div>
+          </div>
+        </div>
+        <div class="project-item reverse reveal">
+          <div class="project-info">
+            <p class="project-index">04 — Global Trade Data</p>
+            <h3 class="project-title">TradeSphere</h3>
+            <p class="project-desc">A macro-focused global trade intelligence platform visualizing international trade
+              flows, supply chain dynamics, and economic indicators. HTMX-powered partial loads and smooth transitions
+              deliver an SPA-like analytical dashboard for strategic insights.</p>
+            <div class="project-tags">
+              <span class="project-tag">Django</span><span class="project-tag">HTMX</span>
+              <span class="project-tag">Chart.js</span><span class="project-tag">Alpine.js</span>
+            </div>
+            <a href="{% url 'trade_dashboard:dashboard' %}" target="_blank" class="project-btn">
+    <span class="project-btn-text">View Demo</span>
+</a>
+          </div>
+          <div class="project-visual">
+            <div class="laptop-wrap tilt-left-sm">
+              <div class="laptop">
+                <div class="laptop-body">
+                  <div class="laptop-screen"><img src="{% static 'images/projects/Tradesphere.png' %}"
+                      alt="TradeSphere Platform" loading="lazy"></div>
+                </div>
+                <div class="laptop-base"></div>
+              </div>
+              <div class="laptop-glow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
 
 
-  <!-- 🐞 Report a Bug -->
-  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Bug%20Report%20-%20Portfolio%20Website&body=Hi%20Punit,%0A%0AI%20found%20a%20bug%20on%20your%20portfolio%20website.%0A%0APage%3A%20%0AIssue%20Description%3A%20%0ASteps%20to%20Reproduce%3A%20%0AExpected%20Result%3A%20%0AActual%20Result%3A%20%0A%0AThanks."
-     target="_blank" class="btn-work">
-    🐞 Report a Bug
-  </a>
-</section>
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section">
+      <p class="section-label reveal">Get in touch</p>
+      <h2 class="section-title reveal" style="margin-bottom:28px">
+        <span class="section-title-typed" data-title="Contact">
+          <span class="title-text"></span><span class="title-cursor"></span>
+        </span>
+      </h2>
 
-<!-- 🚧 Work In Progress Modal -->
-<div id="wipModal" class="wip-modal">
-  <div class="wip-modal-content">
-    <span class="wip-close" onclick="closeWipModal()">&times;</span>
-    <h2>🚧 Project Under Development</h2>
-    <p>
-      This project is currently under active development.
-      I’m working on refining features, improving performance,
-      and ensuring a polished experience.
-    </p>
-    <p style="margin-top:10px;">
-      🔔 <strong>Coming soon!</strong> You’ll be able to explore this project shortly.
-    </p>
-    <button onclick="closeWipModal()">Got it 👍</button>
-  </div>
-</div>
+      <div class="contact-grid reveal">
+        <div class="contact-left">
+          <div class="contact-status">
+            <span class="contact-status-dot"></span>
+            <span class="contact-status-text">
+              <span class="contact-status-label">Current Status</span>
+              <span class="contact-status-value">Open to Freelance &amp; Collaboration</span>
+            </span>
+          </div>
+          <h2 class="contact-headline">Let's craft the<br>extraordinary.</h2>
+          <p class="contact-sub">Open to selective freelance opportunities and global collaborations. Drop a message or
+            reach out directly.</p>
+          <div class="contact-cards">
+
+            <!-- Email card — opens Gmail compose in new tab -->
+            <a id="emailCard"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=punitp0170@gmail.com&su=Let%27s%20Connect%20%E2%80%94%20Saw%20Your%20Portfolio&body=Hi%20Punit%2C%0A%0AI%20came%20across%20your%20portfolio%20and%20really%20liked%20your%20work.%0AI%27d%20love%20to%20connect%20and%20discuss%20how%20we%20might%20work%20together.%0A%0AP.S.%20Feel%20free%20to%20share%20any%20feedback%20on%20my%20portfolio%20or%20projects%20%E2%80%94%0Ait%20would%20really%20help%20me%20improve.%0A%0ARegards%2C%0A%5BYour%20Name%5D"
+              target="_blank" rel="noopener" class="contact-card">
+              <span class="contact-card-icon">
+                <svg viewBox="0 0 24 24">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <polyline points="2,4 12,13 22,4" />
+                </svg>
+              </span>
+              <span class="contact-card-body">
+                <span class="contact-card-label">Email</span>
+                <span class="contact-card-value">punitp0170@gmail.com</span>
+              </span>
+              <span class="contact-card-arrow">→</span>
+            </a>
 
 
-  <!-- Footer -->
+
+            <!-- WhatsApp card — unchanged -->
+            <a href="https://wa.me/917048856947?text=Hey%20I%20saw%20your%20portfolio.%20Can%20we%20discuss%3F"
+              target="_blank" rel="noopener" class="contact-card whatsapp">
+              <span class="contact-card-icon">
+                <svg viewBox="0 0 24 24" stroke="none" fill="#25d366">
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                  <path
+                    d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.849L.057 23.57a.5.5 0 00.614.614l5.721-1.471A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 01-5.079-1.393l-.364-.216-3.767.968.983-3.767-.233-.378A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                </svg>
+              </span>
+              <span class="contact-card-body">
+                <span class="contact-card-label">WhatsApp</span>
+                <span class="contact-card-value">+91 7048 856 947</span>
+              </span>
+              <span class="contact-card-arrow">→</span>
+            </a>
+
+          </div>
+        </div>
+
+        <div class="contact-right">
+          <p class="contact-right-title">Send a Message</p>
+          <!-- novalidate — all validation handled in JS -->
+          <form id="contactForm" novalidate>
+            <div class="form-group">
+              <input type="text" id="contactName" placeholder="Your name" class="form-input" required>
+              <span class="form-error-msg" id="nameError">Please enter your name</span>
+            </div>
+            <div class="form-group">
+              <input type="email" id="contactEmail" placeholder="Your email" class="form-input" required>
+              <span class="form-error-msg" id="emailError">Please enter a valid email address</span>
+            </div>
+            <div class="form-group-grow">
+              <textarea id="contactMessage" placeholder="Tell me about your project..." class="form-input"
+                required></textarea>
+              <span class="form-error-msg" id="messageError">Please write your message</span>
+            </div>
+            <button type="submit" class="form-submit">
+              <span>Send Message <span class="form-submit-arrow">→</span></span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
   <footer>
-    <p>© {% now "Y" %} Punit Patel | Designed with ❤️ and Django</p>
+    <div class="footer-inner">
+      <span class="footer-copy">© {% now "Y" %} Punit Patel — All rights reserved</span>
+      <a href="#home" class="footer-back"><span class="arrow-up">↑</span> Back to top</a>
+    </div>
   </footer>
 
+  <script src="{% static 'js/script.js' %}"></script>
+
 </body>
-<script>
-
-  function openWipModal(e) {
-    e.preventDefault();
-    document.getElementById("wipModal").style.display = "flex";
-  }
-
-  function closeWipModal() {
-    document.getElementById("wipModal").style.display = "none";
-  }
-
-  // Close modal on outside click
-  window.addEventListener("click", function (e) {
-    const modal = document.getElementById("wipModal");
-    if (e.target === modal) {
-      closeWipModal();
-    }
-  });
-
-  const sections = document.querySelectorAll("section");
-  const navLinks = document.querySelectorAll("nav a");
-
-  /* ================= ScrollSpy ================= */
-  function activateScrollSpy() {
-    let current = "";
-
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop - 120;
-      const sectionHeight = section.offsetHeight;
-
-      if (
-        window.scrollY >= sectionTop &&
-        window.scrollY < sectionTop + sectionHeight
-      ) {
-        current = section.getAttribute("id");
-      }
-    });
-
-    navLinks.forEach(link => {
-      link.classList.remove("active");
-      if (link.getAttribute("href") === "#" + current) {
-        link.classList.add("active");
-      }
-    });
-  }
-
-  window.addEventListener("scroll", activateScrollSpy);
-  window.addEventListener("load", activateScrollSpy);
-
-  /* ================= Slow Smooth Scroll ================= */
-  function smoothScrollTo(targetY, duration = 900) {
-    const startY = window.scrollY;
-    const diff = targetY - startY;
-    let startTime = null;
-
-    function step(timestamp) {
-      if (!startTime) startTime = timestamp;
-      const time = timestamp - startTime;
-      const percent = Math.min(time / duration, 1);
-
-      // easeInOut
-      const easing = percent < 0.5
-        ? 2 * percent * percent
-        : 1 - Math.pow(-2 * percent + 2, 2) / 2;
-
-      window.scrollTo(0, startY + diff * easing);
-
-      if (time < duration) {
-        requestAnimationFrame(step);
-      }
-    }
-
-    requestAnimationFrame(step);
-  }
-
-  navLinks.forEach(link => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-      const targetId = this.getAttribute("href").substring(1);
-      const targetSection = document.getElementById(targetId);
-      if (!targetSection) return;
-
-      const targetY = targetSection.offsetTop - 90;
-      smoothScrollTo(targetY, 800); // ⏱️ CHANGE THIS VALUE
-    });
-  });
-</script>
 
 </html>
