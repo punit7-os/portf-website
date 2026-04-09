@@ -111,11 +111,12 @@ pip install -r requirements.txt
 python manage.py runserver
 
 📬 Contact
+
 🌐 Portfolio: https://punitpatel.dev
 💼 LinkedIn: https://linkedin.com/in/punit-patel-40a12721a
 💻 GitHub: https://github.com/punit7-os
 
-his project demonstrates my ability to build, deploy, and manage full-stack Django applications in real-world environments.
+This project demonstrates my ability to build, deploy, and manage full-stack Django applications in real-world environments.
 
 I am open to:
 
