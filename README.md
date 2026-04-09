@@ -94,6 +94,32 @@ This project is deployed using:
 ## 🧪 Local Setup
 
 ### Clone Repository
-```bash
+
 git clone https://github.com/punit7-os/portf-website.git
 cd portf-website
+
+---
+
+### Create Virtual Environment
+
+python -m venv env
+source env/bin/activate   # Linux/Mac
+env\Scripts\activate      # Windows
+
+pip install -r requirements.txt
+
+python manage.py runserver
+
+📬 Contact
+🌐 Portfolio: https://punitpatel.dev
+💼 LinkedIn: https://linkedin.com/in/punit-patel-40a12721a
+💻 GitHub: https://github.com/punit7-os
+
+his project demonstrates my ability to build, deploy, and manage full-stack Django applications in real-world environments.
+
+I am open to:
+
+Full-stack Django roles
+Freelance projects
+SaaS/product development opportunities.
+
