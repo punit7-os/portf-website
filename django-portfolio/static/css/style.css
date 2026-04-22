@@ -2559,6 +2559,28 @@ footer {
 }
 
 @media(max-width:400px) {
+        .hero-content {
+        margin-top: 50px;
+        padding: 100px 20px 60px;
+        
+    }
+    
+    .hero-glow{
+        top: 36%;
+        width: 90vw;
+        left: 50%;
+        height: 50vh;
+        background: radial-gradient(ellipse, rgba(99, 102, 241, .36) 0%, rgba(99, 102, 241, .08) 40%, transparent 70%);
+    }
+    .cta-tagline{
+        gap: 140px;
+    }
+
+        .hero-cta {
+        padding: 12px 28px;
+        font-size: 11px;
+        letter-spacing: .6px;
+    }
     .hero-name {
         font-size: clamp(32px, 10vw, 44px);
         letter-spacing: -1px
